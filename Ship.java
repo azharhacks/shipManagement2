@@ -1,5 +1,7 @@
-public abstract class Ship {
-    protected String type;
+ //i will try to connect this class to the user class which will be the one to input the data
+           //find a way to store the info inputed by the user to the database   
+     public abstract class Ship {        
+    protected String type;            
     protected String location;
     protected String destination;
 
@@ -9,7 +11,7 @@ public abstract class Ship {
         this.destination = destination;
     }
 
-    public abstract String toString(); // Optional: enforce display contract
+    
 
     // Common behavior
     public void setLocation(String location) { this.location = location; }
