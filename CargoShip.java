@@ -6,6 +6,11 @@ public class CargoShip extends Ship {
         this.cargo = cargo;
     }
 
+    public CargoShip(String type, String location, String destination, double cargoCapacity) {
+        super(type, location, destination);
+        this.cargo = new Cargo(cargoCapacity);
+    }
+
     public Cargo getCargo() {
         return cargo;
     }

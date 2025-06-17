@@ -10,7 +10,10 @@ public class Cargo {
         this.ownerName = ownerName;
         this.items = new ArrayList<>();
     }
-//adding new or existing stock items
+public Cargo(double cargoCapacity) {
+        //TODO Auto-generated constructor stub
+    }
+    //adding new or existing stock items
     public void addItem(String name, int amount) {
         for (CargoItem item : items) {
             if (item.getName().equalsIgnoreCase(name)) {
