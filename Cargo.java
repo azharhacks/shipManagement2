@@ -10,7 +10,7 @@ public class Cargo {
         this.ownerName = ownerName;
         this.items = new ArrayList<>();
     }
-
+//adding new or existing stock items
     public void addItem(String name, int amount) {
         for (CargoItem item : items) {
             if (item.getName().equalsIgnoreCase(name)) {
@@ -20,7 +20,7 @@ public class Cargo {
         }
         items.add(new CargoItem(name, amount));
     }
-
+// removing stock items
     public boolean removeItem(String name, int amount) {
         for (CargoItem item : items) {
             if (item.getName().equalsIgnoreCase(name)) {
