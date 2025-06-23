@@ -14,6 +14,10 @@ public class Cargo {
         saveToDatabase();
     }
 
+    public Cargo(double cargoCapacity) {
+        //TODO Auto-generated constructor stub
+    }
+
     private void saveToDatabase() {
         String sql = "INSERT OR REPLACE INTO cargo (cargo_id, owner_name) VALUES (?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
