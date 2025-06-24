@@ -142,21 +142,36 @@
         });
 
         // Event listener for LOG IN button click
-        loginButton.addEventListener('click', () => {
-            const username = loginUsernameInput.value;
-            const password = loginPasswordInput.value;
+       // In firstpage.html, update the login button's click handler
+       <!-- In firstpage.html, update the login button's click handler -->
+loginButton.addEventListener('click', async () => {
+    const username = loginUsernameInput.value;
+    const password = loginPasswordInput.value;
 
-            // Simulate staff login: Replace with actual authentication logic
-            
-            if (username === 'staff' && password === 'password') {
-                alert('Login successful! Redirecting to staff dashboard.');
-                // Redirect to the staff dashboard page, passing the username as a query parameter
-                window.location.href = staffdashboard.html?username=${encodeURIComponent(username)};
-            } else {
-                alert('Invalid username or password. Please try again.');
-                signupLinkParagraph.classList.remove('hidden'); // Ensure link is visible on failed login
-            }
+    try {
+        const response = await fetch('http://localhost:4567/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password })
         });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Save the token in localStorage
+            localStorage.setItem('authToken', result.token);
+            // Redirect to dashboard with username
+            window.location.href = `index.html?username=${encodeURIComponent(username)}`;
+        } else {
+            alert(result.message || 'Login failed');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Error connecting to server');
+    }
+});
 
         // Event listener for SIGN UP button click
         signupSubmitButton.addEventListener('click', () => {
