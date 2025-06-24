@@ -40,7 +40,7 @@
                 </button>
             </div>
 
-            <div id="loginForm" class="w-full space-y-6">
+            <form id="loginForm" action="/api/login" method="POST">
                 <div class="flex items-center bg-white rounded-md shadow-sm p-3">
                     <svg class="w-6 h-6 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
@@ -62,7 +62,7 @@
                 <p id="signupLinkParagraph" class="text-center text-gray-700 text-sm mt-4">
                     Do not have account? <a href="#" id="switchToSignup" class="text-blue-600 hover:underline font-medium">Sign up here</a>
                 </p>
-            </div>
+            </form>
 
             <div id="signupForm" class="w-full space-y-6 hidden">
                 <div class="flex items-center bg-white rounded-md shadow-sm p-3">
@@ -142,36 +142,43 @@
         });
 
         // Event listener for LOG IN button click
-       // In firstpage.html, update the login button's click handler
-       <!-- In firstpage.html, update the login button's click handler -->
-loginButton.addEventListener('click', async () => {
-    const username = loginUsernameInput.value;
-    const password = loginPasswordInput.value;
+        loginButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const username = loginUsernameInput.value.trim();
+            const password = loginPasswordInput.value;
 
-    try {
-        const response = await fetch('http://localhost:4567/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password })
+            if (!username || !password) {
+                alert('Please enter both username and password');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+                console.log('Login response:', result);
+
+                if (result.status === 'success') {
+                    // Save the token in localStorage
+                    if (result.token) {
+                        localStorage.setItem('authToken', result.token);
+                    }
+                    // Redirect to dashboard with role
+                    window.location.href = `/dashboard?role=${result.role || 'user'}`;
+                } else {
+                    alert(result.message || 'Login failed. Please check your credentials.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Error connecting to server. Please try again.');
+            }
         });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            // Save the token in localStorage
-            localStorage.setItem('authToken', result.token);
-            // Redirect to dashboard with username
-            window.location.href = `index.html?username=${encodeURIComponent(username)}`;
-        } else {
-            alert(result.message || 'Login failed');
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        alert('Error connecting to server');
-    }
-});
 
         // Event listener for SIGN UP button click
         signupSubmitButton.addEventListener('click', () => {

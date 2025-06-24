@@ -1,17 +1,17 @@
+package com.shipmanagement;
 import java.util.ArrayList;
-//find a way to store the info inputed by the user to the database
+
 public class Schedule {
     private ArrayList<Ship> scheduledShips;
     public Schedule() {
         scheduledShips = new ArrayList<>();
     }
 
-    // Add any type of ship (CargoShip or PassengerShip)
     public void addShip(Ship ship) {
         scheduledShips.add(ship);
     }
 
-    // Show all scheduled ships
+    
     public void displaySchedule() {
         System.out.println("Ship Schedule:");
         for (int i = 0; i < scheduledShips.size(); i++) {

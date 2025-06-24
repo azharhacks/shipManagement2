@@ -1,11 +1,11 @@
-           //find a way to store the info inputed by the user to the database   
+           package com.shipmanagement;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public abstract class Ship {   
+public abstract class Ship implements ShipInterface {   
     protected int id; // Unique identifier for the ship
     protected String type;            
     protected String location;
@@ -17,15 +17,29 @@ public abstract class Ship {
         this.destination = destination;
     }
 
-    //getters amd setters public int getId() { return id; }
+    // Getters and setters
+    @Override
+    public int getId() { return id; }
+    
+    @Override
     public void setId(int id) { this.id = id; }
+    
+    @Override
     public String getLocation() { return location; }
+    
+    @Override
     public void setLocation(String location) { this.location = location; }
+    
+    @Override
     public String getDestination() { return destination; }
+    
+    @Override
     public void setDestination(String destination) { this.destination = destination; }
+    
+    @Override
     public String getType() { return type; }
 
-    //database methods
+    // Database methods
     public void save(){
         if (id == 0) {
             // Insert new ship into the database
@@ -48,10 +62,20 @@ public abstract class Ship {
         } else {
             // Update existing ship
             String sql = "UPDATE ships SET location = ?, destination = ? WHERE id = ?";
-            DatabaseHelper.executeUpdate(sql, location, destination, id);
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, location);
+                pstmt.setString(2, destination);
+                pstmt.setInt(3, id);
+                pstmt.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println("Error updating ship: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
-   public static Ship findById(int id) {
+
+    public static Ship findById(int id) {
         String sql = "SELECT * FROM ships WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -84,7 +108,14 @@ public abstract class Ship {
     public void delete() {
         if (id != 0) {
             String sql = "DELETE FROM ships WHERE id = ?";
-            DatabaseHelper.executeUpdate(sql, id);
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, id);
+                pstmt.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println("Error deleting ship: " + e.getMessage());
+                e.printStackTrace();
+            }
             this.id = 0;
         }
     }

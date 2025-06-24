@@ -1,3 +1,5 @@
+package com.shipmanagement;
+
 public class CargoItem {
     private String name;
     private int amount;
@@ -7,32 +9,26 @@ public class CargoItem {
         this.amount = amount;
     }
 
-    
+    // Getters and setters
     public String getName() {
         return name;
     }
-    
-    public void addAmount(int amount) {
-        this.amount += amount;
+
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void removeAmount(int amount) {
-        if (this.amount >= amount) {
-            this.amount -= amount;
-        } else {
-            
-            System.out.println("Cannot remove more than available amount.");
-        }
-    }
-
-    
     public int getAmount() {
         return amount;
     }
 
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
     // Optional: toString() is used when you print the item
+    @Override
     public String toString() {
         return name + " - " + amount;
     }
 }
-

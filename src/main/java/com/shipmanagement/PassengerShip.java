@@ -1,3 +1,4 @@
+package com.shipmanagement;
 public class PassengerShip extends Ship {
     private int passengers;
 

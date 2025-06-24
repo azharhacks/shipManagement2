@@ -1,3 +1,5 @@
+package com.shipmanagement;
+
 public class CargoShip extends Ship {
     private Cargo cargo;
 
@@ -21,8 +23,7 @@ public class CargoShip extends Ship {
 
     @Override
     public String toString() {
-        return "CargoShip traveling from " + location + " to " + destination +
-               " carrying " + cargo.getTotalCargo() + " units of goods.";
+        return "CargoShip traveling from " + getLocation() + " to " + getDestination() +
+               " with cargo capacity: " + cargo.getCapacity();
     }
 }
-
