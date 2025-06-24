@@ -35,59 +35,139 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        // Configure server
-        port(8080);
+        // Initialize database
+        DatabaseConnection.getConnection();
+        
+        // Enable CORS
+        enableCORS();
+        
+        // Serve static files from public directory
         staticFiles.location("/public");
         
-        // Enable CORS for development
-        before((req, res) -> {
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Request-Method", "*");
-            res.header("Access-Control-Allow-Headers", "*");
-            res.header("Access-Control-Allow-Credentials", "true");
-            res.type("application/json");
-        });
-
-        // Handle preflight requests
-        options("/*", (req, res) -> {
-            return "OK";
-        });
-
-        // Login endpoint - handle JSON POST requests
+        // JSON transformer
+        Gson gson = new Gson();
+        
+        // Login endpoint
         post("/api/login", (req, res) -> {
             try {
-                // Parse JSON body
-                String body = req.body();
-                String username = null;
-                String password = null;
+                Map<String, String> credentials = gson.fromJson(req.body(), Map.class);
+                String username = credentials.get("username");
+                String password = credentials.get("password");
                 
-                // Simple JSON parsing
-                if (body != null && body.contains("{")) {
-                    username = body.replaceAll(".*\"username\"\\s*:\\s*\"([^\"]+)\".*", "$1");
-                    password = body.replaceAll(".*\"password\"\\s*:\\s*\"([^\"]+)\".*", "$1");
-                }
-                
-                System.out.println("Login attempt - Username: " + username);
-                
-                User user = USERS.get(username);
-                if (user != null && user.password.equals(password)) {
-                    System.out.println("Login successful for user: " + username);
-                    // Create a simple token (in a real app, use JWT or similar)
-                    String token = username + ":" + System.currentTimeMillis();
-                    return "{\"status\":\"success\", \"token\":\"" + token + "\", \"role\":\"" + user.role + "\"}";
+                DatabaseConnection.User user = DatabaseConnection.authenticateUser(username, password);
+                if (user != null) {
+                    // Create session
+                    req.session(true);
+                    req.session().attribute("username", username);
+                    req.session().attribute("role", user.getRole());
+                    
+                    // Create response
+                    Map<String, String> response = new HashMap<>();
+                    response.put("status", "success");
+                    response.put("role", user.getRole());
+                    response.put("message", "Login successful");
+                    return gson.toJson(response);
                 } else {
-                    System.out.println("Login failed - Invalid credentials for user: " + username);
                     res.status(401);
-                    return "{\"status\":\"error\", \"message\":\"Invalid username or password\"}";
+                    return "{\"status\":\"error\",\"message\":\"Invalid credentials\"}";
                 }
             } catch (Exception e) {
-                System.err.println("Login error: " + e.getMessage());
                 e.printStackTrace();
                 res.status(500);
-                return "{\"status\":\"error\", \"message\":\"Internal server error\"}";
+                return "{\"status\":\"error\",\"message\":\"Server error\"}";
             }
         });
-
+        
+        // Create report endpoint
+        post("/api/reports", (req, res) -> {
+            try {
+                // Check authentication
+                if (req.session().attribute("username") == null) {
+                    res.status(401);
+                    return "{\"status\":\"error\",\"message\":\"Not authenticated\"}";
+                }
+                
+                Map<String, String> reportData = gson.fromJson(req.body(), Map.class);
+                String title = reportData.get("title");
+                String content = reportData.get("content");
+                String createdBy = req.session().attribute("username");
+                
+                if (title == null || title.trim().isEmpty() || content == null || content.trim().isEmpty()) {
+                    res.status(400);
+                    return "{\"status\":\"error\",\"message\":\"Title and content are required\"}";
+                }
+                
+                // Save report to database
+                boolean success = DatabaseConnection.addReport(title, content, createdBy);
+                
+                if (success) {
+                    return "{\"status\":\"success\",\"message\":\"Report created successfully\"}";
+                } else {
+                    res.status(500);
+                    return "{\"status\":\"error\",\"message\":\"Failed to create report\"}";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                res.status(500);
+                return "{\"status\":\"error\",\"message\":\"Server error\"}";
+            }
+        });
+        
+        // Add user endpoint (admin only)
+        post("/api/users", (req, res) -> {
+            try {
+                // Check if user is admin
+                if (!"admin".equals(req.session().attribute("role"))) {
+                    res.status(403);
+                    return "{\"status\":\"error\",\"message\":\"Unauthorized\"}";
+                }
+                
+                Map<String, String> userData = gson.fromJson(req.body(), Map.class);
+                String username = userData.get("username");
+                String password = userData.get("password");
+                String role = userData.get("role");
+                
+                if (username == null || password == null || role == null) {
+                    res.status(400);
+                    return "{\"status\":\"error\",\"message\":\"Username, password, and role are required\"}";
+                }
+                
+                // Add user to database
+                boolean success = DatabaseConnection.addUser(username, password, role);
+                
+                if (success) {
+                    return "{\"status\":\"success\",\"message\":\"User created successfully\"}";
+                } else {
+                    res.status(400);
+                    return "{\"status\":\"error\",\"message\":\"Username already exists\"}";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                res.status(500);
+                return "{\"status\":\"error\",\"message\":\"Server error\"}";
+            }
+        });
+        
+        // Get current user info
+        get("/api/me", (req, res) -> {
+            String username = req.session().attribute("username");
+            if (username == null) {
+                res.status(401);
+                return "";
+            }
+            
+            Map<String, String> userInfo = new HashMap<>();
+            userInfo.put("username", username);
+            userInfo.put("role", req.session().attribute("role"));
+            return gson.toJson(userInfo);
+        });
+        
+        // Logout endpoint
+        post("/api/logout", (req, res) -> {
+            req.session().invalidate();
+            return "{\"status\":\"success\",\"message\":\"Logged out successfully\"}";
+        });
+        
         // Crew Management Endpoints
         get("/api/crew", (req, res) -> {
             try {
@@ -137,37 +217,6 @@ public class Main {
             }
         });
 
-        post("/api/reports/create", (req, res) -> {
-            try {
-                String body = req.body();
-                Gson gson = new GsonBuilder().create();
-                Map<String, String> data = gson.fromJson(body, Map.class);
-                String username = req.session().attribute("username");
-                
-                if (username == null) {
-                    res.status(401);
-                    return "{\"status\":\"error\", \"message\":\"Not authenticated\"}";
-                }
-                
-                boolean success = DatabaseConnection.addReport(
-                    data.get("title"),
-                    data.get("content"),
-                    username
-                );
-                
-                if (success) {
-                    return "{\"status\":\"success\", \"message\":\"Report created successfully\"}";
-                } else {
-                    res.status(400);
-                    return "{\"status\":\"error\", \"message\":\"Failed to create report\"}";
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                res.status(500);
-                return "{\"status\":\"error\", \"message\":\"Server error\"}";
-            }
-        });
-
         // Dashboard route - serve the dashboard HTML
         get("/dashboard", (req, res) -> {
             String role = req.queryParams("role");
@@ -205,9 +254,27 @@ public class Main {
             return null;
         });
 
-        System.out.println("Server running at http://localhost:8080");
-        System.out.println("Available users:");
-        System.out.println("Admin: username=admin, password=password123");
-        System.out.println("User:  username=user1, password=user123");
+        // Start server
+        port(4567);
+        System.out.println("Server running on http://localhost:4567");
+    }
+    
+    private static void enableCORS() {
+        options("/*", (request, response) -> {
+            String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
+            if (accessControlRequestHeaders != null) {
+                response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
+            }
+            String accessControlRequestMethod = request.headers("Access-Control-Request-Method");
+            if (accessControlRequestMethod != null) {
+                response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
+            }
+            return "OK";
+        });
+        before((request, response) -> {
+            response.header("Access-Control-Allow-Origin", "*");
+            response.header("Access-Control-Request-Method", "*");
+            response.type("application/json");
+        });
     }
 }

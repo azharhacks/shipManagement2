@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class DatabaseConnection {
     private static final String DB_URL = "jdbc:sqlite:ships.db";
     private static Connection connection = null;
@@ -76,6 +78,11 @@ public class DatabaseConnection {
                 "    UNIQUE(cargo_id, name)\n" +
                 ")");
 
+            stmt.execute("CREATE TABLE IF NOT EXISTS users (\n" +
+                "    username TEXT PRIMARY KEY,\n" +
+                "    password TEXT NOT NULL,\n" +
+                "    role TEXT NOT NULL\n" +
+                ")");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -147,6 +154,38 @@ public class DatabaseConnection {
         return reports;
     }
 
+    public static boolean addUser(String username, String password, String role) {
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+        try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, hashedPassword);
+            pstmt.setString(3, role);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static User authenticateUser(String username, String password) {
+        String sql = "SELECT password, role FROM users WHERE username = ?";
+        try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String hashedPassword = rs.getString("password");
+                if (BCrypt.checkpw(password, hashedPassword)) {
+                    return new User(hashedPassword, rs.getString("role"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -156,6 +195,24 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             System.err.println("Error closing connection: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    public static class User {
+        private String password;
+        private String role;
+
+        public User(String password, String role) {
+            this.password = password;
+            this.role = role;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public String getRole() {
+            return role;
         }
     }
 }
