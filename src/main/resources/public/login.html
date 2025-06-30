@@ -10,25 +10,22 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Custom background image - using the ship image */
         .bg-login-image {
-            background-image: url('https://placehold.co/1920x1080/4A6B8A/FFFFFF?text=Background+Image'); /* Placeholder image - Replace with your actual ship image URL */
+            background-image: url('https://placehold.co/1920x1080/4A6B8A/FFFFFF?text=Background+Image');
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat; /* Ensure image doesn't repeat */
+            background-repeat: no-repeat;
         }
-        /* Hide scrollbar for aesthetic purposes */
         body::-webkit-scrollbar {
             display: none;
         }
         body {
-            -ms-overflow-style: none; /* IE and Edge */
-            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
 <body class="h-screen w-screen flex items-center justify-center bg-login-image">
-
     <div class="relative w-full h-full flex items-center justify-center p-4">
         <div class="bg-gray-200 bg-opacity-90 rounded-xl shadow-lg p-8 md:p-12 max-w-md w-full flex flex-col items-center">
             <div class="flex w-full mb-8">
@@ -40,159 +37,189 @@
                 </button>
             </div>
 
-            <form id="loginForm" action="/api/login" method="POST">
-                <div class="flex items-center bg-white rounded-md shadow-sm p-3">
-                    <svg class="w-6 h-6 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <!-- Login Form -->
+            <form id="loginForm" class="w-full">
+                <div class="flex items-center bg-white rounded-md shadow-sm p-3 mb-3">
+                    <svg class="w-6 h-6 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
                     </svg>
-                    <input type="text" id="loginUsername" placeholder="USERNAME" class="flex-1 bg-black text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="text" id="loginUsername" placeholder="USERNAME" class="flex-1 bg-black text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 </div>
 
-                <div class="flex items-center bg-white rounded-md shadow-sm p-3">
-                    <svg class="w-6 h-6 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <div class="flex items-center bg-white rounded-md shadow-sm p-3 mb-4">
+                    <svg class="w-6 h-6 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2h2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2h2zm2-2v2h6V7a3 3 0 00-6 0z" clip-rule="evenodd"></path>
                     </svg>
-                    <input type="password" id="loginPassword" placeholder="PASSWORD" class="flex-1 bg-black text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="password" id="loginPassword" placeholder="PASSWORD" class="flex-1 bg-black text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 </div>
 
-                <button id="loginButton" class="w-full bg-black text-white py-3 rounded-md font-semibold text-lg hover:bg-gray-800 transition-colors duration-300">
+                <button type="submit" class="w-full bg-black text-white py-3 rounded-md font-semibold text-lg hover:bg-gray-800 transition-colors duration-300">
                     LOG IN
                 </button>
 
-                <p id="signupLinkParagraph" class="text-center text-gray-700 text-sm mt-4">
-                    Do not have account? <a href="#" id="switchToSignup" class="text-blue-600 hover:underline font-medium">Sign up here</a>
-                </p>
+                <p id="loginMessage" class="text-center text-sm mt-4 hidden"></p>
             </form>
 
-            <div id="signupForm" class="w-full space-y-6 hidden">
-                <div class="flex items-center bg-white rounded-md shadow-sm p-3">
-                    <svg class="w-6 h-6 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <!-- Signup Form -->
+            <form id="signupForm" onsubmit="handleSignup(event)" class="w-full hidden">
+                <div class="flex items-center bg-white rounded-md shadow-sm p-3 mb-3">
+                    <svg class="w-6 h-6 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
                     </svg>
-                    <input type="text" placeholder="USERNAME" class="flex-1 bg-black text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="text" id="signupUsername" placeholder="USERNAME" class="flex-1 bg-black text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 </div>
 
-                <div class="flex items-center bg-white rounded-md shadow-sm p-3">
-                    <svg class="w-6 h-6 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <div class="flex items-center bg-white rounded-md shadow-sm p-3 mb-3">
+                    <svg class="w-6 h-6 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2h2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2h2zm2-2v2h6V7a3 3 0 00-6 0z" clip-rule="evenodd"></path>
                     </svg>
-                    <input type="password" placeholder="PASSWORD" class="flex-1 bg-black text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="password" id="signupPassword" placeholder="PASSWORD" class="flex-1 bg-black text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 </div>
 
-                <div class="flex items-center bg-white rounded-md shadow-sm p-3">
-                    <svg class="w-6 h-6 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <div class="flex items-center bg-white rounded-md shadow-sm p-3 mb-4">
+                    <svg class="w-6 h-6 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2h2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2h2zm2-2v2h6V7a3 3 0 00-6 0z" clip-rule="evenodd"></path>
                     </svg>
-                    <input type="password" placeholder="CONFIRM PASSWORD" class="flex-1 bg-black text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="password" id="confirmPassword" placeholder="CONFIRM PASSWORD" class="flex-1 bg-black text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 </div>
 
-                <button id="signupSubmitButton" class="w-full bg-black text-white py-3 rounded-md font-semibold text-lg hover:bg-gray-800 transition-colors duration-300">
+                <button type="submit" class="w-full bg-black text-white py-3 rounded-md font-semibold text-lg hover:bg-gray-800 transition-colors duration-300">
                     SIGN UP
                 </button>
-                <p id="signupProcessingMessage" class="hidden text-center text-gray-700 text-sm mt-4">Processing...</p>
-            </div>
+
+                <p id="signupMessage" class="text-center text-sm mt-4 hidden"></p>
+            </form>
         </div>
     </div>
 
     <script>
+        // DOM Elements
         const loginTab = document.getElementById('loginTab');
         const signupTab = document.getElementById('signupTab');
         const loginForm = document.getElementById('loginForm');
         const signupForm = document.getElementById('signupForm');
-        const switchToSignupLink = document.getElementById('switchToSignup');
-        const signupLinkParagraph = document.getElementById('signupLinkParagraph');
-        const loginButton = document.getElementById('loginButton');
-        const signupSubmitButton = document.getElementById('signupSubmitButton');
-        const signupProcessingMessage = document.getElementById('signupProcessingMessage');
+        const loginMessage = document.getElementById('loginMessage');
+        const signupMessage = document.getElementById('signupMessage');
 
-        // Added IDs for input fields to easily get their values
-        const loginUsernameInput = document.getElementById('loginUsername');
-        const loginPasswordInput = document.getElementById('loginPassword');
-
-
-        // Function to show login form and hide signup form
+        // Show login form
         function showLoginForm() {
-            loginForm.classList.remove('hidden');
-            signupForm.classList.add('hidden');
             loginTab.classList.add('bg-black', 'text-white');
             loginTab.classList.remove('text-gray-700', 'hover:bg-gray-300');
             signupTab.classList.remove('bg-black', 'text-white');
             signupTab.classList.add('text-gray-700', 'hover:bg-gray-300');
-            signupLinkParagraph.classList.remove('hidden');
-            signupSubmitButton.classList.remove('hidden');
-            signupProcessingMessage.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            signupForm.classList.add('hidden');
         }
 
-        // Function to show signup form and hide login form
+        // Show signup form
         function showSignupForm() {
-            signupForm.classList.remove('hidden');
-            loginForm.classList.add('hidden');
             signupTab.classList.add('bg-black', 'text-white');
             signupTab.classList.remove('text-gray-700', 'hover:bg-gray-300');
             loginTab.classList.remove('bg-black', 'text-white');
             loginTab.classList.add('text-gray-700', 'hover:bg-gray-300');
+            signupForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
         }
 
-        // Event listeners for tab clicks
-        loginTab.addEventListener('click', showLoginForm);
-        signupTab.addEventListener('click', showSignupForm);
-        switchToSignupLink.addEventListener('click', (e) => {
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            showSignupForm();
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorElement = document.getElementById('loginMessage');
+            
+            // Show loading state
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Signing in...';
+            
+            // Send login request
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',  // This is important for sending/receiving cookies
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Redirect to the appropriate dashboard based on user role
+                    window.location.href = data.redirect || '/dashboard';
+                } else {
+                    // Show error message
+                    errorElement.textContent = data.message || 'Login failed. Please try again.';
+                    errorElement.className = 'text-center text-red-600 text-sm mt-4';
+                    errorElement.classList.remove('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                errorElement.textContent = 'An error occurred. Please try again.';
+                errorElement.className = 'text-center text-red-600 text-sm mt-4';
+                errorElement.classList.remove('hidden');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            });
         });
 
-        // Event listener for LOG IN button click
-        loginButton.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const username = loginUsernameInput.value.trim();
-            const password = loginPasswordInput.value;
+        // Handle signup form submission
+        async function handleSignup(event) {
+            event.preventDefault();
+            const username = document.getElementById('signupUsername').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
 
-            if (!username || !password) {
-                alert('Please enter both username and password');
+            if (password !== confirmPassword) {
+                signupMessage.textContent = "Passwords don't match!";
+                signupMessage.className = 'text-center text-red-600 text-sm mt-4';
+                signupMessage.classList.remove('hidden');
                 return;
             }
 
+            signupMessage.textContent = 'Creating account...';
+            signupMessage.className = 'text-center text-blue-600 text-sm mt-4';
+            signupMessage.classList.remove('hidden');
+
             try {
-                const response = await fetch('/api/login', {
+                const response = await fetch('/api/signup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ username, password, confirmPassword })
                 });
 
                 const result = await response.json();
-                console.log('Login response:', result);
-
+                
                 if (result.status === 'success') {
-                    // Save the token in localStorage
-                    if (result.token) {
-                        localStorage.setItem('authToken', result.token);
-                    }
-                    // Redirect to dashboard with role
-                    window.location.href = `/dashboard?role=${result.role || 'user'}`;
+                    signupMessage.textContent = 'Account created successfully! Please log in.';
+                    signupMessage.className = 'text-center text-green-600 text-sm mt-4';
+                    setTimeout(showLoginForm, 1500);
                 } else {
-                    alert(result.message || 'Login failed. Please check your credentials.');
+                    signupMessage.textContent = result.message || 'Signup failed. Please try again.';
+                    signupMessage.className = 'text-center text-red-600 text-sm mt-4';
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                alert('Error connecting to server. Please try again.');
+                console.error('Signup error:', error);
+                signupMessage.textContent = 'Error connecting to server. Please try again.';
+                signupMessage.className = 'text-center text-red-600 text-sm mt-4';
             }
-        });
+        }
 
-        // Event listener for SIGN UP button click
-        signupSubmitButton.addEventListener('click', () => {
-            signupSubmitButton.classList.add('hidden');
-            signupProcessingMessage.classList.remove('hidden');
-            alert('Sign Up button clicked! (Processing message shown)');
-            // Simulate a delay for processing, then redirect back to login
-            setTimeout(() => {
-                alert('Sign Up complete! You can now log in.');
-                showLoginForm();
-            }, 2000); // 2-second delay
-        });
+        // Event listeners
+        loginTab.addEventListener('click', showLoginForm);
+        signupTab.addEventListener('click', showSignupForm);
 
-        // Initialize with login form visible
+        // Show login form by default
         showLoginForm();
     </script>
 </body>

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Ship Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: #2c3e50;
+            color: white;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 5px 0;
+            border-radius: 5px;
+            padding: 10px 15px;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: #3498db;
+            color: white;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        .main-content {
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .welcome-card {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .quick-actions .btn {
+            margin: 5px;
+            min-width: 150px;
+        }
+        #sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .navbar-toggler {
+            padding: 0.5rem;
+            font-size: 1.25rem;
+            border: none;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 767.98px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -250px;
+                width: 250px;
+                z-index: 1000;
+                height: 100%;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .main-content {
+                width: 100%;
+                margin-left: 0;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .navbar-toggler {
+                display: none;
+            }
+            .sidebar {
+                position: sticky;
+                top: 0;
+                height: 100vh;
+            }
+        }
+        
+        /* Content sections */
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-overlay"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Mobile navbar -->
+            <nav class="navbar navbar-light bg-light d-md-none">
+                <div class="container-fluid">
+                    <button class="navbar-toggler" type="button" id="sidebarToggle">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <span class="navbar-brand mb-0 h1">Ship Portal</span>
+                </div>
+            </nav>
+            
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar" id="sidebar">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4>Ship Portal</h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#dashboard" data-section="dashboard-section">
+                                <i class="bi bi-house-door"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="ships.html">
+                                <i class="bi bi-ship"></i> View Ships
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#bookings" data-section="bookings-section">
+                                <i class="bi bi-calendar-check"></i> My Bookings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#settings" data-section="settings-section">
+                                <i class="bi bi-gear"></i> Settings
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link text-danger" href="#" id="logout-link">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="content-section active">
+                    <div class="welcome-card">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h2>Welcome back, <span id="user-name">User</span>!</h2>
+                                <p class="mb-0">Here's what's happening with your account today.</p>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <i class="bi bi-person-circle" style="font-size: 4rem; opacity: 0.8;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h4>Quick Actions</h4>
+                            <div class="d-flex flex-wrap quick-actions">
+                                <a href="ships.html" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Find a Ship
+                                </a>
+                                <a href="#bookings" class="btn btn-success section-link" data-section="bookings-section">
+                                    <i class="bi bi-calendar-plus"></i> New Booking
+                                </a>
+                                <a href="#" class="btn btn-info text-white">
+                                    <i class="bi bi-clock-history"></i> Recent Trips
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <i class="bi bi-activity"></i> Recent Activity
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle"></i> No recent activity to show.
+                                    </div>
+                                    <!-- Activity items will be loaded here -->
+                                    <div id="recent-activity"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bookings Section -->
+                <div id="bookings-section" class="content-section">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h4><i class="bi bi-calendar-check"></i> My Bookings</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> You don't have any bookings yet. 
+                                <a href="ships.html" class="alert-link">Browse ships</a> to make your first booking.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Section -->
+                <div id="settings-section" class="content-section">
+                    <div class="card">
+                        <div class="card-header bg-secondary text-white">
+                            <h4><i class="bi bi-gear"></i> Account Settings</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="settings-form">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="username" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="current-password" class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" id="current-password" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-password" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="new-password" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirm-password" class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="confirm-password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const navLinks = document.querySelectorAll('.nav-link[data-section]');
+        const sectionLinks = document.querySelectorAll('.section-link');
+        const contentSections = document.querySelectorAll('.content-section');
+        const settingsForm = document.getElementById('settings-form');
+        
+        // Toggle sidebar on mobile
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+                sidebarOverlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
+            });
+        }
+        
+        // Close sidebar when clicking outside
+        sidebarOverlay.addEventListener('click', function() {
+            sidebar.classList.remove('show');
+            sidebarOverlay.style.display = 'none';
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('show');
+                sidebarOverlay.style.display = 'none';
+            }
+        });
+        
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            contentSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show the selected section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Update active nav link
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-section') === sectionId) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Close sidebar on mobile after navigation
+            if (window.innerWidth < 768) {
+                sidebar.classList.remove('show');
+                sidebarOverlay.style.display = 'none';
+            }
+        }
+        
+        // Add click event to nav links
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.getAttribute('href').startsWith('#')) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    showSection(sectionId);
+                }
+            });
+        });
+        
+        // Add click event to section links
+        sectionLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+        
+        // Settings form submission
+        if (settingsForm) {
+            settingsForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                if (newPassword !== confirmPassword) {
+                    alert('New passwords do not match!');
+                    return;
+                }
+                
+                // Send password change request to API
+                fetch('/api/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        currentPassword: currentPassword,
+                        newPassword: newPassword
+                    }),
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Show success message
+                        alert('Password updated successfully!');
+                        // Reset form
+                        this.reset();
+                    } else {
+                        // Show error message
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating your password. Please try again.');
+                });
+            });
+        }
+
+        // Check authentication and load user data
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/check-auth')
+                .then(response => {
+                    if (!response.ok) {
+                        window.location.href = '/login.html';
+                        throw new Error('Not authenticated');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Redirect to admin dashboard if user is admin
+                    if (data.role === 'admin') {
+                        window.location.href = '/admin-dashboard.html';
+                        return;
+                    }
+                    
+                    // Set user name
+                    if (data.username) {
+                        document.getElementById('user-name').textContent = data.username;
+                        if (document.getElementById('username')) {
+                            document.getElementById('username').value = data.username;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    window.location.href = '/login.html';
+                });
+        });
+
+        // Logout functionality
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            fetch('/api/logout', {
+                method: 'POST',
+                credentials: 'same-origin'
+            })
+            .then(() => {
+                window.location.href = '/login.html';
+            });
+        });
+    </script>
+</body>
+</html>
