@@ -119,4 +119,7 @@ public abstract class Ship implements ShipInterface {
             this.id = 0;
         }
     }
+     public String toString() {
+        return "CargoShip traveling from " + getLocation() ;
+    }
 }
