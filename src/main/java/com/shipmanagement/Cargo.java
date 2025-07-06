@@ -3,8 +3,8 @@ package com.shipmanagement;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import com.shipmanagement.CargoItem;
-import com.shipmanagement.DatabaseConnection;
+
+
 
 public class Cargo {
     private String cargoId;
