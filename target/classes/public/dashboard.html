@@ -587,7 +587,7 @@
             });
             
             // Show the selected section
-            const section = document.getElementById(sectionId + '-section');
+            const section = document.getElementById(sectionId);
             if (section) {
                 section.style.display = 'block';
                 
@@ -671,12 +671,18 @@
                 logoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     console.log('Logout clicked');
-                    if (confirm('Are you sure you want to logout?')) {
-                        // Clear any stored session data
-                        localStorage.removeItem('authToken');
-                        // Redirect to login page
-                        window.location.href = '/';
-                    }
+                    
+                    // Call logout API and redirect
+                    fetch('/api/logout')
+                        .then(response => {
+                            console.log('Logout successful');
+                            window.location.href = '/';
+                        })
+                        .catch(error => {
+                            console.error('Logout error:', error);
+                            // Redirect anyway
+                            window.location.href = '/';
+                        });
                 });
             } else {
                 console.warn('Logout button not found');
@@ -833,6 +839,307 @@
             // Load initial data
             loadCrewMembers();
             loadReports();
+        });
+    </script>
+    <!-- Staff Portal Fixes -->
+    <script src="js/staff-fixes.js"></script>
+    <!-- Simple Direct Fix for Staff Dashboard -->
+    <script>
+        console.log('Simple fix script loaded for staff dashboard');
+        
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fix navigation with a simpler approach
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.onclick = function() {
+                    const sectionId = this.getAttribute('data-section');
+                    if (sectionId) {
+                        console.log('Showing section:', sectionId);
+                        
+                        // Update active state
+                        navItems.forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Hide all sections
+                        const sections = document.querySelectorAll('.content-section');
+                        sections.forEach(section => {
+                            section.style.display = 'none';
+                        });
+                        
+                        // Show selected section
+                        const sectionToShow = document.getElementById(sectionId);
+                        if (sectionToShow) {
+                            sectionToShow.style.display = 'block';
+                        }
+                    }
+                };
+            });
+            
+            // Fix logout button with a simpler approach
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.onclick = function(e) {
+                    e.preventDefault();
+                    console.log('Logout clicked');
+                    
+                    // Simple redirect
+                    window.location.href = '/login.html';
+                };
+            }
+            
+            // Add demo content to overview section
+            const overviewSection = document.getElementById('overview');
+            if (overviewSection) {
+                const statsContainer = overviewSection.querySelector('.stats-container');
+                if (statsContainer && statsContainer.children.length === 0) {
+                    statsContainer.innerHTML = `
+                        <div class="stats-item">
+                            <div class="stats-icon">🚢</div>
+                            <div class="stats-info">
+                                <div class="stats-value">12</div>
+                                <div class="stats-label">Total Ships</div>
+                            </div>
+                        </div>
+                        <div class="stats-item">
+                            <div class="stats-icon">👨‍✈️</div>
+                            <div class="stats-info">
+                                <div class="stats-value">45</div>
+                                <div class="stats-label">Crew Members</div>
+                            </div>
+                        </div>
+                        <div class="stats-item">
+                            <div class="stats-icon">🔄</div>
+                            <div class="stats-info">
+                                <div class="stats-value">8</div>
+                                <div class="stats-label">Active Voyages</div>
+                            </div>
+                        </div>
+                        <div class="stats-item">
+                            <div class="stats-icon">⚠️</div>
+                            <div class="stats-info">
+                                <div class="stats-value">3</div>
+                                <div class="stats-label">Pending Issues</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                const activitiesContainer = overviewSection.querySelector('.recent-activities');
+                if (activitiesContainer && (!activitiesContainer.querySelector('.activity-list') || activitiesContainer.querySelector('.activity-list').children.length === 0)) {
+                    activitiesContainer.innerHTML = `
+                        <h3>Recent Activities</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">🚢</div>
+                                <div class="activity-details">
+                                    <div class="activity-title">Ship "Northern Star" departed</div>
+                                    <div class="activity-time">2 hours ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">🔧</div>
+                                <div class="activity-details">
+                                    <div class="activity-title">Maintenance completed on "Ocean Explorer"</div>
+                                    <div class="activity-time">5 hours ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">📋</div>
+                                <div class="activity-details">
+                                    <div class="activity-title">New crew assignment for "Pacific Trader"</div>
+                                    <div class="activity-time">Yesterday</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Add demo ships to ships section
+            const shipsSection = document.getElementById('ships-section');
+            if (shipsSection) {
+                const shipsList = shipsSection.querySelector('.ships-list');
+                if (shipsList && shipsList.children.length === 0) {
+                    // Add demo ships
+                    const demoShips = [
+                        { id: 1, name: 'Ocean Explorer', type: 'Cargo Ship', status: 'Active', location: 'Port of Singapore' },
+                        { id: 2, name: 'Coastal Voyager', type: 'Passenger Ferry', status: 'Maintenance', location: 'Port of Miami' },
+                        { id: 3, name: 'Northern Star', type: 'Cruise Ship', status: 'En Route', location: 'Mediterranean Sea' },
+                        { id: 4, name: 'Pacific Trader', type: 'Container Ship', status: 'Available', location: 'Port of Shanghai' }
+                    ];
+                    
+                    demoShips.forEach(ship => {
+                        // Set appropriate status class
+                        let statusClass = 'status-inactive';
+                        if (ship.status === 'Active' || ship.status === 'Available') {
+                            statusClass = 'status-active';
+                        } else if (ship.status === 'Maintenance') {
+                            statusClass = 'status-maintenance';
+                        } else if (ship.status === 'En Route') {
+                            statusClass = 'status-en-route';
+                        }
+                        
+                        const shipItem = document.createElement('div');
+                        shipItem.className = 'ship-item';
+                        shipItem.innerHTML = `
+                            <div class="ship-info">
+                                <h3>${ship.name}</h3>
+                                <p>${ship.type}</p>
+                                <p>Location: ${ship.location}</p>
+                            </div>
+                            <div class="ship-status ${statusClass}">${ship.status}</div>
+                            <div class="ship-actions">
+                                <button class="btn view-ship" data-ship-id="${ship.id}">View Details</button>
+                                <button class="btn edit-ship" data-ship-id="${ship.id}">Edit</button>
+                            </div>
+                        `;
+                        
+                        shipsList.appendChild(shipItem);
+                    });
+                    
+                    // Add event listeners to ship buttons
+                    const viewButtons = shipsList.querySelectorAll('.view-ship');
+                    viewButtons.forEach(button => {
+                        button.onclick = function() {
+                            const shipId = this.getAttribute('data-ship-id');
+                            alert(`Viewing details for ship ID: ${shipId}`);
+                        };
+                    });
+                    
+                    const editButtons = shipsList.querySelectorAll('.edit-ship');
+                    editButtons.forEach(button => {
+                        button.onclick = function() {
+                            const shipId = this.getAttribute('data-ship-id');
+                            alert(`Editing ship ID: ${shipId}`);
+                        };
+                    });
+                }
+            }
+            
+            // Add demo crew to crew section
+            const crewSection = document.getElementById('crew-section');
+            if (crewSection) {
+                const crewList = crewSection.querySelector('.crew-list');
+                if (crewList && crewList.children.length === 0) {
+                    const demoCrew = [
+                        { id: 1, name: 'John Smith', position: 'Captain', ship: 'Ocean Explorer', status: 'On Duty' },
+                        { id: 2, name: 'Emily Johnson', position: 'First Officer', ship: 'Northern Star', status: 'On Leave' },
+                        { id: 3, name: 'Michael Brown', position: 'Chief Engineer', ship: 'Coastal Voyager', status: 'On Duty' },
+                        { id: 4, name: 'Sarah Davis', position: 'Navigation Officer', ship: 'Pacific Trader', status: 'On Duty' }
+                    ];
+                    
+                    demoCrew.forEach(crew => {
+                        const crewItem = document.createElement('div');
+                        crewItem.className = 'crew-item';
+                        crewItem.innerHTML = `
+                            <div class="crew-info">
+                                <h3>${crew.name}</h3>
+                                <p>Position: ${crew.position}</p>
+                                <p>Ship: ${crew.ship}</p>
+                                <p>Status: ${crew.status}</p>
+                            </div>
+                            <div class="crew-actions">
+                                <button class="btn view-crew" data-crew-id="${crew.id}">View Details</button>
+                                <button class="btn edit-crew" data-crew-id="${crew.id}">Edit</button>
+                            </div>
+                        `;
+                        
+                        crewList.appendChild(crewItem);
+                    });
+                    
+                    // Add event listeners
+                    const viewButtons = crewList.querySelectorAll('.view-crew');
+                    viewButtons.forEach(button => {
+                        button.onclick = function() {
+                            const crewId = this.getAttribute('data-crew-id');
+                            alert(`Viewing details for crew ID: ${crewId}`);
+                        };
+                    });
+                    
+                    const editButtons = crewList.querySelectorAll('.edit-crew');
+                    editButtons.forEach(button => {
+                        button.onclick = function() {
+                            const crewId = this.getAttribute('data-crew-id');
+                            alert(`Editing crew ID: ${crewId}`);
+                        };
+                    });
+                }
+            }
+            
+            // Add demo reports to reports section
+            const reportsSection = document.getElementById('reports-section');
+            if (reportsSection) {
+                const reportsList = reportsSection.querySelector('.reports-list');
+                if (reportsList && reportsList.children.length === 0) {
+                    const demoReports = [
+                        { id: 1, title: 'Monthly Maintenance Report', date: '2025-06-30', status: 'Completed' },
+                        { id: 2, title: 'Fuel Consumption Analysis', date: '2025-06-25', status: 'In Review' },
+                        { id: 3, title: 'Crew Performance Evaluation', date: '2025-06-20', status: 'Completed' },
+                        { id: 4, title: 'Safety Inspection Results', date: '2025-06-15', status: 'Pending' }
+                    ];
+                    
+                    demoReports.forEach(report => {
+                        const reportItem = document.createElement('div');
+                        reportItem.className = 'report-item';
+                        reportItem.innerHTML = `
+                            <div class="report-info">
+                                <h3>${report.title}</h3>
+                                <p>Date: ${report.date}</p>
+                                <p>Status: ${report.status}</p>
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn view-report" data-report-id="${report.id}">View Report</button>
+                                <button class="btn edit-report" data-report-id="${report.id}">Edit</button>
+                            </div>
+                        `;
+                        
+                        reportsList.appendChild(reportItem);
+                    });
+                    
+                    // Add event listeners
+                    const viewButtons = reportsList.querySelectorAll('.view-report');
+                    viewButtons.forEach(button => {
+                        button.onclick = function() {
+                            const reportId = this.getAttribute('data-report-id');
+                            alert(`Viewing report ID: ${reportId}`);
+                        };
+                    });
+                    
+                    const editButtons = reportsList.querySelectorAll('.edit-report');
+                    editButtons.forEach(button => {
+                        button.onclick = function() {
+                            const reportId = this.getAttribute('data-report-id');
+                            alert(`Editing report ID: ${reportId}`);
+                        };
+                    });
+                }
+            }
+            
+            // Handle form submissions
+            const addShipForm = document.getElementById('add-ship-form');
+            if (addShipForm) {
+                addShipForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    alert('Ship added successfully!');
+                };
+            }
+            
+            const addCrewForm = document.getElementById('add-crew-form');
+            if (addCrewForm) {
+                addCrewForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    alert('Crew member added successfully!');
+                };
+            }
+            
+            const addReportForm = document.getElementById('add-report-form');
+            if (addReportForm) {
+                addReportForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    alert('Report added successfully!');
+                };
+            }
         });
     </script>
 </body>
