@@ -58,27 +58,52 @@
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#" id="dashboard-link">
+                            <a class="nav-link active" href="#" id="dashboard-link" data-section="dashboard-section">
                                 <i class="bi bi-speedometer2"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="ships.html">
+                            <a class="nav-link" href="#" id="ships-link" data-section="ships-section">
                                 <i class="bi bi-ship"></i> Manage Ships
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" id="users-link">
-                                <i class="bi bi-people"></i> Manage Users
+                            <a class="nav-link" href="#" id="docks-link" data-section="docks-section">
+                                <i class="bi bi-water"></i> Manage Docks
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" id="reports-link">
+                            <a class="nav-link" href="#" id="tasks-link" data-section="tasks-section">
+                                <i class="bi bi-list-task"></i> Task Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="staff-link" data-section="staff-section">
+                                <i class="bi bi-people"></i> Manage Staff
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="reports-link" data-section="reports-section">
                                 <i class="bi bi-file-earmark-bar-graph"></i> Reports
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="problems-link" data-section="problems-section">
+                                <i class="bi bi-exclamation-triangle"></i> Problem Reports
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="locations-link" data-section="locations-section">
+                                <i class="bi bi-geo-alt"></i> Ship Locations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="bookings-link" data-section="bookings-section">
+                                <i class="bi bi-calendar-check"></i> Bookings
+                            </a>
+                        </li>
                         <li class="nav-item mt-4">
-                            <a class="nav-link text-danger" href="#" id="logout-link">
+                            <a class="nav-link text-danger" href="/login.html" id="logout-link" onclick="fetch('/api/logout'); return true;">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
                         </li>
@@ -88,83 +113,1287 @@
 
             <!-- Main content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Admin Dashboard</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="content-section active">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Admin Dashboard</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="refresh-dashboard">
+                                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Stats Cards -->
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="card text-white bg-primary">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Ships</h5>
-                                <h2 id="total-ships">0</h2>
-                                <p class="card-text">Registered in the system</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card text-white bg-success">
-                            <div class="card-body">
-                                <h5 class="card-title">Active Users</h5>
-                                <h2 id="active-users">0</h2>
-                                <p class="card-text">Currently active</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card text-white bg-warning">
-                            <div class="card-body">
-                                <h5 class="card-title">Pending Tasks</h5>
-                                <h2 id="pending-tasks">0</h2>
-                                <p class="card-text">Requiring attention</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <span>Recent Activity</span>
-                                <div>
-                                    <button type="button" class="btn btn-sm btn-outline-primary me-2" id="edit-mode-btn">
-                                        <i class="bi bi-pencil"></i> Edit
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-success" id="apply-changes-btn" style="display: none;">
-                                        <i class="bi bi-check-circle"></i> Apply Changes
-                                    </button>
+                    <!-- Stats Cards -->
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-primary mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Ships</h5>
+                                    <h2 id="total-ships">0</h2>
+                                    <p class="card-text">Registered in the system</p>
                                 </div>
                             </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Time</th>
-                                                <th>User</th>
-                                                <th>Activity</th>
-                                                <th>Details</th>
-                                                <th class="edit-column" style="display: none;">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="recent-activity">
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-success mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Staff Members</h5>
+                                    <h2 id="total-staff">0</h2>
+                                    <p class="card-text">Active staff</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-warning mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pending Tasks</h5>
+                                    <h2 id="pending-tasks">0</h2>
+                                    <p class="card-text">Requiring attention</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-danger mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Open Problems</h5>
+                                    <h2 id="open-problems">0</h2>
+                                    <p class="card-text">Reported issues</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-info text-white">
+                                    <i class="bi bi-water"></i> Dock Availability
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h3 id="available-docks">0</h3>
+                                        <span>Available Docks</span>
+                                    </div>
+                                    <div class="progress mt-2">
+                                        <div id="dock-availability-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary text-white">
+                                    <i class="bi bi-geo-alt"></i> Ship Status
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-4 text-center">
+                                            <h4 id="ships-at-sea">0</h4>
+                                            <small>At Sea</small>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <h4 id="ships-docked">0</h4>
+                                            <small>Docked</small>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <h4 id="ships-in-transit">0</h4>
+                                            <small>In Transit</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span>Recent Activity</span>
+                                    <div>
+                                        <button type="button" class="btn btn-sm btn-outline-primary me-2" id="edit-mode-btn">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-success" id="apply-changes-btn" style="display: none;">
+                                            <i class="bi bi-check-circle"></i> Apply Changes
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Time</th>
+                                                    <th>User</th>
+                                                    <th>Activity</th>
+                                                    <th>Details</th>
+                                                    <th class="edit-column" style="display: none;">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="recent-activity">
+                                                <!-- Will be populated by JavaScript -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tasks Section -->
+                <div id="tasks-section" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Task Management</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                                <i class="bi bi-plus-circle"></i> Assign New Task
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Task Filters -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row g-2">
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="task-status-filter">
+                                                <option value="">All Statuses</option>
+                                                <option value="pending">Pending</option>
+                                                <option value="accepted">Accepted</option>
+                                                <option value="in_progress">In Progress</option>
+                                                <option value="completed">Completed</option>
+                                                <option value="rejected">Rejected</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="task-priority-filter">
+                                                <option value="">All Priorities</option>
+                                                <option value="low">Low</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="high">High</option>
+                                                <option value="urgent">Urgent</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="task-staff-filter">
+                                                <option value="">All Staff</option>
+                                                <!-- Will be populated by JavaScript -->
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button class="btn btn-outline-secondary w-100" id="apply-task-filters">
+                                                <i class="bi bi-funnel"></i> Apply Filters
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tasks Table -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Title</th>
+                                            <th>Assigned To</th>
+                                            <th>Ship</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                            <th>Due Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tasks-table">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="tasks-loading" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                            <div id="no-tasks-message" class="alert alert-info" style="display: none;">
+                                No tasks found. Create a new task to get started.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Problem Reports Section -->
+                <div id="problems-section" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Problem Reports</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="refresh-problems">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Problem Reports Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-danger mb-3">
+                                <div class="card-body text-center">
+                                    <h2 id="critical-problems">0</h2>
+                                    <p class="card-text">Critical Issues</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-warning mb-3">
+                                <div class="card-body text-center">
+                                    <h2 id="high-problems">0</h2>
+                                    <p class="card-text">High Priority</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-info mb-3">
+                                <div class="card-body text-center">
+                                    <h2 id="medium-problems">0</h2>
+                                    <p class="card-text">Medium Priority</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-success mb-3">
+                                <div class="card-body text-center">
+                                    <h2 id="resolved-problems">0</h2>
+                                    <p class="card-text">Resolved</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Problem Reports Filters -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row g-2">
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="problem-status-filter">
+                                                <option value="">All Statuses</option>
+                                                <option value="open">Open</option>
+                                                <option value="in_progress">In Progress</option>
+                                                <option value="resolved">Resolved</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="problem-severity-filter">
+                                                <option value="">All Severities</option>
+                                                <option value="low">Low</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="high">High</option>
+                                                <option value="critical">Critical</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="problem-ship-filter">
+                                                <option value="">All Ships</option>
+                                                <!-- Will be populated by JavaScript -->
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button class="btn btn-outline-secondary w-100" id="apply-problem-filters">
+                                                <i class="bi bi-funnel"></i> Apply Filters
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Problem Reports Table -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Title</th>
+                                            <th>Reported By</th>
+                                            <th>Ship</th>
+                                            <th>Severity</th>
+                                            <th>Status</th>
+                                            <th>Reported Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="problems-table">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="problems-loading" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                            <div id="no-problems-message" class="alert alert-info" style="display: none;">
+                                No problem reports found.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Problem Details Modal -->
+                <div class="modal fade" id="problemDetailsModal" tabindex="-1" aria-labelledby="problemDetailsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="problemDetailsModalLabel">Problem Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-8">
+                                        <h4 id="problem-detail-title"></h4>
+                                        <div class="d-flex gap-2 mb-2">
+                                            <span class="badge" id="problem-detail-severity"></span>
+                                            <span class="badge" id="problem-detail-status"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <p class="mb-0"><strong class="text-muted">Reported: <span id="problem-detail-reported-date"></span></strong></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6>Description</h6>
+                                                <p id="problem-detail-description"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p><strong>Reported By:</strong> <span id="problem-detail-reported-by"></span></p>
+                                        <p><strong>Ship:</strong> <span id="problem-detail-ship"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Location:</strong> <span id="problem-detail-location"></span></p>
+                                        <p><strong>Last Updated:</strong> <span id="problem-detail-updated"></span></p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Resolution Section -->
+                                <div class="card mt-3">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Resolution</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="problem-resolution-view">
+                                            <p id="problem-detail-resolution">No resolution provided yet.</p>
+                                        </div>
+                                        <div id="problem-resolution-edit" style="display: none;">
+                                            <form id="update-problem-form">
+                                                <div class="mb-3">
+                                                    <label for="problem-resolution" class="form-label">Resolution Notes</label>
+                                                    <textarea class="form-control" id="problem-resolution" rows="3"></textarea>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="problem-status" class="form-label">Update Status</label>
+                                                    <select class="form-select" id="problem-status">
+                                                        <option value="open">Open</option>
+                                                        <option value="in_progress">In Progress</option>
+                                                        <option value="resolved">Resolved</option>
+                                                    </select>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="edit-problem-btn">Edit Resolution</button>
+                                <button type="button" class="btn btn-success" id="save-problem-btn" style="display: none;">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Staff Management Section -->
+                <div id="staff-section" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Staff Management</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                                <i class="bi bi-plus-circle"></i> Add New Staff
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Staff Overview -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-primary mb-3">
+                                <div class="card-body text-center">
+                                    <h2 id="total-staff-count">0</h2>
+                                    <p class="card-text">Total Staff</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-success mb-3">
+                                <div class="card-body text-center">
+                                    <h2 id="active-staff">0</h2>
+                                    <p class="card-text">Active</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-info mb-3">
+                                <div class="card-body text-center">
+                                    <h2 id="assigned-staff">0</h2>
+                                    <p class="card-text">Assigned to Ships</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-secondary mb-3">
+                                <div class="card-body text-center">
+                                    <h2 id="unassigned-staff">0</h2>
+                                    <p class="card-text">Unassigned</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Staff Filters -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row g-2">
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="staff-status-filter">
+                                                <option value="">All Statuses</option>
+                                                <option value="active">Active</option>
+                                                <option value="inactive">Inactive</option>
+                                                <option value="on_leave">On Leave</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="staff-role-filter">
+                                                <option value="">All Roles</option>
+                                                <option value="captain">Captain</option>
+                                                <option value="engineer">Engineer</option>
+                                                <option value="crew">Crew</option>
+                                                <option value="admin">Admin</option>
+                                                <option value="support">Support</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="staff-ship-filter">
+                                                <option value="">All Ships</option>
+                                                <option value="unassigned">Unassigned</option>
+                                                <!-- Will be populated by JavaScript -->
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button class="btn btn-outline-secondary w-100" id="apply-staff-filters">
+                                                <i class="bi bi-funnel"></i> Apply Filters
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Staff Table -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Username</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th>Assigned Ship</th>
+                                            <th>Tasks</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="staff-table">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="staff-loading" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                            <div id="no-staff-message" class="alert alert-info" style="display: none;">
+                                No staff members found. Add a new staff member to get started.
+                            </div>
+                            <nav aria-label="Staff pagination" id="staff-pagination" style="display: none;">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item disabled" id="prev-page">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                    </li>
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link" id="current-page">1</span>
+                                    </li>
+                                    <li class="page-item" id="next-page">
+                                        <a class="page-link" href="#">Next</a>
+                                    </li>
+                                </ul>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">Showing <span id="page-start">1</span>-<span id="page-end">10</span> of <span id="total-staff">0</span> staff members</small>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add Staff Modal -->
+                <div class="modal fade" id="addStaffModal" tabindex="-1" aria-labelledby="addStaffModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addStaffModalLabel">Add New Staff</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="add-staff-form">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="staff-first-name" class="form-label">First Name</label>
+                                            <input type="text" class="form-control" id="staff-first-name" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="staff-last-name" class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" id="staff-last-name" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="staff-username" class="form-label">Username</label>
+                                        <input type="text" class="form-control" id="staff-username" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="staff-password" class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="staff-password" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="staff-role" class="form-label">Role</label>
+                                        <select class="form-select" id="staff-role" required>
+                                            <option value="">Select Role</option>
+                                            <option value="captain">Captain</option>
+                                            <option value="engineer">Engineer</option>
+                                            <option value="crew">Crew</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="support">Support</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="staff-ship" class="form-label">Assign to Ship (Optional)</label>
+                                        <select class="form-select" id="staff-ship">
+                                            <option value="">Unassigned</option>
                                             <!-- Will be populated by JavaScript -->
-                                        </tbody>
-                                    </table>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="staff-status" class="form-label">Status</label>
+                                        <select class="form-select" id="staff-status" required>
+                                            <option value="active" selected>Active</option>
+                                            <option value="inactive">Inactive</option>
+                                            <option value="on_leave">On Leave</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="save-staff-btn">Save Staff</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Edit Staff Modal -->
+                <div class="modal fade" id="editStaffModal" tabindex="-1" aria-labelledby="editStaffModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editStaffModalLabel">Edit Staff</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="edit-staff-form">
+                                    <input type="hidden" id="edit-staff-id">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="edit-staff-first-name" class="form-label">First Name</label>
+                                            <input type="text" class="form-control" id="edit-staff-first-name" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="edit-staff-last-name" class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" id="edit-staff-last-name" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit-staff-username" class="form-label">Username</label>
+                                        <input type="text" class="form-control" id="edit-staff-username" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit-staff-role" class="form-label">Role</label>
+                                        <select class="form-select" id="edit-staff-role" required>
+                                            <option value="captain">Captain</option>
+                                            <option value="engineer">Engineer</option>
+                                            <option value="crew">Crew</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="support">Support</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit-staff-ship" class="form-label">Assign to Ship</label>
+                                        <select class="form-select" id="edit-staff-ship">
+                                            <option value="">Unassigned</option>
+                                            <!-- Will be populated by JavaScript -->
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit-staff-status" class="form-label">Status</label>
+                                        <select class="form-select" id="edit-staff-status" required>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                            <option value="on_leave">On Leave</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="reset-password-check">
+                                        <label class="form-check-label" for="reset-password-check">Reset Password</label>
+                                    </div>
+                                    <div class="mb-3" id="new-password-container" style="display: none;">
+                                        <label for="new-password" class="form-label">New Password</label>
+                                        <input type="password" class="form-control" id="new-password">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="update-staff-btn">Update Staff</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Staff Details Modal -->
+                <div class="modal fade" id="staffDetailsModal" tabindex="-1" aria-labelledby="staffDetailsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="staffDetailsModalLabel">Staff Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-4 text-center mb-3">
+                                        <div class="avatar-placeholder bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                                            <span id="staff-initials">JS</span>
+                                        </div>
+                                        <h4 class="mt-2" id="staff-detail-name"></h4>
+                                        <span class="badge bg-primary" id="staff-detail-role"></span>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6>Staff Information</h6>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p><strong>Username:</strong> <span id="staff-detail-username"></span></p>
+                                                        <p><strong>Status:</strong> <span id="staff-detail-status"></span></p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p><strong>Assigned Ship:</strong> <span id="staff-detail-ship"></span></p>
+                                                        <p><strong>Joined:</strong> <span id="staff-detail-joined"></span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                                
+                                <!-- Staff Tasks -->
+                                <div class="card mt-3">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Assigned Tasks</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Task</th>
+                                                        <th>Priority</th>
+                                                        <th>Status</th>
+                                                        <th>Due Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="staff-tasks">
+                                                    <!-- Will be populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div id="no-staff-tasks" class="alert alert-info" style="display: none;">
+                                            No tasks assigned to this staff member.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Staff Reports -->
+                                <div class="card mt-3">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Problem Reports</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Report</th>
+                                                        <th>Severity</th>
+                                                        <th>Status</th>
+                                                        <th>Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="staff-reports">
+                                                    <!-- Will be populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div id="no-staff-reports" class="alert alert-info" style="display: none;">
+                                            No problem reports from this staff member.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="assign-task-btn">Assign Task</button>
+                                <button type="button" class="btn btn-warning" id="edit-staff-details-btn">Edit Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ships Management Section -->
+                <div id="ships-section" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Ship Management</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addShipModal">
+                                <i class="bi bi-plus-circle"></i> Add Ship
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Ships List</h5>
+                                    <div id="ships-loading" class="text-center my-3" style="display: none;">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                    <div id="no-ships-message" class="alert alert-info" style="display: none;">
+                                        No ships found. Add a new ship to get started.
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Name</th>
+                                                    <th>IMO Number</th>
+                                                    <th>Type</th>
+                                                    <th>Status</th>
+                                                    <th>Capacity</th>
+                                                    <th>Location</th>
+                                                    <th>Last Maintenance</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="ships-table-body">
+                                                <!-- Ship data will be loaded here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <nav aria-label="Ship pagination">
+                                        <ul class="pagination justify-content-center" id="ships-pagination">
+                                            <li class="page-item disabled" id="ships-prev-page">
+                                                <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                            </li>
+                                            <li class="page-item disabled" id="ships-next-page">
+                                                <a class="page-link" href="#">Next</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Docks Management Section -->
+                <div id="docks-section" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Dock Management</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addDockModal">
+                                <i class="bi bi-plus-circle"></i> Add Dock
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Docks List</h5>
+                                    <p>This section will display the docks management interface.</p>
+                                    <div id="docks-loading" class="text-center my-3" style="display: none;">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                    <div id="no-docks-message" class="alert alert-info" style="display: none;">
+                                        No docks found. Add a new dock to get started.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reports Section -->
+                <div id="reports-section" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Reports</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="refresh-reports">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">System Reports</h5>
+                                    <p>This section will display various system reports and analytics.</p>
+                                    <div id="reports-loading" class="text-center my-3" style="display: none;">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ship Locations Section -->
+                <div id="locations-section" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Ship Locations</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="refresh-locations">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Ship Location Tracker</h5>
+                                    <p>This section will display the map and location tracking for all ships.</p>
+                                    <div id="locations-loading" class="text-center my-3" style="display: none;">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                    <div id="map-container" style="height: 400px; background-color: #f8f9fa; border-radius: 5px;">
+                                        <div class="d-flex justify-content-center align-items-center h-100">
+                                            <p class="text-muted">Map will be displayed here</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bookings Management Section -->
+                <div id="bookings-section" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Bookings Management</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addBookingModal">
+                                <i class="bi bi-plus-circle"></i> Add Booking
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Bookings Filter Card -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="booking-status-filter" class="form-label">Status</label>
+                                    <select class="form-select" id="booking-status-filter">
+                                        <option value="all">All Statuses</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Rejected">Rejected</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="booking-date-filter" class="form-label">Date Range</label>
+                                    <select class="form-select" id="booking-date-filter">
+                                        <option value="all">All Time</option>
+                                        <option value="upcoming">Upcoming</option>
+                                        <option value="past">Past</option>
+                                        <option value="current">Current</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button class="btn btn-primary" id="apply-booking-filters">Apply Filters</button>
+                                    <button class="btn btn-outline-secondary ms-2" id="reset-booking-filters">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bookings Table Card -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Ship</th>
+                                            <th>User</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Status</th>
+                                            <th>Created</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bookings-table-body">
+                                        <!-- Bookings will be loaded here -->
+                                    </tbody>
+                                </table>
+                                
+                                <!-- Loading Spinner -->
+                                <div class="text-center py-4" id="bookings-loading">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- No Bookings Message -->
+                                <div class="alert alert-info" id="no-bookings-message" style="display: none;">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    No bookings found.
+                                </div>
+                            </div>
+                            
+                            <!-- Pagination -->
+                            <div class="d-flex justify-content-between align-items-center mt-4" id="bookings-pagination" style="display: none;">
+                                <div>
+                                    <span id="bookings-showing-text">Showing 1-10 of 100</span>
+                                </div>
+                                <nav aria-label="Bookings pagination">
+                                    <ul class="pagination mb-0">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">Next</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">Showing <span id="page-start">1</span>-<span id="page-end">10</span> of <span id="total-bookings">0</span> bookings</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Booking Details Modal -->
+                <div class="modal fade" id="booking-details-modal" tabindex="-1" aria-labelledby="booking-details-modal-label" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="booking-details-modal-label">Booking Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Ship Information</h6>
+                                        <p><strong>Name:</strong> <span id="modal-ship-name"></span></p>
+                                        <p><strong>Type:</strong> <span id="modal-ship-type"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>User Information</h6>
+                                        <p><strong>Username:</strong> <span id="modal-username"></span></p>
+                                        <p><strong>Booking ID:</strong> <span id="modal-booking-id"></span></p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Date Range</h6>
+                                        <p><strong>Start Date:</strong> <span id="modal-start-date"></span></p>
+                                        <p><strong>End Date:</strong> <span id="modal-end-date"></span></p>
+                                        <p><strong>Created:</strong> <span id="modal-created-at"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Status</h6>
+                                        <p><span class="badge" id="modal-status-badge">Status</span></p>
+                                        <h6 class="mt-3">Purpose</h6>
+                                        <p id="modal-purpose"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="d-flex justify-content-between w-100">
+                                    <div>
+                                        <button type="button" class="btn btn-danger" id="delete-booking-btn">Delete Booking</button>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-success me-2" id="approve-booking-btn">Approve</button>
+                                        <button type="button" class="btn btn-danger me-2" id="reject-booking-btn">Reject</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Delete Booking Confirmation Modal -->
+                <div class="modal fade" id="delete-booking-modal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirm Deletion</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to delete this booking? This action cannot be undone.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="confirm-delete-booking-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add Booking Modal -->
+                <div class="modal fade" id="addBookingModal" tabindex="-1" aria-labelledby="addBookingModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addBookingModalLabel">Add New Booking</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="add-booking-form">
+                                    <div class="mb-3">
+                                        <label for="booking-ship" class="form-label">Ship</label>
+                                        <select class="form-select" id="booking-ship" required>
+                                            <option value="">Select Ship</option>
+                                            <!-- Will be populated by JavaScript -->
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="booking-user" class="form-label">User</label>
+                                        <select class="form-select" id="booking-user" required>
+                                            <option value="">Select User</option>
+                                            <!-- Will be populated by JavaScript -->
+                                        </select>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="booking-start-date" class="form-label">Start Date</label>
+                                            <input type="date" class="form-control" id="booking-start-date" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="booking-end-date" class="form-label">End Date</label>
+                                            <input type="date" class="form-control" id="booking-end-date" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="booking-purpose" class="form-label">Purpose</label>
+                                        <textarea class="form-control" id="booking-purpose" rows="3" required></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="save-booking-btn">Save Booking</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTaskModalLabel">Assign New Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-task-form">
+                        <div class="mb-3">
+                            <label for="task-title" class="form-label">Task Title</label>
+                            <input type="text" class="form-control" id="task-title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="task-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="task-description" rows="3" required></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="task-assigned-to" class="form-label">Assign To</label>
+                                <select class="form-select" id="task-assigned-to" required>
+                                    <option value="">Select Staff Member</option>
+                                    <!-- Will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="task-ship" class="form-label">Related Ship (Optional)</label>
+                                <select class="form-select" id="task-ship">
+                                    <option value="">None</option>
+                                    <!-- Will be populated by JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="task-priority" class="form-label">Priority</label>
+                                <select class="form-select" id="task-priority" required>
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="task-due-date" class="form-label">Due Date</label>
+                                <input type="date" class="form-control" id="task-due-date" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-task-btn">Assign Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task Details Modal -->
+    <div class="modal fade" id="taskDetailsModal" tabindex="-1" aria-labelledby="taskDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskDetailsModalLabel">Task Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <h4 id="task-detail-title"></h4>
+                            <div class="d-flex gap-2 mb-2">
+                                <span class="badge bg-primary" id="task-detail-priority"></span>
+                                <span class="badge" id="task-detail-status"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <p class="mb-0"><strong>Due:</strong> <span id="task-detail-due-date"></span></p>
+                            <p class="mb-0"><small class="text-muted">Created: <span id="task-detail-created"></span></small></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>Description</h6>
+                                    <p id="task-detail-description"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Assigned By:</strong> <span id="task-detail-assigned-by"></span></p>
+                            <p><strong>Assigned To:</strong> <span id="task-detail-assigned-to"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Related Ship:</strong> <span id="task-detail-ship"></span></p>
+                            <p><strong>Last Updated:</strong> <span id="task-detail-updated"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div class="btn-group" id="task-action-buttons">
+                        <button type="button" class="btn btn-success" id="complete-task-btn">Mark Complete</button>
+                        <button type="button" class="btn btn-danger" id="delete-task-btn">Delete Task</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -283,11 +1512,29 @@
                     if (document.getElementById('total-ships')) {
                         document.getElementById('total-ships').textContent = stats.totalShips || 0;
                     }
-                    if (document.getElementById('active-users')) {
-                        document.getElementById('active-users').textContent = stats.activeUsers || 0;
+                    if (document.getElementById('total-staff')) {
+                        document.getElementById('total-staff').textContent = stats.totalStaff || 0;
                     }
                     if (document.getElementById('pending-tasks')) {
                         document.getElementById('pending-tasks').textContent = stats.pendingTasks || 0;
+                    }
+                    if (document.getElementById('open-problems')) {
+                        document.getElementById('open-problems').textContent = stats.openProblems || 0;
+                    }
+                    if (document.getElementById('available-docks')) {
+                        document.getElementById('available-docks').textContent = stats.availableDocks || 0;
+                    }
+                    if (document.getElementById('dock-availability-bar')) {
+                        document.getElementById('dock-availability-bar').style.width = `${stats.dockAvailability}%`;
+                    }
+                    if (document.getElementById('ships-at-sea')) {
+                        document.getElementById('ships-at-sea').textContent = stats.shipsAtSea || 0;
+                    }
+                    if (document.getElementById('ships-docked')) {
+                        document.getElementById('ships-docked').textContent = stats.shipsDocked || 0;
+                    }
+                    if (document.getElementById('ships-in-transit')) {
+                        document.getElementById('ships-in-transit').textContent = stats.shipsInTransit || 0;
                     }
                 }
 
@@ -341,39 +1588,2115 @@
             }
         }
 
+        // Function to set up navigation
+        function setupNavigation() {
+            // Get all navigation links with data-section attribute
+            const navLinks = document.querySelectorAll('.nav-link[data-section]');
+            
+            // Add click event listener to each navigation link
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Get the section ID from data-section attribute
+                    const sectionId = this.getAttribute('data-section');
+                    
+                    // Hide all content sections
+                    document.querySelectorAll('.content-section').forEach(section => {
+                        section.style.display = 'none';
+                    });
+                    
+                    // Show the selected section
+                    document.getElementById(sectionId).style.display = 'block';
+                    
+                    // Remove active class from all links
+                    navLinks.forEach(navLink => {
+                        navLink.classList.remove('active');
+                    });
+                    
+                    // Add active class to the clicked link
+                    this.classList.add('active');
+                    
+                    // Load section-specific data if needed
+                    if (sectionId === 'staff-section') {
+                        loadStaff();
+                    } else if (sectionId === 'dashboard-section') {
+                        loadDashboardData();
+                    } else if (sectionId === 'ships-section') {
+                        loadShips();
+                    } else if (sectionId === 'docks-section') {
+                        loadDocks();
+                    } else if (sectionId === 'bookings-section') {
+                        loadBookings();
+                    }
+                    // Add other section-specific data loading here as needed
+                });
+            });
+            
+            // Set dashboard as active by default
+            document.getElementById('dashboard-section').style.display = 'block';
+            document.querySelector('.nav-link[data-section="dashboard-section"]').classList.add('active');
+        }
+
         // Initialize the dashboard when the page loads
         document.addEventListener('DOMContentLoaded', async function() {
             const isAuthenticated = await checkAuth();
             if (isAuthenticated) {
-                await loadDashboardData();
+                setupNavigation();
                 
-                // Add event listeners
-                document.getElementById('edit-mode-btn').addEventListener('click', () => toggleEditMode(true));
-                document.getElementById('apply-changes-btn').addEventListener('click', () => {
-                    saveChanges();
-                    toggleEditMode(false);
-                });
+                // Load dashboard data
+                loadDashboardData();
                 
+                // Add event listeners for staff management
+                setupStaffEventListeners();
+                
+                // Add event listener for logout
                 document.getElementById('logout-link').addEventListener('click', handleLogout);
             }
         });
-
-        // Handle logout
-        async function handleLogout(e) {
-            e.preventDefault();
-            try {
-                const response = await fetch('/api/logout', {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-                
-                if (response.ok) {
-                    window.location.href = '/login.html';
+        
+        // Function to set up staff event listeners
+        function setupStaffEventListeners() {
+            // Filter button
+            document.getElementById('apply-staff-filters').addEventListener('click', applyStaffFilters);
+            
+            // Search button
+            document.getElementById('search-staff-btn').addEventListener('click', searchStaff);
+            
+            // Clear search button
+            document.getElementById('clear-search-btn').addEventListener('click', function() {
+                document.getElementById('staff-search').value = '';
+                currentPage = 1;
+                loadStaff();
+            });
+            
+            // Pagination buttons
+            document.getElementById('prev-page').querySelector('a').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    currentPage--;
+                    updateStaffTable(paginateStaff(allStaffData, currentPage, pageSize));
+                    updatePagination(totalStaffCount);
                 }
-            } catch (error) {
-                console.error('Logout error:', error);
-                window.location.href = '/login.html';
+            });
+            
+            document.getElementById('next-page').querySelector('a').addEventListener('click', function(e) {
+                e.preventDefault();
+                const totalPages = Math.ceil(totalStaffCount / pageSize);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updateStaffTable(paginateStaff(allStaffData, currentPage, pageSize));
+                    updatePagination(totalStaffCount);
+                }
+            });
+        }
+        
+        // Function to search staff
+        function searchStaff() {
+            const searchQuery = document.getElementById('staff-search').value.trim();
+            
+            if (!searchQuery) {
+                alert('Please enter a search query');
+                return;
             }
+            
+            // Reset to first page
+            currentPage = 1;
+            
+            // Show loading spinner
+            document.getElementById('staff-loading').style.display = 'block';
+            document.getElementById('no-staff-message').style.display = 'none';
+            document.getElementById('staff-pagination').style.display = 'none';
+            
+            fetch(`/api/staff?search=${encodeURIComponent(searchQuery)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to search staff: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(staff => {
+                    allStaffData = staff;
+                    totalStaffCount = staff.length;
+                    updateStaffTable(paginateStaff(staff, currentPage, pageSize));
+                    updatePagination(totalStaffCount);
+                    // Don't update stats when searching
+                })
+                .catch(error => {
+                    console.error('Error searching staff:', error);
+                    
+                    // Show error message
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'alert alert-danger';
+                    errorMsg.innerHTML = `
+                        <strong>Error searching staff:</strong> ${error.message}
+                        <button class="btn btn-sm btn-outline-danger float-end" onclick="searchStaff()">Retry</button>
+                    `;
+                    document.getElementById('staff-table').innerHTML = '';
+                    document.getElementById('staff-table').parentNode.insertBefore(errorMsg, document.getElementById('staff-table'));
+                    
+                    document.getElementById('staff-loading').style.display = 'none';
+                })
+                .finally(() => {
+                    document.getElementById('staff-loading').style.display = 'none';
+                });
+        }
+        
+        // Function to apply staff filters
+        function applyStaffFilters() {
+            const statusFilter = document.getElementById('staff-status-filter').value;
+            const roleFilter = document.getElementById('staff-role-filter').value;
+            const shipFilter = document.getElementById('staff-ship-filter').value;
+            
+            // Reset to first page
+            currentPage = 1;
+            
+            document.getElementById('staff-loading').style.display = 'block';
+            document.getElementById('no-staff-message').style.display = 'none';
+            document.getElementById('staff-pagination').style.display = 'none';
+            
+            // Build query parameters
+            let queryParams = [];
+            if (statusFilter) {
+                queryParams.push(`status=${statusFilter}`);
+            }
+            if (roleFilter) {
+                queryParams.push(`role=${roleFilter}`);
+            }
+            if (shipFilter) {
+                if (shipFilter === 'unassigned') {
+                    queryParams.push('unassigned=true');
+                } else {
+                    queryParams.push(`shipId=${shipFilter}`);
+                }
+            }
+            
+            const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+            
+            fetch(`/api/staff${queryString}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch filtered staff');
+                    }
+                    return response.json();
+                })
+                .then(staff => {
+                    allStaffData = staff;
+                    totalStaffCount = staff.length;
+                    updateStaffTable(paginateStaff(staff, currentPage, pageSize));
+                    updatePagination(totalStaffCount);
+                    // Don't update stats when filtering
+                })
+                .catch(error => {
+                    console.error('Error applying staff filters:', error);
+                    
+                    // Show error message
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'alert alert-danger';
+                    errorMsg.innerHTML = `
+                        <strong>Error applying filters:</strong> ${error.message}
+                        <button class="btn btn-sm btn-outline-danger float-end" onclick="applyStaffFilters()">Retry</button>
+                    `;
+                    document.getElementById('staff-table').innerHTML = '';
+                    document.getElementById('staff-table').parentNode.insertBefore(errorMsg, document.getElementById('staff-table'));
+                    
+                    document.getElementById('staff-loading').style.display = 'none';
+                })
+                .finally(() => {
+                    document.getElementById('staff-loading').style.display = 'none';
+                });
+        }
+        
+        // Function to load staff
+        let currentPage = 1;
+        const pageSize = 10;
+        let totalStaffCount = 0;
+        let allStaffData = [];
+        
+        function loadStaff() {
+            document.getElementById('staff-loading').style.display = 'block';
+            document.getElementById('no-staff-message').style.display = 'none';
+            
+            fetch('/api/staff')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch staff');
+                    }
+                    return response.json();
+                })
+                .then(staff => {
+                    allStaffData = staff; // Store all staff data
+                    totalStaffCount = staff.length;
+                    updateStaffTable(paginateStaff(staff, currentPage, pageSize));
+                    updatePagination(staff.length);
+                    updateStaffStats(staff);
+                    loadShipsForStaffAssignment();
+                })
+                .catch(error => {
+                    console.error('Error loading staff:', error);
+                    document.getElementById('staff-loading').style.display = 'none';
+                    
+                    // Show error message with retry option
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'alert alert-danger';
+                    errorMsg.innerHTML = `
+                        <strong>Error loading staff data:</strong> ${error.message}
+                        <button class="btn btn-sm btn-outline-danger float-end" onclick="loadStaff()">Retry</button>
+                    `;
+                    document.getElementById('no-staff-message').style.display = 'none';
+                    document.getElementById('staff-table').innerHTML = '';
+                    document.getElementById('staff-table').parentNode.insertBefore(errorMsg, document.getElementById('staff-table'));
+                    
+                    // For demo purposes, load mock data after a delay
+                    setTimeout(() => {
+                        // Remove error message
+                        if (errorMsg.parentNode) {
+                            errorMsg.parentNode.removeChild(errorMsg);
+                        }
+                        
+                        const mockStaff = [
+                            { id: 1, firstName: 'John', lastName: 'Smith', username: 'john_smith', role: 'captain', status: 'active', shipName: 'Northern Star', taskCount: 3, joinedDate: '2023-01-15' },
+                            { id: 2, firstName: 'Sarah', lastName: 'Johnson', username: 'sarah_j', role: 'engineer', status: 'active', shipName: 'Sea Voyager', taskCount: 2, joinedDate: '2023-02-20' },
+                            { id: 3, firstName: 'Mike', lastName: 'Brown', username: 'mike_b', role: 'crew', status: 'on_leave', shipName: null, taskCount: 0, joinedDate: '2023-03-10' },
+                            { id: 4, firstName: 'Emily', lastName: 'Davis', username: 'emily_d', role: 'admin', status: 'active', shipName: null, taskCount: 5, joinedDate: '2022-11-05' },
+                            { id: 5, firstName: 'Robert', lastName: 'Wilson', username: 'robert_w', role: 'support', status: 'inactive', shipName: null, taskCount: 0, joinedDate: '2023-04-18' },
+                            { id: 6, firstName: 'Lisa', lastName: 'Taylor', username: 'lisa_t', role: 'captain', status: 'active', shipName: 'Ocean Explorer', taskCount: 4, joinedDate: '2023-01-05' },
+                            { id: 7, firstName: 'David', lastName: 'Clark', username: 'david_c', role: 'engineer', status: 'active', shipName: 'Northern Star', taskCount: 1, joinedDate: '2023-02-12' },
+                            { id: 8, firstName: 'Jennifer', lastName: 'White', username: 'jen_w', role: 'crew', status: 'active', shipName: 'Sea Voyager', taskCount: 2, joinedDate: '2023-03-22' },
+                            { id: 9, firstName: 'Thomas', lastName: 'Harris', username: 'tom_h', role: 'support', status: 'on_leave', shipName: null, taskCount: 0, joinedDate: '2023-01-30' },
+                            { id: 10, firstName: 'Jessica', lastName: 'Martin', username: 'jess_m', role: 'admin', status: 'active', shipName: null, taskCount: 3, joinedDate: '2022-12-15' },
+                            { id: 11, firstName: 'Daniel', lastName: 'Thompson', username: 'dan_t', role: 'crew', status: 'inactive', shipName: null, taskCount: 0, joinedDate: '2023-02-05' },
+                            { id: 12, firstName: 'Amanda', lastName: 'Garcia', username: 'amanda_g', role: 'engineer', status: 'active', shipName: 'Ocean Explorer', taskCount: 2, joinedDate: '2023-01-18' }
+                        ];
+                        allStaffData = mockStaff;
+                        totalStaffCount = mockStaff.length;
+                        updateStaffTable(paginateStaff(mockStaff, currentPage, pageSize));
+                        updatePagination(mockStaff.length);
+                        updateStaffStats(mockStaff);
+                        
+                        // Mock ships for dropdown
+                        const mockShips = [
+                            { id: 1, name: 'Northern Star' },
+                            { id: 2, name: 'Sea Voyager' },
+                            { id: 3, name: 'Ocean Explorer' }
+                        ];
+                        
+                        updateShipsDropdownForStaff(mockShips);
+                    }, 1500);
+                });
+        }
+        
+        function paginateStaff(staff, page, size) {
+            const start = (page - 1) * size;
+            const end = start + size;
+            return staff.slice(start, end);
+        }
+        
+        function updatePagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / pageSize);
+            
+            if (totalItems <= pageSize) {
+                document.getElementById('staff-pagination').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('staff-pagination').style.display = 'block';
+            document.getElementById('current-page').textContent = currentPage;
+            document.getElementById('total-staff').textContent = totalItems;
+            
+            const start = ((currentPage - 1) * pageSize) + 1;
+            const end = Math.min(currentPage * pageSize, totalItems);
+            document.getElementById('page-start').textContent = start;
+            document.getElementById('page-end').textContent = end;
+            
+            // Update previous button state
+            const prevPageItem = document.getElementById('prev-page');
+            if (currentPage === 1) {
+                prevPageItem.classList.add('disabled');
+                prevPageItem.querySelector('a').setAttribute('aria-disabled', 'true');
+            } else {
+                prevPageItem.classList.remove('disabled');
+                prevPageItem.querySelector('a').removeAttribute('aria-disabled');
+            }
+            
+            // Update next button state
+            const nextPageItem = document.getElementById('next-page');
+            if (currentPage === totalPages) {
+                nextPageItem.classList.add('disabled');
+                nextPageItem.querySelector('a').setAttribute('aria-disabled', 'true');
+            } else {
+                nextPageItem.classList.remove('disabled');
+                nextPageItem.querySelector('a').removeAttribute('aria-disabled');
+            }
+        }
+        
+        function updateStaffTable(staff) {
+            const staffTable = document.getElementById('staff-table');
+            document.getElementById('staff-loading').style.display = 'none';
+            
+            staffTable.innerHTML = '';
+            
+            if (staff.length === 0) {
+                document.getElementById('no-staff-message').style.display = 'block';
+                return;
+            }
+            
+            document.getElementById('no-staff-message').style.display = 'none';
+            
+            staff.forEach(member => {
+                const row = document.createElement('tr');
+                
+                // Format status badge
+                let statusBadge = '';
+                switch(member.status) {
+                    case 'active':
+                        statusBadge = '<span class="badge bg-success">Active</span>';
+                        break;
+                    case 'inactive':
+                        statusBadge = '<span class="badge bg-danger">Inactive</span>';
+                        break;
+                    case 'on_leave':
+                        statusBadge = '<span class="badge bg-warning">On Leave</span>';
+                        break;
+                    default:
+                        statusBadge = '<span class="badge bg-secondary">Unknown</span>';
+                }
+                
+                // Format role badge
+                let roleBadge = '';
+                switch(member.role) {
+                    case 'captain':
+                        roleBadge = '<span class="badge bg-primary">Captain</span>';
+                        break;
+                    case 'engineer':
+                        roleBadge = '<span class="badge bg-info">Engineer</span>';
+                        break;
+                    case 'crew':
+                        roleBadge = '<span class="badge bg-secondary">Crew</span>';
+                        break;
+                    case 'admin':
+                        roleBadge = '<span class="badge bg-dark">Admin</span>';
+                        break;
+                    case 'support':
+                        roleBadge = '<span class="badge bg-light text-dark">Support</span>';
+                        break;
+                    default:
+                        roleBadge = '<span class="badge bg-secondary">Unknown</span>';
+                }
+                
+                row.innerHTML = `
+                    <td>${member.id}</td>
+                    <td>${member.firstName} ${member.lastName}</td>
+                    <td>${member.username}</td>
+                    <td>${roleBadge}</td>
+                    <td>${statusBadge}</td>
+                    <td>${member.shipName || 'Unassigned'}</td>
+                    <td><span class="badge rounded-pill bg-info">${member.taskCount || 0}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary view-staff" data-staff-id="${member.id}">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning edit-staff" data-staff-id="${member.id}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger delete-staff" data-staff-id="${member.id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                staffTable.appendChild(row);
+            });
+            
+            // Add event listeners to view, edit and delete buttons
+            document.querySelectorAll('.view-staff').forEach(button => {
+                button.addEventListener('click', function() {
+                    const staffId = this.getAttribute('data-staff-id');
+                    viewStaffDetails(staffId);
+                });
+            });
+            
+            document.querySelectorAll('.edit-staff').forEach(button => {
+                button.addEventListener('click', function() {
+                    const staffId = this.getAttribute('data-staff-id');
+                    editStaff(staffId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-staff').forEach(button => {
+                button.addEventListener('click', function() {
+                    const staffId = this.getAttribute('data-staff-id');
+                    deleteStaff(staffId);
+                });
+            });
+        }
+        
+        function updateStaffStats(staff) {
+            const totalStaff = staff.length;
+            const activeStaff = staff.filter(member => member.status === 'active').length;
+            const assignedStaff = staff.filter(member => member.shipName).length;
+            const unassignedStaff = staff.filter(member => !member.shipName).length;
+            
+            document.getElementById('total-staff-count').textContent = totalStaff;
+            document.getElementById('active-staff').textContent = activeStaff;
+            document.getElementById('assigned-staff').textContent = assignedStaff;
+            document.getElementById('unassigned-staff').textContent = unassignedStaff;
+        }
+        
+        function loadShipsForStaffAssignment() {
+            fetch('/api/ships')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch ships');
+                    }
+                    return response.json();
+                })
+                .then(ships => {
+                    updateShipsDropdownForStaff(ships);
+                })
+                .catch(error => {
+                    console.error('Error loading ships:', error);
+                });
+        }
+        
+        function updateShipsDropdownForStaff(ships) {
+            const shipDropdowns = [
+                document.getElementById('staff-ship'),
+                document.getElementById('edit-staff-ship'),
+                document.getElementById('staff-ship-filter')
+            ];
+            
+            shipDropdowns.forEach(dropdown => {
+                if (!dropdown) return;
+                
+                // Clear existing options except the first one
+                while (dropdown.options.length > 1) {
+                    dropdown.remove(1);
+                }
+                
+                // Add ship options
+                ships.forEach(ship => {
+                    const option = document.createElement('option');
+                    option.value = ship.id;
+                    option.textContent = ship.name;
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+        
+        // Save staff button event listener
+        document.getElementById('save-staff-btn').addEventListener('click', function() {
+            const firstName = document.getElementById('staff-first-name').value;
+            const lastName = document.getElementById('staff-last-name').value;
+            const username = document.getElementById('staff-username').value;
+            const password = document.getElementById('staff-password').value;
+            const role = document.getElementById('staff-role').value;
+            const shipId = document.getElementById('staff-ship').value;
+            const status = document.getElementById('staff-status').value;
+            
+            if (!firstName || !lastName || !username || !password || !role || !status) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            const staffData = {
+                firstName,
+                lastName,
+                username,
+                password,
+                role,
+                shipId: shipId || null,
+                status
+            };
+            
+            fetch('/api/staff', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(staffData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to create staff');
+                }
+                return response.json();
+            })
+            .then(result => {
+                alert('Staff created successfully');
+                // Clear form
+                document.getElementById('add-staff-form').reset();
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('addStaffModal')).hide();
+                // Reload staff data
+                loadStaff();
+                loadDashboardStats(); // Refresh dashboard stats
+            })
+            .catch(error => {
+                console.error('Error creating staff:', error);
+                alert('Failed to create staff. Please try again.');
+            });
+        });
+        
+        // Function to view staff details
+        function viewStaffDetails(staffId) {
+            fetch(`/api/staff/${staffId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch staff details');
+                    }
+                    return response.json();
+                })
+                .then(staff => {
+                    // Set modal data attribute for reference
+                    document.getElementById('staffDetailsModal').setAttribute('data-staff-id', staffId);
+                    
+                    // Populate staff details
+                    document.getElementById('staff-detail-name').textContent = `${staff.firstName} ${staff.lastName}`;
+                    document.getElementById('staff-detail-username').textContent = staff.username;
+                    document.getElementById('staff-detail-role').textContent = staff.role.charAt(0).toUpperCase() + staff.role.slice(1);
+                    document.getElementById('staff-detail-status').textContent = staff.status.charAt(0).toUpperCase() + staff.status.slice(1).replace('_', ' ');
+                    document.getElementById('staff-detail-ship').textContent = staff.shipName || 'Unassigned';
+                    document.getElementById('staff-detail-joined').textContent = staff.joinedDate || 'Unknown';
+                    
+                    // Set initials for avatar
+                    const initials = `${staff.firstName.charAt(0)}${staff.lastName.charAt(0)}`;
+                    document.getElementById('staff-initials').textContent = initials;
+                    
+                    // Load staff tasks
+                    loadStaffTasks(staffId);
+                    
+                    // Load staff problem reports
+                    loadStaffReports(staffId);
+                    
+                    // Open the modal
+                    new bootstrap.Modal(document.getElementById('staffDetailsModal')).show();
+                })
+                .catch(error => {
+                    console.error('Error fetching staff details:', error);
+                    alert('Failed to load staff details');
+                });
+        }
+        
+        // Function to load staff tasks
+        function loadStaffTasks(staffId) {
+            fetch(`/api/staff/${staffId}/tasks`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch staff tasks');
+                    }
+                    return response.json();
+                })
+                .then(tasks => {
+                    const tasksTable = document.getElementById('staff-tasks');
+                    tasksTable.innerHTML = '';
+                    
+                    if (tasks.length === 0) {
+                        document.getElementById('no-staff-tasks').style.display = 'block';
+                        return;
+                    }
+                    
+                    document.getElementById('no-staff-tasks').style.display = 'none';
+                    
+                    tasks.forEach(task => {
+                        const row = document.createElement('tr');
+                        
+                        // Format priority badge
+                        let priorityBadge = '';
+                        switch(task.priority) {
+                            case 'low':
+                                priorityBadge = '<span class="badge bg-success">Low</span>';
+                                break;
+                            case 'medium':
+                                priorityBadge = '<span class="badge bg-warning">Medium</span>';
+                                break;
+                            case 'high':
+                                priorityBadge = '<span class="badge bg-danger">High</span>';
+                                break;
+                            default:
+                                priorityBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        }
+                        
+                        // Format status badge
+                        let statusBadge = '';
+                        switch(task.status) {
+                            case 'pending':
+                                statusBadge = '<span class="badge bg-warning">Pending</span>';
+                                break;
+                            case 'in_progress':
+                                statusBadge = '<span class="badge bg-info">In Progress</span>';
+                                break;
+                            case 'completed':
+                                statusBadge = '<span class="badge bg-success">Completed</span>';
+                                break;
+                            default:
+                                statusBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        }
+                        
+                        row.innerHTML = `
+                            <td>${task.title}</td>
+                            <td>${priorityBadge}</td>
+                            <td>${statusBadge}</td>
+                            <td>${task.dueDate}</td>
+                        `;
+                        tasksTable.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading staff tasks:', error);
+                    // For demo purposes, show mock data
+                    const mockTasks = [
+                        { title: 'Engine Maintenance', priority: 'high', status: 'pending', dueDate: '2023-07-20' },
+                        { title: 'Safety Inspection', priority: 'medium', status: 'in_progress', dueDate: '2023-07-18' }
+                    ];
+                    
+                    const tasksTable = document.getElementById('staff-tasks');
+                    tasksTable.innerHTML = '';
+                    document.getElementById('no-staff-tasks').style.display = 'none';
+                    
+                    mockTasks.forEach(task => {
+                        const row = document.createElement('tr');
+                        
+                        // Format priority badge
+                        let priorityBadge = '';
+                        switch(task.priority) {
+                            case 'low':
+                                priorityBadge = '<span class="badge bg-success">Low</span>';
+                                break;
+                            case 'medium':
+                                priorityBadge = '<span class="badge bg-warning">Medium</span>';
+                                break;
+                            case 'high':
+                                priorityBadge = '<span class="badge bg-danger">High</span>';
+                                break;
+                            default:
+                                priorityBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        }
+                        
+                        // Format status badge
+                        let statusBadge = '';
+                        switch(task.status) {
+                            case 'pending':
+                                statusBadge = '<span class="badge bg-warning">Pending</span>';
+                                break;
+                            case 'in_progress':
+                                statusBadge = '<span class="badge bg-info">In Progress</span>';
+                                break;
+                            case 'completed':
+                                statusBadge = '<span class="badge bg-success">Completed</span>';
+                                break;
+                            default:
+                                statusBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        }
+                        
+                        row.innerHTML = `
+                            <td>${task.title}</td>
+                            <td>${priorityBadge}</td>
+                            <td>${statusBadge}</td>
+                            <td>${task.dueDate}</td>
+                        `;
+                        tasksTable.appendChild(row);
+                    });
+                });
+        }
+        
+        // Function to load staff problem reports
+        function loadStaffReports(staffId) {
+            fetch(`/api/staff/${staffId}/reports`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch staff reports');
+                    }
+                    return response.json();
+                })
+                .then(reports => {
+                    const reportsTable = document.getElementById('staff-reports');
+                    reportsTable.innerHTML = '';
+                    
+                    if (reports.length === 0) {
+                        document.getElementById('no-staff-reports').style.display = 'block';
+                        return;
+                    }
+                    
+                    document.getElementById('no-staff-reports').style.display = 'none';
+                    
+                    reports.forEach(report => {
+                        const row = document.createElement('tr');
+                        
+                        // Format severity badge
+                        let severityBadge = '';
+                        switch(report.severity) {
+                            case 'low':
+                                severityBadge = '<span class="badge bg-success">Low</span>';
+                                break;
+                            case 'medium':
+                                severityBadge = '<span class="badge bg-warning">Medium</span>';
+                                break;
+                            case 'high':
+                                severityBadge = '<span class="badge bg-danger">High</span>';
+                                break;
+                            case 'critical':
+                                severityBadge = '<span class="badge bg-danger">Critical</span>';
+                                break;
+                            default:
+                                severityBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        }
+                        
+                        // Format status badge
+                        let statusBadge = '';
+                        switch(report.status) {
+                            case 'open':
+                                statusBadge = '<span class="badge bg-danger">Open</span>';
+                                break;
+                            case 'in_progress':
+                                statusBadge = '<span class="badge bg-warning">In Progress</span>';
+                                break;
+                            case 'resolved':
+                                statusBadge = '<span class="badge bg-success">Resolved</span>';
+                                break;
+                            default:
+                                statusBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        }
+                        
+                        row.innerHTML = `
+                            <td>${report.title}</td>
+                            <td>${severityBadge}</td>
+                            <td>${statusBadge}</td>
+                            <td>${report.date}</td>
+                        `;
+                        reportsTable.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading staff reports:', error);
+                    // For demo purposes, show mock data
+                    const mockReports = [
+                        { title: 'Engine malfunction', severity: 'high', status: 'in_progress', date: '2023-07-15' },
+                        { title: 'Navigation system issue', severity: 'medium', status: 'open', date: '2023-07-14' }
+                    ];
+                    
+                    const reportsTable = document.getElementById('staff-reports');
+                    reportsTable.innerHTML = '';
+                    document.getElementById('no-staff-reports').style.display = 'none';
+                    
+                    mockReports.forEach(report => {
+                        const row = document.createElement('tr');
+                        
+                        // Format severity badge
+                        let severityBadge = '';
+                        switch(report.severity) {
+                            case 'low':
+                                severityBadge = '<span class="badge bg-success">Low</span>';
+                                break;
+                            case 'medium':
+                                severityBadge = '<span class="badge bg-warning">Medium</span>';
+                                break;
+                            case 'high':
+                                severityBadge = '<span class="badge bg-danger">High</span>';
+                                break;
+                            default:
+                                severityBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        }
+                        
+                        // Format status badge
+                        let statusBadge = '';
+                        switch(report.status) {
+                            case 'open':
+                                statusBadge = '<span class="badge bg-danger">Open</span>';
+                                break;
+                            case 'in_progress':
+                                statusBadge = '<span class="badge bg-warning">In Progress</span>';
+                                break;
+                            case 'resolved':
+                                statusBadge = '<span class="badge bg-success">Resolved</span>';
+                                break;
+                            default:
+                                statusBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        }
+                        
+                        row.innerHTML = `
+                            <td>${report.title}</td>
+                            <td>${severityBadge}</td>
+                            <td>${statusBadge}</td>
+                            <td>${report.date}</td>
+                        `;
+                        reportsTable.appendChild(row);
+                    });
+                });
+        }
+        
+        // Function to edit staff
+        function editStaff(staffId) {
+            fetch(`/api/staff/${staffId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch staff details');
+                    }
+                    return response.json();
+                })
+                .then(staff => {
+                    // Set form values
+                    document.getElementById('edit-staff-id').value = staffId;
+                    document.getElementById('edit-staff-first-name').value = staff.firstName;
+                    document.getElementById('edit-staff-last-name').value = staff.lastName;
+                    document.getElementById('edit-staff-username').value = staff.username;
+                    document.getElementById('edit-staff-role').value = staff.role;
+                    document.getElementById('edit-staff-status').value = staff.status;
+                    
+                    if (staff.shipId) {
+                        document.getElementById('edit-staff-ship').value = staff.shipId;
+                    } else {
+                        document.getElementById('edit-staff-ship').value = '';
+                    }
+                    
+                    // Reset password fields
+                    document.getElementById('reset-password-check').checked = false;
+                    document.getElementById('new-password-container').style.display = 'none';
+                    document.getElementById('new-password').value = '';
+                    
+                    // Open the modal
+                    new bootstrap.Modal(document.getElementById('editStaffModal')).show();
+                })
+                .catch(error => {
+                    console.error('Error fetching staff details for edit:', error);
+                    alert('Failed to load staff details for editing');
+                });
+        }
+        
+        // Update staff button event listener
+        document.getElementById('update-staff-btn').addEventListener('click', function() {
+            const staffId = document.getElementById('edit-staff-id').value;
+            const firstName = document.getElementById('edit-staff-first-name').value;
+            const lastName = document.getElementById('edit-staff-last-name').value;
+            const role = document.getElementById('edit-staff-role').value;
+            const shipId = document.getElementById('edit-staff-ship').value;
+            const status = document.getElementById('edit-staff-status').value;
+            const resetPassword = document.getElementById('reset-password-check').checked;
+            const newPassword = document.getElementById('new-password').value;
+            
+            if (!firstName || !lastName || !role || !status) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            if (resetPassword && !newPassword) {
+                alert('Please enter a new password');
+                return;
+            }
+            
+            const staffData = {
+                firstName,
+                lastName,
+                role,
+                shipId: shipId || null,
+                status
+            };
+            
+            if (resetPassword) {
+                staffData.password = newPassword;
+            }
+            
+            fetch(`/api/staff/${staffId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(staffData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update staff');
+                }
+                return response.json();
+            })
+            .then(result => {
+                alert('Staff updated successfully');
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('editStaffModal')).hide();
+                // Reload staff data
+                loadStaff();
+            })
+            .catch(error => {
+                console.error('Error updating staff:', error);
+                alert('Failed to update staff. Please try again.');
+            });
+        });
+        
+        // Function to delete staff
+        function deleteStaff(staffId) {
+            if (confirm('Are you sure you want to delete this staff member? This action cannot be undone.')) {
+                fetch(`/api/staff/${staffId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to delete staff');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('Staff deleted successfully');
+                    loadStaff();
+                    loadDashboardStats(); // Refresh dashboard stats
+                })
+                .catch(error => {
+                    console.error('Error deleting staff:', error);
+                    alert('Failed to delete staff. Please try again.');
+                });
+            }
+        }
+        
+        // Assign task to staff button event listener
+        document.getElementById('assign-task-btn').addEventListener('click', function() {
+            const staffId = document.getElementById('staffDetailsModal').getAttribute('data-staff-id');
+            // Store the staff ID in localStorage temporarily
+            localStorage.setItem('selectedStaffId', staffId);
+            
+            // Close the staff details modal
+            bootstrap.Modal.getInstance(document.getElementById('staffDetailsModal')).hide();
+            
+            // Navigate to tasks section and open add task modal
+            document.querySelector('[data-section="tasks-section"]').click();
+            
+            // Wait for tasks to load then open the modal
+            setTimeout(() => {
+                // Pre-select the staff in the dropdown
+                const staffDropdown = document.getElementById('task-assigned-to');
+                const staffIdToSelect = localStorage.getItem('selectedStaffId');
+                
+                // Find the staff member in the dropdown
+                for (let i = 0; i < staffDropdown.options.length; i++) {
+                    if (staffDropdown.options[i].value === staffIdToSelect) {
+                        staffDropdown.selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                // Open the add task modal
+                new bootstrap.Modal(document.getElementById('addTaskModal')).show();
+                
+                // Clear the temporary storage
+                localStorage.removeItem('selectedStaffId');
+            }, 500);
+        });
+        
+        // Edit staff details button event listener
+        document.getElementById('edit-staff-details-btn').addEventListener('click', function() {
+            const staffId = document.getElementById('staffDetailsModal').getAttribute('data-staff-id');
+            
+            // Close the staff details modal
+            bootstrap.Modal.getInstance(document.getElementById('staffDetailsModal')).hide();
+            
+            // Open the edit staff modal
+            editStaff(staffId);
+        });
+        
+        // Apply staff filters button event listener
+        document.getElementById('apply-staff-filters').addEventListener('click', applyStaffFilters);
+        
+        // Variables for ships data
+        let allShipsData = [];
+        let totalShipsCount = 0;
+        
+        // Variables for docks data
+        let allDocksData = [];
+        let totalDocksCount = 0;
+        
+        // Function to load ships
+        function loadShips() {
+            console.log("Loading ships...");
+            document.getElementById('ships-loading').style.display = 'block';
+            document.getElementById('no-ships-message').style.display = 'none';
+            document.getElementById('ships-table-body').innerHTML = '';
+            
+            fetch('/api/ships')
+                .then(response => {
+                    console.log("Ships API response status:", response.status);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch ships: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(ships => {
+                    console.log("Ships data received:", ships);
+                    allShipsData = ships || [];
+                    totalShipsCount = ships ? ships.length : 0;
+                    
+                    // Update UI with ship count
+                    const totalShipsElement = document.getElementById('total-ships');
+                    if (totalShipsElement) {
+                        totalShipsElement.textContent = totalShipsCount;
+                    }
+                    
+                    // Hide loading spinner
+                    document.getElementById('ships-loading').style.display = 'none';
+                    
+                    // Show ships or no-ships message
+                    if (!ships || ships.length === 0) {
+                        document.getElementById('no-ships-message').style.display = 'block';
+                    } else {
+                        updateShipsTable(ships);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading ships:', error);
+                    document.getElementById('ships-loading').style.display = 'none';
+                    document.getElementById('no-ships-message').style.display = 'block';
+                    document.getElementById('no-ships-message').textContent = 'Error loading ships: ' + error.message;
+                });
+        }
+
+        // Function to update ships table
+        function updateShipsTable(ships) {
+            const tableBody = document.getElementById('ships-table-body');
+            tableBody.innerHTML = '';
+            
+            // Hide loading spinner
+            document.getElementById('ships-loading').style.display = 'none';
+            
+            if (!ships || ships.length === 0) {
+                document.getElementById('no-ships-message').style.display = 'block';
+                return;
+            }
+            
+            ships.forEach(ship => {
+                const row = document.createElement('tr');
+                
+                // Create status badge
+                let statusBadgeClass = 'bg-secondary';
+                if (ship.status === 'Active') {
+                    statusBadgeClass = 'bg-success';
+                } else if (ship.status === 'Maintenance') {
+                    statusBadgeClass = 'bg-warning';
+                } else if (ship.status === 'Out of Service') {
+                    statusBadgeClass = 'bg-danger';
+                }
+                
+                row.innerHTML = `
+                    <td>${ship.id}</td>
+                    <td>${ship.name}</td>
+                    <td>${ship.type || 'N/A'}</td>
+                    <td>${ship.capacity || 'N/A'}</td>
+                    <td><span class="badge ${statusBadgeClass}">${ship.status || 'Unknown'}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="viewShipDetails(${ship.id})">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="editShip(${ship.id})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteShip(${ship.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to view ship details
+        function viewShipDetails(shipId) {
+            fetch(`/api/ships/${shipId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch ship details');
+                    }
+                    return response.json();
+                })
+                .then(ship => {
+                    // Create a formatted details string
+                    const details = `
+                        <h4>${ship.name}</h4>
+                        <p><strong>Type:</strong> ${ship.type || 'N/A'}</p>
+                        <p><strong>Capacity:</strong> ${ship.capacity || 'N/A'}</p>
+                        <p><strong>Status:</strong> ${ship.status || 'Unknown'}</p>
+                    `;
+                    
+                    // Show the details in a modal or alert
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.innerHTML = details;
+                    alert(detailsDiv.textContent);
+                })
+                .catch(error => {
+                    console.error('Error loading ship details:', error);
+                    alert('Error loading ship details. Please try again.');
+                });
+        }
+
+        // Function to edit ship
+        function editShip(shipId) {
+            fetch(`/api/ships/${shipId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch ship details for editing');
+                    }
+                    return response.json();
+                })
+                .then(ship => {
+                    // Here you would populate form fields in an edit modal
+                    alert(`Edit functionality for ship ${ship.name} is not yet implemented.`);
+                    
+                    // In a real implementation, you would:
+                    // 1. Open a modal with a form
+                    // 2. Populate the form with ship data
+                    // 3. Handle form submission with a PUT request to update the ship
+                })
+                .catch(error => {
+                    console.error('Error loading ship for edit:', error);
+                    alert('Error loading ship data for editing. Please try again.');
+                });
+        }
+
+        // Function to delete ship
+        function deleteShip(shipId) {
+            if (confirm('Are you sure you want to delete this ship?')) {
+                fetch(`/api/ships/${shipId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to delete ship');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('Ship deleted successfully');
+                    loadShips(); // Reload the ships list
+                })
+                .catch(error => {
+                    console.error('Error deleting ship:', error);
+                    alert('Error deleting ship. Please try again.');
+                });
+            }
+        }
+        
+        // Load bookings data
+        function loadBookings() {
+            document.getElementById('bookings-loading').style.display = 'block';
+            document.getElementById('no-bookings-message').style.display = 'none';
+            
+            fetch('/api/bookings')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch bookings');
+                    }
+                    return response.json();
+                })
+                .then(bookings => {
+                    allBookingsData = bookings;
+                    updateBookingsTable(bookings);
+                })
+                .catch(error => {
+                    console.error('Error loading bookings:', error);
+                    document.getElementById('bookings-loading').style.display = 'none';
+                    document.getElementById('no-bookings-message').style.display = 'block';
+                    document.getElementById('no-bookings-message').textContent = 'Error loading bookings. Please try again.';
+                });
+        }
+        
+        // Update bookings table with data
+        function updateBookingsTable(bookings) {
+            const tableBody = document.getElementById('bookings-table-body');
+            tableBody.innerHTML = '';
+            
+            document.getElementById('bookings-loading').style.display = 'none';
+            
+            if (!bookings || bookings.length === 0) {
+                document.getElementById('no-bookings-message').style.display = 'block';
+                return;
+            }
+            
+            bookings.forEach(booking => {
+                const row = document.createElement('tr');
+                
+                // Format dates
+                const startDate = new Date(booking.start_date);
+                const endDate = new Date(booking.end_date);
+                const createdDate = new Date(booking.created_at);
+                
+                // Determine status badge class
+                let statusBadgeClass = 'bg-secondary';
+                if (booking.status === 'Pending') statusBadgeClass = 'bg-warning text-dark';
+                if (booking.status === 'Approved') statusBadgeClass = 'bg-success';
+                if (booking.status === 'Rejected') statusBadgeClass = 'bg-danger';
+                if (booking.status === 'Completed') statusBadgeClass = 'bg-info';
+                if (booking.status === 'Cancelled') statusBadgeClass = 'bg-secondary';
+                
+                row.innerHTML = `
+                    <td>${booking.id}</td>
+                    <td>${booking.ship_name}</td>
+                    <td>${booking.user_username}</td>
+                    <td>${startDate.toLocaleDateString()}</td>
+                    <td>${endDate.toLocaleDateString()}</td>
+                    <td><span class="badge ${statusBadgeClass}">${booking.status}</span></td>
+                    <td>${createdDate.toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary view-booking-details" data-booking-id="${booking.id}">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        ${booking.status === 'Pending' ? `
+                            <button class="btn btn-sm btn-success approve-booking" data-booking-id="${booking.id}">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger reject-booking" data-booking-id="${booking.id}">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-danger delete-booking" data-booking-id="${booking.id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.view-booking-details').forEach(button => {
+                button.addEventListener('click', () => viewBookingDetails(button.getAttribute('data-booking-id')));
+            });
+            
+            document.querySelectorAll('.approve-booking').forEach(button => {
+                button.addEventListener('click', () => updateBookingStatus(button.getAttribute('data-booking-id'), 'Approved'));
+            });
+            
+            document.querySelectorAll('.reject-booking').forEach(button => {
+                button.addEventListener('click', () => updateBookingStatus(button.getAttribute('data-booking-id'), 'Rejected'));
+            });
+            
+            document.querySelectorAll('.delete-booking').forEach(button => {
+                button.addEventListener('click', () => {
+                    currentBookingId = button.getAttribute('data-booking-id');
+                    const deleteModal = new bootstrap.Modal(document.getElementById('delete-booking-modal'));
+                    deleteModal.show();
+                });
+            });
+        }
+        
+        // View booking details
+        function viewBookingDetails(bookingId) {
+            const booking = allBookingsData.find(b => b.id == bookingId);
+            if (!booking) return;
+            
+            currentBookingId = bookingId;
+            
+            // Format dates
+            const startDate = new Date(booking.start_date);
+            const endDate = new Date(booking.end_date);
+            const createdDate = new Date(booking.created_at);
+            
+            // Determine status badge class
+            let statusBadgeClass = 'bg-secondary';
+            if (booking.status === 'Pending') statusBadgeClass = 'bg-warning text-dark';
+            if (booking.status === 'Approved') statusBadgeClass = 'bg-success';
+            if (booking.status === 'Rejected') statusBadgeClass = 'bg-danger';
+            if (booking.status === 'Completed') statusBadgeClass = 'bg-info';
+            if (booking.status === 'Cancelled') statusBadgeClass = 'bg-secondary';
+            
+            // Populate modal
+            document.getElementById('modal-booking-id').textContent = booking.id;
+            document.getElementById('modal-ship-name').textContent = booking.ship_name;
+            document.getElementById('modal-ship-type').textContent = booking.ship_type || 'N/A';
+            document.getElementById('modal-username').textContent = booking.user_username;
+            document.getElementById('modal-start-date').textContent = startDate.toLocaleDateString();
+            document.getElementById('modal-end-date').textContent = endDate.toLocaleDateString();
+            document.getElementById('modal-created-at').textContent = createdDate.toLocaleString();
+            document.getElementById('modal-purpose').textContent = booking.purpose || 'No purpose specified';
+            
+            const statusBadge = document.getElementById('modal-status-badge');
+            statusBadge.textContent = booking.status;
+            statusBadge.className = `badge ${statusBadgeClass}`;
+            
+            // Show/hide action buttons based on status
+            const isPending = booking.status === 'Pending';
+            document.getElementById('approve-booking-btn').style.display = isPending ? 'inline-block' : 'none';
+            document.getElementById('reject-booking-btn').style.display = isPending ? 'inline-block' : 'none';
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('booking-details-modal'));
+            modal.show();
+        }
+        
+        // Update booking status
+        function updateBookingStatus(bookingId, status) {
+            fetch(`/api/bookings/${bookingId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update booking status');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Hide modal if open
+                const modal = bootstrap.Modal.getInstance(document.getElementById('booking-details-modal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Reload bookings
+                loadBookings();
+                
+                // Show success message
+                showAlert(`Booking ${status.toLowerCase()} successfully`, 'success');
+            })
+            .catch(error => {
+                console.error('Error updating booking status:', error);
+                showAlert('Error updating booking status', 'danger');
+            });
+        }
+        
+        // Delete booking
+        function deleteBooking(bookingId) {
+            fetch(`/api/bookings/${bookingId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete booking');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Hide modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('delete-booking-modal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Reload bookings
+                loadBookings();
+                
+                // Show success message
+                showAlert('Booking deleted successfully', 'success');
+            })
+            .catch(error => {
+                console.error('Error deleting booking:', error);
+                showAlert('Error deleting booking', 'danger');
+            });
+        }
+        
+        // Apply booking filters
+        function applyBookingFilters() {
+            const statusFilter = document.getElementById('booking-status-filter').value;
+            const dateFilter = document.getElementById('booking-date-filter').value;
+            
+            let filteredBookings = [...allBookingsData];
+            
+            // Apply status filter
+            if (statusFilter !== 'all') {
+                filteredBookings = filteredBookings.filter(booking => booking.status === statusFilter);
+            }
+            
+            // Apply date filter
+            if (dateFilter !== 'all') {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                filteredBookings = filteredBookings.filter(booking => {
+                    const startDate = new Date(booking.start_date);
+                    const endDate = new Date(booking.end_date);
+                    
+                    if (dateFilter === 'upcoming') {
+                        return startDate > today;
+                    } else if (dateFilter === 'past') {
+                        return endDate < today;
+                    } else if (dateFilter === 'current') {
+                        return startDate <= today && endDate >= today;
+                    }
+                    return true;
+                });
+            }
+            
+            updateBookingsTable(filteredBookings);
+        }
+        
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar navigation
+            setupNavigation();
+            
+            // Load initial data
+            loadStaff();
+            loadShips();
+            loadDocks();
+            loadBookings();
+            loadTasks();
+            loadProblems();
+            
+            // Event listeners for filters
+            document.getElementById('apply-staff-filters').addEventListener('click', applyStaffFilters);
+            document.getElementById('reset-staff-filters').addEventListener('click', resetStaffFilters);
+            
+            document.getElementById('apply-booking-filters').addEventListener('click', applyBookingFilters);
+            document.getElementById('reset-booking-filters').addEventListener('click', function() {
+                document.getElementById('booking-status-filter').value = 'all';
+                document.getElementById('booking-date-filter').value = 'all';
+                updateBookingsTable(allBookingsData);
+            });
+            
+            // Event listeners for modals
+            document.getElementById('save-ship-btn').addEventListener('click', saveShip);
+            document.getElementById('save-dock-btn').addEventListener('click', saveDock);
+            document.getElementById('confirm-delete-booking-btn').addEventListener('click', function() {
+                deleteBooking(currentBookingId);
+            });
+            
+            document.getElementById('approve-booking-btn').addEventListener('click', function() {
+                updateBookingStatus(currentBookingId, 'Approved');
+            });
+            
+            // Task modal event listeners
+            document.getElementById('save-task-btn').addEventListener('click', saveTask);
+            document.getElementById('complete-task-btn').addEventListener('click', completeTask);
+            
+            // Problem modal event listeners
+            document.getElementById('edit-problem-btn').addEventListener('click', toggleProblemEditMode);
+            document.getElementById('save-problem-btn').addEventListener('click', updateProblemResolution);
+            
+            // Refresh buttons
+            document.getElementById('refresh-tasks').addEventListener('click', loadTasks);
+            document.getElementById('refresh-problems').addEventListener('click', loadProblems);
+        });
+        
+        // Variables for tasks data
+        let allTasksData = [];
+        
+        // Variables for problems data
+        let allProblemsData = [];
+        let currentTaskId = null;
+        let currentProblemId = null;
+        
+        // Function to load tasks
+        function loadTasks() {
+            console.log("Loading tasks...");
+            document.getElementById('tasks-loading').style.display = 'block';
+            document.getElementById('no-tasks-message').style.display = 'none';
+            document.getElementById('tasks-table').innerHTML = '';
+            
+            fetch('/api/tasks')
+                .then(response => {
+                    console.log("Tasks API response status:", response.status);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch tasks: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(tasks => {
+                    console.log("Tasks data received:", tasks);
+                    allTasksData = tasks || [];
+                    
+                    // Update UI with task count
+                    const pendingTasksElement = document.getElementById('pending-tasks');
+                    if (pendingTasksElement) {
+                        const pendingCount = tasks ? tasks.filter(task => task.status !== 'completed' && task.status !== 'rejected').length : 0;
+                        pendingTasksElement.textContent = pendingCount;
+                    }
+                    
+                    // Hide loading spinner
+                    document.getElementById('tasks-loading').style.display = 'none';
+                    
+                    // Show tasks or no-tasks message
+                    if (!tasks || tasks.length === 0) {
+                        document.getElementById('no-tasks-message').style.display = 'block';
+                    } else {
+                        updateTasksTable(tasks);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading tasks:', error);
+                    document.getElementById('tasks-loading').style.display = 'none';
+                    document.getElementById('no-tasks-message').style.display = 'block';
+                    document.getElementById('no-tasks-message').textContent = 'Error loading tasks: ' + error.message;
+                });
+        }
+        
+        // Function to update tasks table
+        function updateTasksTable(tasks) {
+            const tableBody = document.getElementById('tasks-table');
+            tableBody.innerHTML = '';
+            
+            // Hide loading spinner
+            document.getElementById('tasks-loading').style.display = 'none';
+            
+            if (!tasks || tasks.length === 0) {
+                document.getElementById('no-tasks-message').style.display = 'block';
+                return;
+            }
+            
+            tasks.forEach(task => {
+                const row = document.createElement('tr');
+                
+                // Create priority badge
+                let priorityBadgeClass = 'bg-secondary';
+                if (task.priority === 'low') {
+                    priorityBadgeClass = 'bg-info';
+                } else if (task.priority === 'medium') {
+                    priorityBadgeClass = 'bg-warning text-dark';
+                } else if (task.priority === 'high') {
+                    priorityBadgeClass = 'bg-danger';
+                } else if (task.priority === 'urgent') {
+                    priorityBadgeClass = 'bg-danger';
+                }
+                
+                // Create status badge
+                let statusBadgeClass = 'bg-secondary';
+                if (task.status === 'pending') {
+                    statusBadgeClass = 'bg-warning text-dark';
+                } else if (task.status === 'accepted') {
+                    statusBadgeClass = 'bg-info';
+                } else if (task.status === 'in_progress') {
+                    statusBadgeClass = 'bg-primary';
+                } else if (task.status === 'completed') {
+                    statusBadgeClass = 'bg-success';
+                } else if (task.status === 'rejected') {
+                    statusBadgeClass = 'bg-danger';
+                }
+                
+                // Format due date
+                const dueDate = new Date(task.due_date);
+                
+                row.innerHTML = `
+                    <td>${task.id}</td>
+                    <td>${task.title}</td>
+                    <td>${task.assigned_to_name || 'Unassigned'}</td>
+                    <td>${task.ship_name || 'N/A'}</td>
+                    <td><span class="badge ${priorityBadgeClass}">${task.priority}</span></td>
+                    <td><span class="badge ${statusBadgeClass}">${task.status}</span></td>
+                    <td>${dueDate.toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="viewTaskDetails(${task.id})">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteTask(${task.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Function to load problem reports
+        function loadProblems() {
+            console.log("Loading problem reports...");
+            document.getElementById('problems-loading').style.display = 'block';
+            document.getElementById('no-problems-message').style.display = 'none';
+            document.getElementById('problems-table').innerHTML = '';
+            
+            fetch('/api/problems')
+                .then(response => {
+                    console.log("Problems API response status:", response.status);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch problems: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(problems => {
+                    console.log("Problems data received:", problems);
+                    allProblemsData = problems || [];
+                    
+                    // Update UI with problem counts
+                    const openProblemsElement = document.getElementById('open-problems');
+                    if (openProblemsElement) {
+                        const openCount = problems ? problems.filter(problem => problem.status !== 'resolved').length : 0;
+                        openProblemsElement.textContent = openCount;
+                    }
+                    
+                    // Hide loading spinner
+                    document.getElementById('problems-loading').style.display = 'none';
+                    
+                    // Show problems or no-problems message
+                    if (!problems || problems.length === 0) {
+                        document.getElementById('no-problems-message').style.display = 'block';
+                    } else {
+                        updateProblemsTable(problems);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading problems:', error);
+                    document.getElementById('problems-loading').style.display = 'none';
+                    document.getElementById('no-problems-message').style.display = 'block';
+                    document.getElementById('no-problems-message').textContent = 'Error loading problem reports: ' + error.message;
+                });
+        }
+        
+        // Function to update problems table
+        function updateProblemsTable(problems) {
+            const tableBody = document.getElementById('problems-table');
+            tableBody.innerHTML = '';
+            
+            // Hide loading spinner
+            document.getElementById('problems-loading').style.display = 'none';
+            
+            if (!problems || problems.length === 0) {
+                document.getElementById('no-problems-message').style.display = 'block';
+                return;
+            }
+            
+            problems.forEach(problem => {
+                const row = document.createElement('tr');
+                
+                // Create severity badge
+                let severityBadgeClass = 'bg-secondary';
+                if (problem.severity === 'low') {
+                    severityBadgeClass = 'bg-info';
+                } else if (problem.severity === 'medium') {
+                    severityBadgeClass = 'bg-warning text-dark';
+                } else if (problem.severity === 'high') {
+                    severityBadgeClass = 'bg-danger';
+                } else if (problem.severity === 'critical') {
+                    severityBadgeClass = 'bg-danger';
+                }
+                
+                // Create status badge
+                let statusBadgeClass = 'bg-secondary';
+                if (problem.status === 'open') {
+                    statusBadgeClass = 'bg-danger';
+                } else if (problem.status === 'in_progress') {
+                    statusBadgeClass = 'bg-warning text-dark';
+                } else if (problem.status === 'resolved') {
+                    statusBadgeClass = 'bg-success';
+                }
+                
+                // Format date
+                const reportedDate = new Date(problem.reported_at);
+                
+                row.innerHTML = `
+                    <td>${problem.id}</td>
+                    <td>${problem.title}</td>
+                    <td>${problem.reported_by_name || 'Anonymous'}</td>
+                    <td>${problem.ship_name || 'N/A'}</td>
+                    <td><span class="badge ${severityBadgeClass}">${problem.severity}</span></td>
+                    <td><span class="badge ${statusBadgeClass}">${problem.status}</span></td>
+                    <td>${reportedDate.toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="viewProblemDetails(${problem.id})">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Function to view task details
+        function viewTaskDetails(taskId) {
+            currentTaskId = taskId;
+            
+            fetch(`/api/tasks/${taskId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch task details');
+                    }
+                    return response.json();
+                })
+                .then(task => {
+                    // Populate the task details modal
+                    document.getElementById('task-detail-title').textContent = task.title;
+                    document.getElementById('task-detail-description').textContent = task.description;
+                    
+                    // Set priority badge
+                    const priorityBadge = document.getElementById('task-detail-priority');
+                    priorityBadge.textContent = task.priority;
+                    
+                    if (task.priority === 'low') {
+                        priorityBadge.className = 'badge bg-info';
+                    } else if (task.priority === 'medium') {
+                        priorityBadge.className = 'badge bg-warning text-dark';
+                    } else if (task.priority === 'high') {
+                        priorityBadge.className = 'badge bg-danger';
+                    } else if (task.priority === 'urgent') {
+                        priorityBadge.className = 'badge bg-danger';
+                    } else {
+                        priorityBadge.className = 'badge bg-secondary';
+                    }
+                    
+                    // Set status badge
+                    const statusBadge = document.getElementById('task-detail-status');
+                    statusBadge.textContent = task.status;
+                    
+                    if (task.status === 'pending') {
+                        statusBadge.className = 'badge bg-warning text-dark';
+                    } else if (task.status === 'accepted') {
+                        statusBadge.className = 'badge bg-info';
+                    } else if (task.status === 'in_progress') {
+                        statusBadge.className = 'badge bg-primary';
+                    } else if (task.status === 'completed') {
+                        statusBadge.className = 'badge bg-success';
+                    } else if (task.status === 'rejected') {
+                        statusBadge.className = 'badge bg-danger';
+                    } else {
+                        statusBadge.className = 'badge bg-secondary';
+                    }
+                    
+                    // Format dates
+                    const dueDate = new Date(task.due_date);
+                    const createdDate = new Date(task.created_at);
+                    const updatedDate = new Date(task.updated_at);
+                    
+                    document.getElementById('task-detail-due-date').textContent = dueDate.toLocaleDateString();
+                    document.getElementById('task-detail-created').textContent = createdDate.toLocaleDateString();
+                    document.getElementById('task-detail-updated').textContent = updatedDate.toLocaleDateString();
+                    
+                    // Set other details
+                    document.getElementById('task-detail-assigned-by').textContent = task.assigned_by_name || 'System';
+                    document.getElementById('task-detail-assigned-to').textContent = task.assigned_to_name || 'Unassigned';
+                    document.getElementById('task-detail-ship').textContent = task.ship_name || 'N/A';
+                    
+                    // Show/hide action buttons based on task status
+                    const completeBtn = document.getElementById('complete-task-btn');
+                    if (task.status === 'completed' || task.status === 'rejected') {
+                        completeBtn.style.display = 'none';
+                    } else {
+                        completeBtn.style.display = 'block';
+                    }
+                    
+                    // Show the modal
+                    const taskModal = new bootstrap.Modal(document.getElementById('taskDetailsModal'));
+                    taskModal.show();
+                })
+                .catch(error => {
+                    console.error('Error loading task details:', error);
+                    alert('Error loading task details. Please try again.');
+                });
+        }
+        
+        // Function to save a new task
+        function saveTask() {
+            const title = document.getElementById('task-title').value;
+            const description = document.getElementById('task-description').value;
+            const assignedTo = document.getElementById('task-assigned-to').value;
+            const shipId = document.getElementById('task-ship').value;
+            const priority = document.getElementById('task-priority').value;
+            const dueDate = document.getElementById('task-due-date').value;
+            
+            if (!title || !description || !assignedTo || !dueDate) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            const taskData = {
+                title: title,
+                description: description,
+                assigned_to: assignedTo,
+                ship_id: shipId || null,
+                priority: priority,
+                due_date: dueDate,
+                status: 'pending'
+            };
+            
+            fetch('/api/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(taskData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to create task');
+                }
+                return response.json();
+            })
+            .then(result => {
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('addTaskModal')).hide();
+                
+                // Reset form
+                document.getElementById('add-task-form').reset();
+                
+                // Reload tasks
+                loadTasks();
+                
+                // Show success message
+                alert('Task assigned successfully');
+            })
+            .catch(error => {
+                console.error('Error creating task:', error);
+                alert('Failed to create task. Please try again.');
+            });
+        }
+        
+        // Function to complete a task
+        function completeTask() {
+            if (!currentTaskId) return;
+            
+            fetch(`/api/tasks/${currentTaskId}/complete`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to complete task');
+                }
+                return response.json();
+            })
+            .then(result => {
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('taskDetailsModal')).hide();
+                
+                // Reload tasks
+                loadTasks();
+                
+                // Show success message
+                alert('Task marked as complete');
+            })
+            .catch(error => {
+                console.error('Error completing task:', error);
+                alert('Failed to complete task. Please try again.');
+            });
+        }
+        
+        // Function to delete a task
+        function deleteTask(taskId) {
+            if (!taskId && currentTaskId) {
+                taskId = currentTaskId;
+            }
+            
+            if (!taskId) return;
+            
+            if (confirm('Are you sure you want to delete this task?')) {
+                fetch(`/api/tasks/${taskId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to delete task');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Close modal if open
+                    const taskModal = bootstrap.Modal.getInstance(document.getElementById('taskDetailsModal'));
+                    if (taskModal) {
+                        taskModal.hide();
+                    }
+                    
+                    // Reload tasks
+                    loadTasks();
+                    
+                    // Show success message
+                    alert('Task deleted successfully');
+                })
+                .catch(error => {
+                    console.error('Error deleting task:', error);
+                    alert('Failed to delete task. Please try again.');
+                });
+            }
+        }
+        
+        // Function to apply task filters
+        function applyTaskFilters() {
+            const statusFilter = document.getElementById('task-status-filter').value;
+            const priorityFilter = document.getElementById('task-priority-filter').value;
+            const staffFilter = document.getElementById('task-staff-filter').value;
+            
+            let filteredTasks = [...allTasksData];
+            
+            // Apply status filter
+            if (statusFilter) {
+                filteredTasks = filteredTasks.filter(task => task.status === statusFilter);
+            }
+            
+            // Apply priority filter
+            if (priorityFilter) {
+                filteredTasks = filteredTasks.filter(task => task.priority === priorityFilter);
+            }
+            
+            // Apply staff filter
+            if (staffFilter) {
+                filteredTasks = filteredTasks.filter(task => task.assigned_to === staffFilter);
+            }
+            
+            updateTasksTable(filteredTasks);
+        }
+        
+        // Function to view problem details
+        function viewProblemDetails(problemId) {
+            currentProblemId = problemId;
+            
+            fetch(`/api/problems/${problemId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch problem details');
+                    }
+                    return response.json();
+                })
+                .then(problem => {
+                    // Populate the problem details modal
+                    document.getElementById('problem-detail-title').textContent = problem.title;
+                    document.getElementById('problem-detail-description').textContent = problem.description;
+                    
+                    // Set severity badge
+                    const severityBadge = document.getElementById('problem-detail-severity');
+                    severityBadge.textContent = problem.severity;
+                    
+                    if (problem.severity === 'low') {
+                        severityBadge.className = 'badge bg-info';
+                    } else if (problem.severity === 'medium') {
+                        severityBadge.className = 'badge bg-warning text-dark';
+                    } else if (problem.severity === 'high') {
+                        severityBadge.className = 'badge bg-danger';
+                    } else if (problem.severity === 'critical') {
+                        severityBadge.className = 'badge bg-danger';
+                    } else {
+                        severityBadge.className = 'badge bg-secondary';
+                    }
+                    
+                    // Set status badge
+                    const statusBadge = document.getElementById('problem-detail-status');
+                    statusBadge.textContent = problem.status;
+                    
+                    if (problem.status === 'open') {
+                        statusBadge.className = 'badge bg-danger';
+                    } else if (problem.status === 'in_progress') {
+                        statusBadge.className = 'badge bg-warning text-dark';
+                    } else if (problem.status === 'resolved') {
+                        statusBadge.className = 'badge bg-success';
+                    } else {
+                        statusBadge.className = 'badge bg-secondary';
+                    }
+                    
+                    // Format dates
+                    const reportedDate = new Date(problem.reported_at);
+                    const updatedDate = new Date(problem.updated_at);
+                    
+                    document.getElementById('problem-detail-reported-date').textContent = reportedDate.toLocaleDateString();
+                    document.getElementById('problem-detail-updated').textContent = updatedDate.toLocaleDateString();
+                    
+                    // Set other details
+                    document.getElementById('problem-detail-reported-by').textContent = problem.reported_by_name || 'Anonymous';
+                    document.getElementById('problem-detail-ship').textContent = problem.ship_name || 'N/A';
+                    document.getElementById('problem-detail-location').textContent = problem.location || 'Not specified';
+                    
+                    // Set resolution
+                    const resolutionElement = document.getElementById('problem-detail-resolution');
+                    resolutionElement.textContent = problem.resolution || 'No resolution provided yet.';
+                    
+                    // Reset edit mode
+                    document.getElementById('edit-problem-btn').style.display = 'inline-block';
+                    document.getElementById('save-problem-btn').style.display = 'none';
+                    document.getElementById('problem-resolution-edit').style.display = 'none';
+                    document.getElementById('problem-resolution-view').style.display = 'block';
+                    
+                    // Show the modal
+                    const problemModal = new bootstrap.Modal(document.getElementById('problemDetailsModal'));
+                    problemModal.show();
+                })
+                .catch(error => {
+                    console.error('Error loading problem details:', error);
+                    alert('Error loading problem details. Please try again.');
+                });
+        }
+        
+        // Function to toggle problem edit mode
+        function toggleProblemEditMode() {
+            const editorElement = document.getElementById('problem-resolution-edit');
+            const displayElement = document.getElementById('problem-resolution-view');
+            const editBtn = document.getElementById('edit-problem-btn');
+            const saveBtn = document.getElementById('save-problem-btn');
+            
+            // Switch to edit mode
+            editorElement.style.display = 'block';
+            displayElement.style.display = 'none';
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'inline-block';
+            
+            // Copy current resolution to editor
+            const currentResolution = document.getElementById('problem-detail-resolution').textContent;
+            document.getElementById('problem-resolution').value = currentResolution !== 'No resolution provided yet.' ? currentResolution : '';
+            
+            // Set current status
+            const statusBadge = document.getElementById('problem-detail-status');
+            document.getElementById('problem-status').value = statusBadge.textContent.toLowerCase();
+        }
+        
+        // Function to update problem resolution
+        function updateProblemResolution() {
+            if (!currentProblemId) return;
+            
+            const resolution = document.getElementById('problem-resolution').value;
+            const status = document.getElementById('problem-status').value;
+            
+            const updateData = {
+                resolution: resolution,
+                status: status
+            };
+            
+            fetch(`/api/problems/${currentProblemId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(updateData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update problem');
+                }
+                return response.json();
+            })
+            .then(result => {
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('problemDetailsModal')).hide();
+                
+                // Reload problems
+                loadProblems();
+                
+                // Show success message
+                alert('Problem report updated successfully');
+            })
+            .catch(error => {
+                console.error('Error updating problem:', error);
+                alert('Failed to update problem. Please try again.');
+            });
+        }
+        
+        // Function to apply problem filters
+        function applyProblemFilters() {
+            const statusFilter = document.getElementById('problem-status-filter').value;
+            const severityFilter = document.getElementById('problem-severity-filter').value;
+            const shipFilter = document.getElementById('problem-ship-filter').value;
+            
+            let filteredProblems = [...allProblemsData];
+            
+            // Apply status filter
+            if (statusFilter) {
+                filteredProblems = filteredProblems.filter(problem => problem.status === statusFilter);
+            }
+            
+            // Apply severity filter
+            if (severityFilter) {
+                filteredProblems = filteredProblems.filter(problem => problem.severity === severityFilter);
+            }
+            
+            // Apply ship filter
+            if (shipFilter) {
+                filteredProblems = filteredProblems.filter(problem => problem.ship_id === parseInt(shipFilter));
+            }
+            
+            updateProblemsTable(filteredProblems);
         }
     </script>
 </body>

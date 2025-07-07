@@ -8,126 +8,202 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <style>
         body {
-            padding-top: 20px;
             background-color: #f8f9fa;
         }
+        .navbar {
+            background-color: #2c3e50;
+        }
+        .navbar-brand, .navbar-nav .nav-link {
+            color: white;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #3498db;
+        }
         .ship-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-            height: 100%;
+            transition: transform 0.3s;
             margin-bottom: 20px;
-            border: none;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            height: 100%;
         }
         .ship-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-        .status-badge {
+        .ship-status {
             position: absolute;
             top: 10px;
             right: 10px;
         }
-        .card-img-top {
-            height: 180px;
+        .ship-image {
+            height: 200px;
             object-fit: cover;
         }
-        .card-body {
-            padding: 1.25rem;
+        .filter-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        .card-text {
-            color: #6c757d;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-        .badge {
-            font-weight: 500;
-            padding: 0.35em 0.65em;
-        }
-        .search-container {
-            max-width: 500px;
-            margin: 0 auto 2rem;
-        }
-        .ship-feature {
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
             display: flex;
+            justify-content: center;
             align-items: center;
-            margin-bottom: 0.5rem;
-        }
-        .ship-feature i {
-            width: 20px;
-            margin-right: 10px;
-            color: #3498db;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white rounded shadow-sm mb-4">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="user-dashboard.html">
-                <i class="bi bi-ship me-2"></i>Ship Management
-            </a>
-            <div class="d-flex align-items-center">
-                <a href="user-dashboard.html" class="btn btn-outline-secondary me-2">
-                    <i class="bi bi-arrow-left"></i> Back to Dashboard
-                </a>
-                <a href="#" class="btn btn-outline-danger" id="logout-link">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
+            <a class="navbar-brand" href="user-dashboard.html">Ship Portal</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="user-dashboard.html"><i class="bi bi-house-door"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="ships.html"><i class="bi bi-ship"></i> Ships</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="user-dashboard.html#bookings"><i class="bi bi-calendar-check"></i> My Bookings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="user-dashboard.html#settings"><i class="bi bi-gear"></i> Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logout-link"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container">
-        <!-- Page Header -->
-        <div class="text-center mb-5">
-            <h1 class="display-5 fw-bold mb-3">Available Ships</h1>
-            <p class="lead text-muted">Browse and book from our fleet of modern vessels</p>
-            
-            <div class="search-container">
-                <div class="input-group">
-                    <input type="text" class="form-control form-control-lg" id="searchInput" placeholder="Search ships by name, type, or location...">
-                    <button class="btn btn-primary" type="button" id="searchButton">
-                        <i class="bi bi-search"></i> Search
+    <!-- Main Content -->
+    <div class="container py-4">
+        <h1 class="mb-4">Available Ships</h1>
+        
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="ship-type-filter" class="form-label">Ship Type</label>
+                    <select class="form-select" id="ship-type-filter">
+                        <option value="">All Types</option>
+                        <option value="Cargo">Cargo</option>
+                        <option value="Passenger">Passenger</option>
+                        <option value="Tanker">Tanker</option>
+                        <option value="Container">Container</option>
+                        <option value="Bulk Carrier">Bulk Carrier</option>
+                        <option value="Fishing">Fishing</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="capacity-filter" class="form-label">Min Capacity</label>
+                    <input type="number" class="form-control" id="capacity-filter" min="0">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="location-filter" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location-filter" placeholder="Enter location">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="status-filter" class="form-label">Status</label>
+                    <select class="form-select" id="status-filter">
+                        <option value="">All Statuses</option>
+                        <option value="Active" selected>Active Only</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Out of Service">Out of Service</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button class="btn btn-primary" id="apply-filters">
+                        <i class="bi bi-funnel"></i> Apply Filters
+                    </button>
+                    <button class="btn btn-outline-secondary" id="reset-filters">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
                     </button>
                 </div>
             </div>
         </div>
-
-        <!-- Ships Grid -->
-        <div class="row" id="shipsContainer">
-            <!-- Ships will be loaded here dynamically -->
-            <div class="col-12 text-center my-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading ships...</span>
-                </div>
-                <p class="mt-2">Loading available ships...</p>
-            </div>
+        
+        <!-- No Ships Message -->
+        <div id="no-ships-message" class="alert alert-info" style="display: none;">
+            No ships found matching your criteria. Please try different filters.
         </div>
+        
+        <!-- Ships Grid -->
+        <div class="row" id="ships-container">
+            <!-- Ships will be loaded here dynamically -->
+        </div>
+    </div>
 
-        <!-- Ship Details Modal -->
-        <div class="modal fade" id="shipDetailsModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="shipDetailsModalLabel">Ship Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Ship Details Modal -->
+    <div class="modal fade" id="shipDetailsModal" tabindex="-1" aria-labelledby="shipDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shipDetailsModalLabel">Ship Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img src="images/ship-placeholder.jpg" class="img-fluid rounded" id="modal-ship-image" alt="Ship Image">
+                        </div>
+                        <div class="col-md-6">
+                            <h4 id="modal-ship-name"></h4>
+                            <p><strong>IMO Number:</strong> <span id="modal-ship-imo"></span></p>
+                            <p><strong>Type:</strong> <span id="modal-ship-type"></span></p>
+                            <p><strong>Capacity:</strong> <span id="modal-ship-capacity"></span></p>
+                            <p><strong>Current Location:</strong> <span id="modal-ship-location"></span></p>
+                            <p><strong>Status:</strong> <span id="modal-ship-status"></span></p>
+                            <p><strong>Last Maintenance:</strong> <span id="modal-ship-maintenance"></span></p>
+                        </div>
                     </div>
-                    <div class="modal-body" id="shipDetailsContent">
-                        <!-- Ship details will be loaded here -->
+                    <hr>
+                    <div id="booking-section">
+                        <h5>Book This Ship</h5>
+                        <form id="booking-form">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="booking-start-date" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="booking-start-date" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="booking-end-date" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="booking-end-date" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="booking-purpose" class="form-label">Purpose of Booking</label>
+                                <textarea class="form-control" id="booking-purpose" rows="3" required></textarea>
+                            </div>
+                            <input type="hidden" id="booking-ship-id">
+                        </form>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="bookShipBtn">
-                            <i class="bi bi-calendar-plus"></i> Book This Ship
-                        </button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submit-booking">Book Now</button>
                 </div>
             </div>
         </div>
@@ -135,220 +211,323 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Constants
-        const API_BASE_URL = '/api';
-        let allShips = [];
-        let filteredShips = [];
-
         // DOM Elements
-        const shipsContainer = document.getElementById('shipsContainer');
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
-        const shipDetailsModal = new bootstrap.Modal(document.getElementById('shipDetailsModal'));
-        const shipDetailsContent = document.getElementById('shipDetailsContent');
-        const bookShipBtn = document.getElementById('bookShipBtn');
-        let selectedShipId = null;
-
+        const shipsContainer = document.getElementById('ships-container');
+        const noShipsMessage = document.getElementById('no-ships-message');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const applyFiltersBtn = document.getElementById('apply-filters');
+        const resetFiltersBtn = document.getElementById('reset-filters');
+        const shipTypeFilter = document.getElementById('ship-type-filter');
+        const capacityFilter = document.getElementById('capacity-filter');
+        const locationFilter = document.getElementById('location-filter');
+        const statusFilter = document.getElementById('status-filter');
+        const logoutLink = document.getElementById('logout-link');
+        const submitBookingBtn = document.getElementById('submit-booking');
+        
+        // Global variables
+        let allShips = [];
+        
         // Check authentication
-        async function checkAuth() {
-            try {
-                const response = await fetch('/api/check-auth', {
-                    credentials: 'include'
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            loadShips();
+            
+            // Event listeners
+            applyFiltersBtn.addEventListener('click', filterShips);
+            resetFiltersBtn.addEventListener('click', resetFilters);
+            logoutLink.addEventListener('click', logout);
+            submitBookingBtn.addEventListener('click', submitBooking);
+        });
+        
+        // Check if user is authenticated
+        function checkAuthentication() {
+            fetch('/api/check-auth')
+                .then(response => {
+                    if (!response.ok) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.authenticated) {
+                        // User is authenticated, continue
+                    } else {
+                        window.location.href = 'login.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking authentication:', error);
+                    window.location.href = 'login.html';
                 });
-                
-                if (!response.ok) {
-                    window.location.href = '/login.html';
-                    return false;
-                }
-                
-                const data = await response.json();
-                if (!data.authenticated) {
-                    window.location.href = '/login.html';
-                    return false;
-                }
-                return true;
-            } catch (error) {
-                console.error('Authentication error:', error);
-                window.location.href = '/login.html';
-                return false;
-            }
         }
-
-        // Load ships from API
-        async function loadShips() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/ships`);
-                if (!response.ok) throw new Error('Failed to load ships');
-                
-                allShips = await response.json();
-                filteredShips = [...allShips];
-                renderShips();
-            } catch (error) {
-                console.error('Error loading ships:', error);
-                shipsContainer.innerHTML = `
-                    <div class="col-12 text-center my-5">
-                        <div class="alert alert-danger">
-                            <i class="bi bi-exclamation-triangle"></i> Failed to load ships. Please try again later.
-                        </div>
-                        <button class="btn btn-primary" onclick="loadShips()">
-                            <i class="bi bi-arrow-clockwise"></i> Retry
-                        </button>
-                    </div>`;
-            }
+        
+        // Load all ships
+        function loadShips() {
+            loadingOverlay.style.display = 'flex';
+            
+            fetch('/api/ships')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch ships');
+                    }
+                    return response.json();
+                })
+                .then(ships => {
+                    allShips = ships;
+                    displayShips(ships);
+                })
+                .catch(error => {
+                    console.error('Error loading ships:', error);
+                    noShipsMessage.style.display = 'block';
+                    noShipsMessage.textContent = 'Error loading ships. Please try again.';
+                })
+                .finally(() => {
+                    loadingOverlay.style.display = 'none';
+                });
         }
-
-        // Render ships in the grid
-        function renderShips() {
-            if (filteredShips.length === 0) {
-                shipsContainer.innerHTML = `
-                    <div class="col-12 text-center my-5">
-                        <i class="bi bi-ship" style="font-size: 3rem; color: #6c757d;"></i>
-                        <h4 class="mt-3">No ships found</h4>
-                        <p class="text-muted">Try adjusting your search criteria</p>
-                    </div>`;
+        
+        // Display ships in the grid
+        function displayShips(ships) {
+            shipsContainer.innerHTML = '';
+            
+            if (ships.length === 0) {
+                noShipsMessage.style.display = 'block';
                 return;
             }
-
-            shipsContainer.innerHTML = filteredShips.map(ship => `
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card ship-card h-100">
-                        <div style="height: 180px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                            <i class="bi bi-ship" style="font-size: 4rem;"></i>
+            
+            noShipsMessage.style.display = 'none';
+            
+            ships.forEach(ship => {
+                // Only show active ships by default
+                if (statusFilter.value && ship.status !== statusFilter.value && statusFilter.value !== '') {
+                    return;
+                }
+                
+                const shipCard = document.createElement('div');
+                shipCard.className = 'col-md-4 mb-4';
+                
+                // Determine status badge color
+                let statusBadgeClass = 'bg-success';
+                if (ship.status === 'Maintenance') {
+                    statusBadgeClass = 'bg-warning text-dark';
+                } else if (ship.status === 'Out of Service') {
+                    statusBadgeClass = 'bg-danger';
+                }
+                
+                // Format maintenance date
+                let maintenanceDate = 'Not available';
+                if (ship.last_maintenance_date) {
+                    const date = new Date(ship.last_maintenance_date);
+                    maintenanceDate = date.toLocaleDateString();
+                }
+                
+                shipCard.innerHTML = `
+                    <div class="card ship-card">
+                        <div class="ship-status">
+                            <span class="badge ${statusBadgeClass}">${ship.status || 'Unknown'}</span>
                         </div>
+                        <img src="images/ship-placeholder.jpg" class="card-img-top ship-image" alt="${ship.name}">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0">${ship.name}</h5>
-                                <span class="badge ${getStatusBadgeClass(ship.status)}">${ship.status}</span>
-                            </div>
-                            <p class="text-muted mb-3">${ship.type || 'Cargo Ship'}</p>
-                            
-                            <div class="ship-feature">
-                                <i class="bi bi-geo-alt"></i>
-                                <span>${ship.currentLocation || 'At sea'}</span>
-                            </div>
-                            <div class="ship-feature">
-                                <i class="bi bi-box-seam"></i>
-                                <span>Capacity: ${ship.capacity || 'N/A'} TEU</span>
-                            </div>
-                            <div class="ship-feature">
-                                <i class="bi bi-info-circle"></i>
-                                <span>IMO: ${ship.imoNumber || 'N/A'}</span>
-                            </div>
-                            
-                            <button class="btn btn-outline-primary w-100 mt-3" onclick="showShipDetails('${ship.id}')">
-                                <i class="bi bi-eye"></i> View Details
+                            <h5 class="card-title">${ship.name}</h5>
+                            <p class="card-text">
+                                <strong>Type:</strong> ${ship.type || 'Not specified'}<br>
+                                <strong>Capacity:</strong> ${ship.capacity || 'Not specified'}<br>
+                                <strong>Location:</strong> ${ship.current_location || 'Unknown'}
+                            </p>
+                            <button class="btn btn-primary view-details" data-ship-id="${ship.id}">
+                                View Details
                             </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Show ship details in modal
-        async function showShipDetails(shipId) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/ships/${shipId}`);
-                if (!response.ok) throw new Error('Failed to load ship details');
-                
-                const ship = await response.json();
-                selectedShipId = ship.id;
-                
-                // Format the ship details
-                shipDetailsContent.innerHTML = `
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="ratio ratio-16x9 mb-3" style="background: #f8f9fa; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
-                                <i class="bi bi-ship" style="font-size: 5rem; color: #6c757d;"></i>
-                            </div>
-                            <h3>${ship.name}</h3>
-                            <span class="badge ${getStatusBadgeClass(ship.status)} mb-3">${ship.status}</span>
-                            <p class="lead">${ship.type || 'Cargo Ship'}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h5 class="mb-3">Ship Details</h5>
-                            <div class="mb-3">
-                                <p><strong>IMO Number:</strong> ${ship.imoNumber || 'N/A'}</p>
-                                <p><strong>Current Location:</strong> ${ship.currentLocation || 'At sea'}</p>
-                                <p><strong>Capacity:</strong> ${ship.capacity || 'N/A'} TEU</p>
-                                <p><strong>Last Maintenance:</strong> ${ship.lastMaintenanceDate ? new Date(ship.lastMaintenanceDate).toLocaleDateString() : 'N/A'}</p>
-                            </div>
-                            <div class="alert alert-info">
-                                <i class="bi bi-info-circle"></i> Contact our team for booking and more information.
-                            </div>
                         </div>
                     </div>
                 `;
                 
-                shipDetailsModal.show();
-            } catch (error) {
-                console.error('Error loading ship details:', error);
-                alert('Failed to load ship details. Please try again.');
-            }
-        }
-
-        // Handle ship booking
-        function handleBookShip() {
-            if (!selectedShipId) return;
-            alert(`Booking initiated for ship ID: ${selectedShipId}\nThis feature will be implemented soon.`);
-            // TODO: Implement booking functionality
-        }
-
-        // Filter ships based on search input
-        function filterShips() {
-            const searchTerm = searchInput.value.toLowerCase();
-            
-            filteredShips = allShips.filter(ship => {
-                return (
-                    ship.name.toLowerCase().includes(searchTerm) ||
-                    (ship.type && ship.type.toLowerCase().includes(searchTerm)) ||
-                    (ship.currentLocation && ship.currentLocation.toLowerCase().includes(searchTerm)) ||
-                    (ship.imoNumber && ship.imoNumber.toLowerCase().includes(searchTerm))
-                );
+                shipsContainer.appendChild(shipCard);
+                
+                // Add event listener to the view details button
+                const viewDetailsBtn = shipCard.querySelector('.view-details');
+                viewDetailsBtn.addEventListener('click', () => viewShipDetails(ship.id));
             });
-            
-            renderShips();
         }
-
-        // Helper function to get status badge class
-        function getStatusBadgeClass(status) {
-            switch (status?.toLowerCase()) {
-                case 'active': return 'bg-success';
-                case 'in transit': return 'bg-primary';
-                case 'docked': return 'bg-info';
-                case 'maintenance': return 'bg-warning';
-                case 'inactive': return 'bg-secondary';
-                default: return 'bg-secondary';
-            }
-        }
-
-        // Initialize the page
-        async function init() {
-            const isAuthenticated = await checkAuth();
-            if (isAuthenticated) {
-                loadShips();
-            }
-        }
-
-        // Event Listeners
-        searchButton.addEventListener('click', filterShips);
-        searchInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') filterShips();
-        });
-        bookShipBtn.addEventListener('click', handleBookShip);
         
-        // Logout functionality
-        document.getElementById('logout-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            fetch('/api/logout', {
-                method: 'POST',
-                credentials: 'same-origin'
-            }).then(() => {
-                window.location.href = '/login.html';
+        // Filter ships based on selected criteria
+        function filterShips() {
+            const type = shipTypeFilter.value;
+            const minCapacity = capacityFilter.value ? parseInt(capacityFilter.value) : 0;
+            const location = locationFilter.value.toLowerCase();
+            const status = statusFilter.value;
+            
+            const filteredShips = allShips.filter(ship => {
+                // Filter by type
+                if (type && ship.type !== type) {
+                    return false;
+                }
+                
+                // Filter by capacity
+                if (minCapacity > 0 && (!ship.capacity || ship.capacity < minCapacity)) {
+                    return false;
+                }
+                
+                // Filter by location
+                if (location && (!ship.current_location || !ship.current_location.toLowerCase().includes(location))) {
+                    return false;
+                }
+                
+                // Filter by status
+                if (status && ship.status !== status) {
+                    return false;
+                }
+                
+                return true;
             });
-        });
-
-        // Initialize the page
-        init();
+            
+            displayShips(filteredShips);
+        }
+        
+        // Reset all filters
+        function resetFilters() {
+            shipTypeFilter.value = '';
+            capacityFilter.value = '';
+            locationFilter.value = '';
+            statusFilter.value = 'Active';
+            
+            displayShips(allShips);
+        }
+        
+        // View ship details
+        function viewShipDetails(shipId) {
+            const ship = allShips.find(s => s.id === shipId);
+            
+            if (!ship) {
+                alert('Ship not found');
+                return;
+            }
+            
+            // Set modal content
+            document.getElementById('modal-ship-name').textContent = ship.name;
+            document.getElementById('modal-ship-imo').textContent = ship.imo_number || 'Not available';
+            document.getElementById('modal-ship-type').textContent = ship.type || 'Not specified';
+            document.getElementById('modal-ship-capacity').textContent = ship.capacity || 'Not specified';
+            document.getElementById('modal-ship-location').textContent = ship.current_location || 'Unknown';
+            
+            // Format status with badge
+            let statusBadgeClass = 'bg-success';
+            if (ship.status === 'Maintenance') {
+                statusBadgeClass = 'bg-warning text-dark';
+            } else if (ship.status === 'Out of Service') {
+                statusBadgeClass = 'bg-danger';
+            }
+            document.getElementById('modal-ship-status').innerHTML = `<span class="badge ${statusBadgeClass}">${ship.status || 'Unknown'}</span>`;
+            
+            // Format maintenance date
+            let maintenanceDate = 'Not available';
+            if (ship.last_maintenance_date) {
+                const date = new Date(ship.last_maintenance_date);
+                maintenanceDate = date.toLocaleDateString();
+            }
+            document.getElementById('modal-ship-maintenance').textContent = maintenanceDate;
+            
+            // Set booking ship ID
+            document.getElementById('booking-ship-id').value = ship.id;
+            
+            // Show/hide booking section based on ship status
+            const bookingSection = document.getElementById('booking-section');
+            const submitBookingBtn = document.getElementById('submit-booking');
+            
+            if (ship.status === 'Active') {
+                bookingSection.style.display = 'block';
+                submitBookingBtn.style.display = 'block';
+            } else {
+                bookingSection.style.display = 'none';
+                submitBookingBtn.style.display = 'none';
+            }
+            
+            // Set minimum date for booking to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('booking-start-date').min = today;
+            document.getElementById('booking-end-date').min = today;
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('shipDetailsModal'));
+            modal.show();
+        }
+        
+        // Submit booking
+        function submitBooking() {
+            const shipId = document.getElementById('booking-ship-id').value;
+            const startDate = document.getElementById('booking-start-date').value;
+            const endDate = document.getElementById('booking-end-date').value;
+            const purpose = document.getElementById('booking-purpose').value;
+            
+            // Validate form
+            if (!startDate || !endDate || !purpose) {
+                alert('Please fill in all booking fields');
+                return;
+            }
+            
+            // Validate dates
+            if (new Date(startDate) > new Date(endDate)) {
+                alert('End date must be after start date');
+                return;
+            }
+            
+            // Create booking object
+            const bookingData = {
+                ship_id: parseInt(shipId),
+                start_date: startDate,
+                end_date: endDate,
+                purpose: purpose
+            };
+            
+            // Send booking request
+            loadingOverlay.style.display = 'flex';
+            
+            fetch('/api/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bookingData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to create booking');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('shipDetailsModal'));
+                modal.hide();
+                
+                // Show success message
+                alert('Booking created successfully! You can view your bookings in the My Bookings section.');
+                
+                // Reset form
+                document.getElementById('booking-form').reset();
+            })
+            .catch(error => {
+                console.error('Error creating booking:', error);
+                alert('Error creating booking. Please try again.');
+            })
+            .finally(() => {
+                loadingOverlay.style.display = 'none';
+            });
+        }
+        
+        // Logout function
+        function logout() {
+            fetch('/api/logout', {
+                method: 'POST'
+            })
+            .then(() => {
+                window.location.href = 'login.html';
+            })
+            .catch(error => {
+                console.error('Error logging out:', error);
+                window.location.href = 'login.html';
+            });
+        }
     </script>
 </body>
 </html>

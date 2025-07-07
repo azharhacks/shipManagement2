@@ -15,7 +15,11 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+<<<<<<< HEAD
             
+=======
+            opacity: 0.9;
+>>>>>>> 892758ec32bfe0ae1eb18a8b379131b300a329b1
         }
         .sidebar {
             min-height: 100vh;
@@ -129,22 +133,22 @@
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#dashboard" data-section="dashboard-section">
+                            <a class="nav-link active" href="#dashboard" data-section="dashboard">
                                 <i class="bi bi-house-door"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="ships.html">
+                            <a class="nav-link" href="#ships" data-section="ships">
                                 <i class="bi bi-ship"></i> View Ships
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#bookings" data-section="bookings-section">
+                            <a class="nav-link" href="#bookings" data-section="bookings">
                                 <i class="bi bi-calendar-check"></i> My Bookings
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#settings" data-section="settings-section">
+                            <a class="nav-link" href="#settings" data-section="settings">
                                 <i class="bi bi-gear"></i> Settings
                             </a>
                         </li>
@@ -160,7 +164,7 @@
             <!-- Main content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <!-- Dashboard Section -->
-                <div id="dashboard-section" class="content-section active">
+                <div id="dashboard" class="content-section active">
                     <div class="welcome-card">
                         <div class="row align-items-center">
                             <div class="col-md-8">
@@ -178,11 +182,11 @@
                         <div class="col-12">
                             <h4>Quick Actions</h4>
                             <div class="d-flex flex-wrap quick-actions">
-                                <a href="ships.html" class="btn btn-primary">
+                                <a href="#ships" class="btn btn-primary" data-section="ships">
                                     <i class="bi bi-search"></i> Find a Ship
                                 </a>
-                                <a href="#bookings" class="btn btn-success section-link" data-section="bookings-section">
-                                    <i class="bi bi-calendar-plus"></i> New Booking
+                                <a href="#bookings" class="btn btn-success" data-section="bookings">
+                                    <i class="bi bi-calendar-plus"></i> View Bookings
                                 </a>
                                 <a href="#" class="btn btn-info text-white">
                                     <i class="bi bi-clock-history"></i> Recent Trips
@@ -208,49 +212,232 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Recent Bookings -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Recent Bookings</h5>
+                                    <a href="#bookings" class="btn btn-sm btn-primary" data-section="bookings">View All</a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ship</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="recent-bookings-table">
+                                                <!-- Recent bookings will be loaded here -->
+                                            </tbody>
+                                        </table>
+                                        
+                                        <!-- Loading Spinner -->
+                                        <div class="text-center py-4" id="recent-bookings-loading">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- No Bookings Message -->
+                                        <div class="alert alert-info" id="no-recent-bookings-message" style="display: none;">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            You don't have any bookings yet. <a href="#ships" class="alert-link" data-section="ships">Browse ships</a> to make a booking.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
+                <!-- Ships Section -->
+                <div class="content-section" id="ships" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Available Ships</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="input-group me-2">
+                                <input type="text" class="form-control" id="ship-search" placeholder="Search ships...">
+                                <button class="btn btn-outline-secondary" type="button" id="search-ship-btn">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ships Filter Card -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="ship-type-filter" class="form-label">Ship Type</label>
+                                    <select class="form-select" id="ship-type-filter">
+                                        <option value="all">All Types</option>
+                                        <option value="Cargo">Cargo</option>
+                                        <option value="Passenger">Passenger</option>
+                                        <option value="Tanker">Tanker</option>
+                                        <option value="Container">Container</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="ship-status-filter" class="form-label">Status</label>
+                                    <select class="form-select" id="ship-status-filter">
+                                        <option value="all">All Statuses</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Maintenance">Maintenance</option>
+                                        <option value="Docked">Docked</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button class="btn btn-primary" id="apply-ship-filters">Apply Filters</button>
+                                    <button class="btn btn-outline-secondary ms-2" id="reset-ship-filters">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ships Grid -->
+                    <div class="row" id="ships-grid">
+                        <!-- Ships will be loaded here -->
+                    </div>
+                    
+                    <!-- Loading Spinner -->
+                    <div class="text-center py-4" id="ships-loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- No Ships Message -->
+                    <div class="alert alert-info" id="no-ships-message" style="display: none;">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No ships found.
+                    </div>
+                </div>
+
                 <!-- Bookings Section -->
-                <div id="bookings-section" class="content-section">
+                <div id="bookings" class="content-section">
                     <div class="card">
                         <div class="card-header bg-success text-white">
                             <h4><i class="bi bi-calendar-check"></i> My Bookings</h4>
                         </div>
                         <div class="card-body">
-                            <div class="alert alert-info">
-                                <i class="bi bi-info-circle"></i> You don't have any bookings yet. 
-                                <a href="ships.html" class="alert-link">Browse ships</a> to make your first booking.
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Ship</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Ocean Explorer</td>
+                                            <td>2025-07-15</td>
+                                            <td>2025-07-30</td>
+                                            <td><span class="badge bg-success">Confirmed</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">View</button>
+                                                <button class="btn btn-sm btn-danger">Cancel</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Northern Star</td>
+                                            <td>2025-08-10</td>
+                                            <td>2025-08-25</td>
+                                            <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">View</button>
+                                                <button class="btn btn-sm btn-danger">Cancel</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Settings Section -->
-                <div id="settings-section" class="content-section">
-                    <div class="card">
-                        <div class="card-header bg-secondary text-white">
-                            <h4><i class="bi bi-gear"></i> Account Settings</h4>
+                <div class="content-section" id="settings" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Profile Settings</h1>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <div class="mb-3">
+                                        <img src="https://via.placeholder.com/150" class="rounded-circle img-fluid" alt="Profile Picture">
+                                    </div>
+                                    <h5 class="card-title" id="profile-name">John Doe</h5>
+                                    <p class="card-text text-muted" id="profile-role">Customer</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <form id="settings-form">
-                                <div class="mb-3">
-                                    <label for="username" class="form-label">Username</label>
-                                    <input type="text" class="form-control" id="username" disabled>
+                        
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Personal Information</h5>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="current-password" class="form-label">Current Password</label>
-                                    <input type="password" class="form-control" id="current-password" required>
+                                <div class="card-body">
+                                    <form id="profile-form">
+                                        <div class="mb-3">
+                                            <label for="profile-username" class="form-label">Username</label>
+                                            <input type="text" class="form-control" id="profile-username" readonly>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="profile-first-name" class="form-label">First Name</label>
+                                                <input type="text" class="form-control" id="profile-first-name">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="profile-last-name" class="form-label">Last Name</label>
+                                                <input type="text" class="form-control" id="profile-last-name">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="profile-email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="profile-email">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                                    </form>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="new-password" class="form-label">New Password</label>
-                                    <input type="password" class="form-control" id="new-password" required>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Change Password</h5>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="confirm-password" class="form-label">Confirm New Password</label>
-                                    <input type="password" class="form-control" id="confirm-password" required>
+                                <div class="card-body">
+                                    <form id="password-form">
+                                        <div class="mb-3">
+                                            <label for="current-password" class="form-label">Current Password</label>
+                                            <input type="password" class="form-control" id="current-password" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="new-password" class="form-label">New Password</label>
+                                            <input type="password" class="form-control" id="new-password" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="confirm-password" class="form-label">Confirm New Password</label>
+                                            <input type="password" class="form-control" id="confirm-password" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Change Password</button>
+                                    </form>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Update Password</button>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -258,172 +445,243 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // DOM Elements
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
-        const navLinks = document.querySelectorAll('.nav-link[data-section]');
-        const sectionLinks = document.querySelectorAll('.section-link');
-        const contentSections = document.querySelectorAll('.content-section');
-        const settingsForm = document.getElementById('settings-form');
-        
-        // Toggle sidebar on mobile
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
-                sidebarOverlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
-            });
-        }
-        
-        // Close sidebar when clicking outside
-        sidebarOverlay.addEventListener('click', function() {
-            sidebar.classList.remove('show');
-            sidebarOverlay.style.display = 'none';
-        });
-        
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 768) {
-                sidebar.classList.remove('show');
-                sidebarOverlay.style.display = 'none';
-            }
-        });
-        
-        // Navigation functionality
-        function showSection(sectionId) {
-            // Hide all sections
-            contentSections.forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Show the selected section
-            const targetSection = document.getElementById(sectionId);
-            if (targetSection) {
-                targetSection.classList.add('active');
-            }
-            
-            // Update active nav link
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('data-section') === sectionId) {
-                    link.classList.add('active');
-                }
-            });
-            
-            // Close sidebar on mobile after navigation
-            if (window.innerWidth < 768) {
-                sidebar.classList.remove('show');
-                sidebarOverlay.style.display = 'none';
-            }
-        }
-        
-        // Add click event to nav links
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                if (this.getAttribute('href').startsWith('#')) {
-                    e.preventDefault();
-                    const sectionId = this.getAttribute('data-section');
-                    showSection(sectionId);
-                }
-            });
-        });
-        
-        // Add click event to section links
-        sectionLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const sectionId = this.getAttribute('data-section');
-                showSection(sectionId);
-            });
-        });
-        
-        // Settings form submission
-        if (settingsForm) {
-            settingsForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const currentPassword = document.getElementById('current-password').value;
-                const newPassword = document.getElementById('new-password').value;
-                const confirmPassword = document.getElementById('confirm-password').value;
-                
-                if (newPassword !== confirmPassword) {
-                    alert('New passwords do not match!');
-                    return;
-                }
-                
-                // Send password change request to API
-                fetch('/api/change-password', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        currentPassword: currentPassword,
-                        newPassword: newPassword
-                    }),
-                    credentials: 'same-origin'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Show success message
-                        alert('Password updated successfully!');
-                        // Reset form
-                        this.reset();
-                    } else {
-                        // Show error message
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating your password. Please try again.');
-                });
-            });
-        }
+    <!-- Ship Details Modal -->
+    <div class="modal fade" id="ship-details-modal" tabindex="-1" aria-labelledby="shipDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="shipDetailsModalLabel">Ship Details: <span id="modal-ship-name"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Type:</strong> <span id="modal-ship-type"></span></p>
+                            <p><strong>Capacity:</strong> <span id="modal-ship-capacity"></span></p>
+                            <p><strong>Status:</strong> <span id="modal-ship-status"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="ship-location-info">
+                                <p><strong>Current Location:</strong> <span id="modal-ship-location">Loading...</span></p>
+                                <p><strong>Last Updated:</strong> <span id="modal-ship-last-updated">Loading...</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="modal-book-ship-btn">Book This Ship</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // Check authentication and load user data
+    <!-- Alert Container for notifications -->
+    <div id="alert-container" style="position: fixed; top: 20px; right: 20px; z-index: 1050;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/user-fixes.js"></script>
+    <!-- Simple Direct Fix -->
+    <script>
+        console.log('Simple fix script loaded');
+        
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('/api/check-auth')
-                .then(response => {
-                    if (!response.ok) {
-                        window.location.href = '/login.html';
-                        throw new Error('Not authenticated');
+            // Fix navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.onclick = function(e) {
+                    const sectionId = this.getAttribute('data-section');
+                    if (sectionId) {
+                        e.preventDefault();
+                        console.log('Navigating to section:', sectionId);
+                        
+                        // Hide all sections
+                        const sections = document.querySelectorAll('.content-section');
+                        sections.forEach(section => {
+                            section.style.display = 'none';
+                        });
+                        
+                        // Show selected section
+                        const targetSection = document.getElementById(sectionId);
+                        if (targetSection) {
+                            targetSection.style.display = 'block';
+                        }
+                        
+                        // Update active state
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    // Redirect to admin dashboard if user is admin
-                    if (data.role === 'admin') {
-                        window.location.href = '/admin-dashboard.html';
-                        return;
+                };
+            });
+            
+            // Fix logout button with a simpler approach
+            const logoutBtn = document.querySelector('.nav-link.text-danger');
+            if (logoutBtn) {
+                logoutBtn.onclick = function(e) {
+                    e.preventDefault();
+                    console.log('Logout clicked');
+                    
+                    // Simple redirect
+                    window.location.href = '/login.html';
+                };
+            }
+            
+            // Add demo ships
+            const shipsGrid = document.getElementById('ships-grid');
+            if (shipsGrid && shipsGrid.children.length === 0) {
+                // Hide loading and no ships message
+                const shipsLoading = document.getElementById('ships-loading');
+                const noShipsMessage = document.getElementById('no-ships-message');
+                if (shipsLoading) shipsLoading.style.display = 'none';
+                if (noShipsMessage) noShipsMessage.style.display = 'none';
+                
+                // Add demo ships
+                const demoShips = [
+                    { id: 1, name: 'Ocean Explorer', type: 'Cargo Ship', status: 'Active', location: 'Port of Singapore' },
+                    { id: 2, name: 'Coastal Voyager', type: 'Passenger Ferry', status: 'Maintenance', location: 'Port of Miami' },
+                    { id: 3, name: 'Northern Star', type: 'Cruise Ship', status: 'En Route', location: 'Mediterranean Sea' },
+                    { id: 4, name: 'Pacific Trader', type: 'Container Ship', status: 'Available', location: 'Port of Shanghai' }
+                ];
+                
+                demoShips.forEach(ship => {
+                    // Create ship card
+                    const shipCard = document.createElement('div');
+                    shipCard.className = 'col-md-6 col-lg-4 mb-4';
+                    
+                    // Set badge color based on status
+                    let badgeClass = 'bg-secondary';
+                    let canBook = false;
+                    
+                    if (ship.status === 'Active' || ship.status === 'Available') {
+                        badgeClass = 'bg-success';
+                        canBook = true;
+                    } else if (ship.status === 'Maintenance') {
+                        badgeClass = 'bg-warning text-dark';
+                    } else if (ship.status === 'En Route') {
+                        badgeClass = 'bg-info text-dark';
                     }
                     
-                    // Set user name
-                    if (data.username) {
-                        document.getElementById('user-name').textContent = data.username;
-                        if (document.getElementById('username')) {
-                            document.getElementById('username').value = data.username;
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    window.location.href = '/login.html';
+                    shipCard.innerHTML = `
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">${ship.name}</h5>
+                                <span class="badge ${badgeClass}">${ship.status}</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">Type: ${ship.type}</p>
+                                <p class="card-text">Location: ${ship.location}</p>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between">
+                                <button class="btn btn-sm btn-outline-primary view-ship-details" data-ship-id="${ship.id}">View Details</button>
+                                <button class="btn btn-sm btn-primary book-ship" data-ship-id="${ship.id}" data-ship-name="${ship.name}" ${!canBook ? 'disabled' : ''}>Book Now</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    shipsGrid.appendChild(shipCard);
                 });
-        });
-
-        // Logout functionality
-        document.getElementById('logout-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            fetch('/api/logout', {
-                method: 'POST',
-                credentials: 'same-origin'
-            })
-            .then(() => {
-                window.location.href = '/login.html';
-            });
+                
+                // Add event listeners for ship buttons
+                const viewButtons = document.querySelectorAll('.view-ship-details');
+                viewButtons.forEach(button => {
+                    button.onclick = function() {
+                        const shipId = this.getAttribute('data-ship-id');
+                        alert(`Viewing details for ship ID: ${shipId}`);
+                    };
+                });
+                
+                const bookButtons = document.querySelectorAll('.book-ship');
+                bookButtons.forEach(button => {
+                    button.onclick = function() {
+                        const shipId = this.getAttribute('data-ship-id');
+                        const shipName = this.getAttribute('data-ship-name');
+                        
+                        // Show booking modal
+                        const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+                        document.getElementById('bookingShipId').value = shipId;
+                        document.getElementById('bookingShipName').textContent = shipName;
+                        bookingModal.show();
+                    };
+                });
+            }
+            
+            // Add demo bookings
+            const bookingsSection = document.getElementById('bookings');
+            if (bookingsSection) {
+                bookingsSection.innerHTML = `
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h4><i class="bi bi-calendar-check"></i> My Bookings</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Ship</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Ocean Explorer</td>
+                                            <td>2025-07-15</td>
+                                            <td>2025-07-30</td>
+                                            <td><span class="badge bg-success">Confirmed</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">View</button>
+                                                <button class="btn btn-sm btn-danger">Cancel</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Northern Star</td>
+                                            <td>2025-08-10</td>
+                                            <td>2025-08-25</td>
+                                            <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">View</button>
+                                                <button class="btn btn-sm btn-danger">Cancel</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Update profile in settings section
+            const profileName = document.getElementById('profile-name');
+            if (profileName) {
+                profileName.textContent = 'John Doe';
+            }
+            
+            const profileRole = document.getElementById('profile-role');
+            if (profileRole) {
+                profileRole.textContent = 'Customer';
+            }
+            
+            // Handle form submissions
+            const profileForm = document.getElementById('profile-form');
+            if (profileForm) {
+                profileForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    alert('Profile updated successfully!');
+                };
+            }
+            
+            const passwordForm = document.getElementById('password-form');
+            if (passwordForm) {
+                passwordForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    alert('Password changed successfully!');
+                };
+            }
         });
     </script>
 </body>

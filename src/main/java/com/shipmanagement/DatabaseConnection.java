@@ -94,6 +94,88 @@ public class DatabaseConnection {
                 "FOREIGN KEY (generated_by) REFERENCES users(id) ON DELETE SET NULL, " +
                 "FOREIGN KEY (ship_id) REFERENCES ships(id) ON DELETE SET NULL)");
             
+            // Create docks table
+            stmt.execute("CREATE TABLE IF NOT EXISTS docks (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "name TEXT NOT NULL, " +
+                "location TEXT NOT NULL, " +
+                "capacity INTEGER, " +
+                "status TEXT DEFAULT 'available', " + // available, occupied, maintenance
+                "ship_id INTEGER, " +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                "FOREIGN KEY (ship_id) REFERENCES ships(id) ON DELETE SET NULL)");
+                
+            // Create ship_locations table
+            stmt.execute("CREATE TABLE IF NOT EXISTS ship_locations (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "ship_id INTEGER NOT NULL, " +
+                "latitude REAL, " +
+                "longitude REAL, " +
+                "current_port TEXT, " +
+                "status TEXT, " + // at sea, docked, in transit
+                "last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                "FOREIGN KEY (ship_id) REFERENCES ships(id) ON DELETE CASCADE)");
+                
+            // Create tasks table
+            stmt.execute("CREATE TABLE IF NOT EXISTS tasks (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "title TEXT NOT NULL, " +
+                "description TEXT, " +
+                "assigned_by INTEGER, " + // admin user id
+                "assigned_to INTEGER, " + // staff user id
+                "ship_id INTEGER, " +
+                "priority TEXT DEFAULT 'medium', " + // low, medium, high, urgent
+                "status TEXT DEFAULT 'pending', " + // pending, accepted, in_progress, completed, rejected
+                "due_date TEXT, " +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                "FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE SET NULL, " +
+                "FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL, " +
+                "FOREIGN KEY (ship_id) REFERENCES ships(id) ON DELETE SET NULL)");
+                
+            // Create problem_reports table
+            stmt.execute("CREATE TABLE IF NOT EXISTS problem_reports (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "title TEXT NOT NULL, " +
+                "description TEXT NOT NULL, " +
+                "reported_by INTEGER NOT NULL, " + // staff user id
+                "ship_id INTEGER, " +
+                "severity TEXT DEFAULT 'medium', " + // low, medium, high, critical
+                "status TEXT DEFAULT 'open', " + // open, in_progress, resolved, closed
+                "resolution_notes TEXT, " +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                "resolved_at TIMESTAMP, " +
+                "FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE SET NULL, " +
+                "FOREIGN KEY (ship_id) REFERENCES ships(id) ON DELETE SET NULL)");
+            
+            // Create staff table
+            stmt.execute("CREATE TABLE IF NOT EXISTS staff (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "first_name TEXT NOT NULL, " +
+                "last_name TEXT NOT NULL, " +
+                "username TEXT UNIQUE NOT NULL, " +
+                "password TEXT NOT NULL, " +
+                "role TEXT NOT NULL, " +
+                "status TEXT NOT NULL DEFAULT 'active', " +
+                "ship_id INTEGER, " +
+                "email TEXT, " +
+                "phone TEXT, " +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                "FOREIGN KEY (ship_id) REFERENCES ships(id) ON DELETE SET NULL)");
+            
+            // Create bookings table
+            stmt.execute("CREATE TABLE IF NOT EXISTS bookings (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "ship_id INTEGER NOT NULL, " +
+                "user_id INTEGER NOT NULL, " +
+                "start_date TEXT NOT NULL, " +
+                "end_date TEXT NOT NULL, " +
+                "purpose TEXT, " +
+                "status TEXT NOT NULL DEFAULT 'pending', " +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                "FOREIGN KEY (ship_id) REFERENCES ships(id) ON DELETE CASCADE, " +
+                "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)");
+            
             // Create default admin user if not exists
             if (!userExists("admin")) {
                 String hashedPassword = BCrypt.hashpw("admin123", BCrypt.gensalt());
@@ -102,6 +184,18 @@ public class DatabaseConnection {
                     pstmt.setString(1, "admin");
                     pstmt.setString(2, hashedPassword);
                     pstmt.setString(3, "admin");
+                    pstmt.executeUpdate();
+                }
+            }
+            
+            // Create default staff user if not exists
+            if (!userExists("staff")) {
+                String hashedPassword = BCrypt.hashpw("staff123", BCrypt.gensalt());
+                try (PreparedStatement pstmt = conn.prepareStatement(
+                        "INSERT INTO users (username, password, role) VALUES (?, ?, ?)")) {
+                    pstmt.setString(1, "staff");
+                    pstmt.setString(2, hashedPassword);
+                    pstmt.setString(3, "staff");
                     pstmt.executeUpdate();
                 }
             }
@@ -388,58 +482,28 @@ public class DatabaseConnection {
     }
     
     /**
-     * Get bookings for a specific user
-     * @param userId The user ID
-     * @return List of bookings as maps
-     */
-    public static List<Map<String, Object>> getUserBookings(int userId) {
-        List<Map<String, Object>> bookings = new ArrayList<>();
-        String sql = "SELECT b.*, s.name as ship_name, s.type as ship_type " +
-                     "FROM bookings b " +
-                     "JOIN ships s ON b.ship_id = s.id " +
-                     "WHERE b.user_id = ?";
-        
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, userId);
-            ResultSet rs = pstmt.executeQuery();
-            
-            while (rs.next()) {
-                Map<String, Object> booking = new HashMap<>();
-                booking.put("id", rs.getInt("id"));
-                booking.put("ship_id", rs.getInt("ship_id"));
-                booking.put("ship_name", rs.getString("ship_name"));
-                booking.put("ship_type", rs.getString("ship_type"));
-                booking.put("start_date", rs.getString("start_date"));
-                booking.put("end_date", rs.getString("end_date"));
-                booking.put("status", rs.getString("status"));
-                booking.put("created_at", rs.getString("created_at"));
-                bookings.add(booking);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        
-        return bookings;
-    }
-    
-    /**
      * Get tasks assigned to a specific user
      * @param userId The user ID
      * @return List of tasks as maps
      */
     public static List<Map<String, Object>> getUserTasks(int userId) {
         List<Map<String, Object>> tasks = new ArrayList<>();
-        String sql = "SELECT t.*, s.name as ship_name " +
-                     "FROM tasks t " +
-                     "LEFT JOIN ships s ON t.ship_id = s.id " +
-                     "WHERE t.assigned_to = ?";
+        String sql = "SELECT t.*, " +
+                    "s1.first_name || ' ' || s1.last_name as assigned_to_name, " +
+                    "s2.first_name || ' ' || s2.last_name as assigned_by_name, " +
+                    "sh.name as ship_name " +
+                    "FROM tasks t " +
+                    "LEFT JOIN staff s1 ON t.assigned_to = s1.id " +
+                    "LEFT JOIN staff s2 ON t.assigned_by = s2.id " +
+                    "LEFT JOIN ships sh ON t.ship_id = sh.id " +
+                    "WHERE t.assigned_to = ? OR t.assigned_by = ? " +
+                    "ORDER BY t.created_at DESC";
         
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setInt(1, userId);
+            pstmt.setInt(2, userId);
             ResultSet rs = pstmt.executeQuery();
             
             while (rs.next()) {
@@ -448,10 +512,15 @@ public class DatabaseConnection {
                 task.put("title", rs.getString("title"));
                 task.put("description", rs.getString("description"));
                 task.put("status", rs.getString("status"));
-                task.put("ship_id", rs.getInt("ship_id"));
+                task.put("assigned_to", rs.getObject("assigned_to"));
+                task.put("assigned_to_name", rs.getString("assigned_to_name"));
+                task.put("assigned_by", rs.getInt("assigned_by"));
+                task.put("assigned_by_name", rs.getString("assigned_by_name"));
+                task.put("ship_id", rs.getObject("ship_id"));
                 task.put("ship_name", rs.getString("ship_name"));
                 task.put("due_date", rs.getString("due_date"));
                 task.put("created_at", rs.getString("created_at"));
+                task.put("updated_at", rs.getString("updated_at"));
                 tasks.add(task);
             }
         } catch (SQLException e) {
@@ -611,6 +680,39 @@ public class DatabaseConnection {
                 }
             }
             
+            // Add demo staff
+            String[][] staffNames = {
+                {"Emily", "Chen"}, {"Kevin", "White"}, {"Ava", "Lee"}, 
+                {"Liam", "Hall"}, {"Sophia", "Patel"}, {"Noah", "Kim"},
+                {"Mia", "Brown"}, {"Ethan", "Davis"}, {"Isabella", "Miller"},
+                {"Lucas", "Wilson"}
+            };
+            
+            String[] staffRoles = {"Manager", "Engineer", "Navigator", "Deck Officer", "Chief Officer"};
+            String[] staffEmails = {"emily.chen@example.com", "kevin.white@example.com", "ava.lee@example.com", 
+                                    "liam.hall@example.com", "sophia.patel@example.com", "noah.kim@example.com",
+                                    "mia.brown@example.com", "ethan.davis@example.com", "isabella.miller@example.com",
+                                    "lucas.wilson@example.com"};
+            String[] staffPhones = {"123-456-7890", "987-654-3210", "555-123-4567", 
+                                    "111-222-3333", "444-555-6666", "777-888-9999",
+                                    "999-000-1111", "222-333-4444", "666-777-8888",
+                                    "888-999-0000"};
+            
+            for (int i = 0; i < staffNames.length; i++) {
+                try (PreparedStatement pstmt = conn.prepareStatement(
+                        "INSERT INTO staff (first_name, last_name, username, password, role, ship_id, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+                    pstmt.setString(1, staffNames[i][0]);
+                    pstmt.setString(2, staffNames[i][1]);
+                    pstmt.setString(3, staffNames[i][0].toLowerCase() + staffNames[i][1].toLowerCase());
+                    pstmt.setString(4, BCrypt.hashpw("password123", BCrypt.gensalt()));
+                    pstmt.setString(5, staffRoles[i % staffRoles.length]);
+                    pstmt.setInt(6, (i % 5) + 1); // Assign to one of the 5 ships
+                    pstmt.setString(7, staffEmails[i]);
+                    pstmt.setString(8, staffPhones[i]);
+                    pstmt.executeUpdate();
+                }
+            }
+            
             // Add a regular user if not exists
             if (!userExists("user")) {
                 String hashedPassword = BCrypt.hashpw("user123", BCrypt.gensalt());
@@ -719,5 +821,686 @@ public class DatabaseConnection {
             e.printStackTrace();
             System.err.println("Failed to add demo data: " + e.getMessage());
         }
+    }
+
+    /**
+     * Get all docks from the database
+     * @return List of dock objects
+     */
+    public static List<Map<String, Object>> getAllDocks() throws SQLException {
+        String sql = "SELECT * FROM docks ORDER BY name";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            
+            return resultSetToList(rs);
+        }
+    }
+    
+    /**
+     * Get a dock by its ID
+     * @param dockId The ID of the dock
+     * @return The dock object or null if not found
+     */
+    public static Map<String, Object> getDockById(int dockId) throws SQLException {
+        String sql = "SELECT * FROM docks WHERE id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, dockId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return resultSetToMap(rs);
+                } else {
+                    return null;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Add a new dock to the database
+     * @param name The name of the dock
+     * @param location The location of the dock
+     * @param capacity The capacity of the dock
+     * @param status The status of the dock
+     * @return The ID of the newly created dock
+     */
+    public static int addDock(String name, String location, int capacity, String status) throws SQLException {
+        String sql = "INSERT INTO docks (name, location, capacity, status) VALUES (?, ?, ?, ?)";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            pstmt.setString(1, name);
+            pstmt.setString(2, location);
+            pstmt.setInt(3, capacity);
+            pstmt.setString(4, status);
+            
+            int affectedRows = pstmt.executeUpdate();
+            
+            if (affectedRows == 0) {
+                throw new SQLException("Creating dock failed, no rows affected.");
+            }
+            
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                } else {
+                    throw new SQLException("Creating dock failed, no ID obtained.");
+                }
+            }
+        }
+    }
+    
+    /**
+     * Update an existing dock
+     * @param id The ID of the dock to update
+     * @param name The name of the dock
+     * @param location The location of the dock
+     * @param capacity The capacity of the dock
+     * @param status The status of the dock
+     * @return True if the update was successful, false otherwise
+     */
+    public static boolean updateDock(int id, String name, String location, int capacity, String status) throws SQLException {
+        String sql = "UPDATE docks SET name = ?, location = ?, capacity = ?, status = ? WHERE id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, name);
+            pstmt.setString(2, location);
+            pstmt.setInt(3, capacity);
+            pstmt.setString(4, status);
+            pstmt.setInt(5, id);
+            
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        }
+    }
+    
+    /**
+     * Delete a dock from the database
+     * @param id The ID of the dock to delete
+     * @return True if the deletion was successful, false otherwise
+     */
+    public static boolean deleteDock(int id) throws SQLException {
+        String sql = "DELETE FROM docks WHERE id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, id);
+            
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        }
+    }
+
+    /**
+     * Get all bookings from the database
+     * @return List of booking objects
+     */
+    public static List<Map<String, Object>> getAllBookings() {
+        List<Map<String, Object>> bookings = new ArrayList<>();
+        String sql = "SELECT b.*, s.name as ship_name, u.username as user_username " +
+                   "FROM bookings b " +
+                   "JOIN ships s ON b.ship_id = s.id " +
+                   "JOIN users u ON b.user_id = u.id " +
+                   "ORDER BY b.id";
+        
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                Map<String, Object> booking = new HashMap<>();
+                booking.put("id", rs.getInt("id"));
+                booking.put("ship_id", rs.getInt("ship_id"));
+                booking.put("ship_name", rs.getString("ship_name"));
+                booking.put("user_id", rs.getInt("user_id"));
+                booking.put("user_username", rs.getString("user_username"));
+                booking.put("start_date", rs.getString("start_date"));
+                booking.put("end_date", rs.getString("end_date"));
+                booking.put("purpose", rs.getString("purpose"));
+                booking.put("status", rs.getString("status"));
+                booking.put("created_at", rs.getString("created_at"));
+                bookings.add(booking);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return bookings;
+    }
+    
+    /**
+     * Get a booking by its ID
+     * @param bookingId The ID of the booking
+     * @return The booking object or null if not found
+     */
+    public static Map<String, Object> getBookingById(int bookingId) {
+        Map<String, Object> booking = new HashMap<>();
+        String sql = "SELECT b.*, s.name as ship_name, u.username as user_username " +
+                   "FROM bookings b " +
+                   "JOIN ships s ON b.ship_id = s.id " +
+                   "JOIN users u ON b.user_id = u.id " +
+                   "WHERE b.id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, bookingId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                booking.put("id", rs.getInt("id"));
+                booking.put("ship_id", rs.getInt("ship_id"));
+                booking.put("ship_name", rs.getString("ship_name"));
+                booking.put("user_id", rs.getInt("user_id"));
+                booking.put("user_username", rs.getString("user_username"));
+                booking.put("start_date", rs.getString("start_date"));
+                booking.put("end_date", rs.getString("end_date"));
+                booking.put("purpose", rs.getString("purpose"));
+                booking.put("status", rs.getString("status"));
+                booking.put("created_at", rs.getString("created_at"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return booking;
+    }
+    
+    /**
+     * Get bookings for a specific user
+     * @param userId The ID of the user
+     * @return List of booking objects
+     */
+    public static List<Map<String, Object>> getUserBookings(int userId) {
+        List<Map<String, Object>> bookings = new ArrayList<>();
+        String sql = "SELECT b.*, s.name as ship_name, s.type as ship_type " +
+                   "FROM bookings b " +
+                   "JOIN ships s ON b.ship_id = s.id " +
+                   "WHERE b.user_id = ? " +
+                   "ORDER BY b.created_at DESC";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Map<String, Object> booking = new HashMap<>();
+                booking.put("id", rs.getInt("id"));
+                booking.put("ship_id", rs.getInt("ship_id"));
+                booking.put("ship_name", rs.getString("ship_name"));
+                booking.put("ship_type", rs.getString("ship_type"));
+                booking.put("start_date", rs.getString("start_date"));
+                booking.put("end_date", rs.getString("end_date"));
+                booking.put("purpose", rs.getString("purpose"));
+                booking.put("status", rs.getString("status"));
+                booking.put("created_at", rs.getString("created_at"));
+                bookings.add(booking);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return bookings;
+    }
+    
+    /**
+     * Add a new booking to the database
+     * @param shipId The ID of the ship
+     * @param userId The ID of the user
+     * @param startDate The start date of the booking
+     * @param endDate The end date of the booking
+     * @param purpose The purpose of the booking
+     * @return The ID of the newly created booking
+     */
+    public static int addBooking(int shipId, int userId, String startDate, String endDate, String purpose) {
+        String sql = "INSERT INTO bookings (ship_id, user_id, start_date, end_date, purpose, status) VALUES (?, ?, ?, ?, ?, ?)";
+        int id = -1;
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            pstmt.setInt(1, shipId);
+            pstmt.setInt(2, userId);
+            pstmt.setString(3, startDate);
+            pstmt.setString(4, endDate);
+            pstmt.setString(5, purpose);
+            pstmt.setString(6, "Pending"); // Default status for new bookings
+            
+            int affectedRows = pstmt.executeUpdate();
+            
+            if (affectedRows > 0) {
+                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        id = rs.getInt(1);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return id;
+    }
+    
+    /**
+     * Update the status of a booking
+     * @param bookingId The ID of the booking
+     * @param status The new status of the booking
+     * @return True if the update was successful, false otherwise
+     */
+    public static boolean updateBookingStatus(int bookingId, String status) {
+        String sql = "UPDATE bookings SET status = ? WHERE id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, status);
+            pstmt.setInt(2, bookingId);
+            
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Delete a booking from the database
+     * @param bookingId The ID of the booking
+     * @return True if the deletion was successful, false otherwise
+     */
+    public static boolean deleteBooking(int bookingId) {
+        String sql = "DELETE FROM bookings WHERE id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, bookingId);
+            
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static List<Map<String, Object>> resultSetToList(ResultSet rs) throws SQLException {
+        List<Map<String, Object>> list = new ArrayList<>();
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+        
+        while (rs.next()) {
+            Map<String, Object> row = new HashMap<>();
+            for (int i = 1; i <= columnCount; i++) {
+                row.put(metaData.getColumnName(i), rs.getObject(i));
+            }
+            list.add(row);
+        }
+        
+        return list;
+    }
+
+    private static Map<String, Object> resultSetToMap(ResultSet rs) throws SQLException {
+        Map<String, Object> map = new HashMap<>();
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+        
+        for (int i = 1; i <= columnCount; i++) {
+            map.put(metaData.getColumnName(i), rs.getObject(i));
+        }
+        
+        return map;
+    }
+
+    /**
+     * Get all tasks from the database
+     * @return List of task objects
+     */
+    public static List<Map<String, Object>> getAllTasks() {
+        List<Map<String, Object>> tasks = new ArrayList<>();
+        String sql = "SELECT t.*, " +
+                    "s1.first_name || ' ' || s1.last_name as assigned_to_name, " +
+                    "s2.first_name || ' ' || s2.last_name as assigned_by_name, " +
+                    "sh.name as ship_name " +
+                    "FROM tasks t " +
+                    "LEFT JOIN staff s1 ON t.assigned_to = s1.id " +
+                    "LEFT JOIN staff s2 ON t.assigned_by = s2.id " +
+                    "LEFT JOIN ships sh ON t.ship_id = sh.id " +
+                    "ORDER BY t.created_at DESC";
+        
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                Map<String, Object> task = new HashMap<>();
+                task.put("id", rs.getInt("id"));
+                task.put("title", rs.getString("title"));
+                task.put("description", rs.getString("description"));
+                task.put("status", rs.getString("status"));
+                task.put("assigned_to", rs.getObject("assigned_to"));
+                task.put("assigned_to_name", rs.getString("assigned_to_name"));
+                task.put("assigned_by", rs.getInt("assigned_by"));
+                task.put("assigned_by_name", rs.getString("assigned_by_name"));
+                task.put("ship_id", rs.getObject("ship_id"));
+                task.put("ship_name", rs.getString("ship_name"));
+                task.put("due_date", rs.getString("due_date"));
+                task.put("created_at", rs.getString("created_at"));
+                task.put("updated_at", rs.getString("updated_at"));
+                tasks.add(task);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return tasks;
+    }
+    
+    /**
+     * Get a task by ID
+     * @param taskId The ID of the task
+     * @return Task object or null if not found
+     */
+    public static Map<String, Object> getTaskById(int taskId) {
+        Map<String, Object> task = null;
+        String sql = "SELECT t.*, " +
+                    "s1.first_name || ' ' || s1.last_name as assigned_to_name, " +
+                    "s2.first_name || ' ' || s2.last_name as assigned_by_name, " +
+                    "sh.name as ship_name " +
+                    "FROM tasks t " +
+                    "LEFT JOIN staff s1 ON t.assigned_to = s1.id " +
+                    "LEFT JOIN staff s2 ON t.assigned_by = s2.id " +
+                    "LEFT JOIN ships sh ON t.ship_id = sh.id " +
+                    "WHERE t.id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, taskId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                task = new HashMap<>();
+                task.put("id", rs.getInt("id"));
+                task.put("title", rs.getString("title"));
+                task.put("description", rs.getString("description"));
+                task.put("status", rs.getString("status"));
+                task.put("assigned_to", rs.getObject("assigned_to"));
+                task.put("assigned_to_name", rs.getString("assigned_to_name"));
+                task.put("assigned_by", rs.getInt("assigned_by"));
+                task.put("assigned_by_name", rs.getString("assigned_by_name"));
+                task.put("ship_id", rs.getObject("ship_id"));
+                task.put("ship_name", rs.getString("ship_name"));
+                task.put("due_date", rs.getString("due_date"));
+                task.put("created_at", rs.getString("created_at"));
+                task.put("updated_at", rs.getString("updated_at"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return task;
+    }
+    
+    /**
+     * Add a new task to the database
+     * @param title The title of the task
+     * @param description The description of the task
+     * @param status The status of the task
+     * @param assignedTo The ID of the staff member assigned to the task
+     * @param assignedBy The ID of the staff member who assigned the task
+     * @param shipId The ID of the ship associated with the task
+     * @param dueDate The due date of the task
+     * @return The ID of the newly created task
+     */
+    public static int addTask(String title, String description, String status, Integer assignedTo, int assignedBy, Integer shipId, String dueDate) {
+        String sql = "INSERT INTO tasks (title, description, status, assigned_to, assigned_by, ship_id, due_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        int id = -1;
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            pstmt.setString(1, title);
+            pstmt.setString(2, description);
+            pstmt.setString(3, status);
+            
+            if (assignedTo != null) {
+                pstmt.setInt(4, assignedTo);
+            } else {
+                pstmt.setNull(4, java.sql.Types.INTEGER);
+            }
+            
+            pstmt.setInt(5, assignedBy);
+            
+            if (shipId != null) {
+                pstmt.setInt(6, shipId);
+            } else {
+                pstmt.setNull(6, java.sql.Types.INTEGER);
+            }
+            
+            pstmt.setString(7, dueDate);
+            
+            int affectedRows = pstmt.executeUpdate();
+            
+            if (affectedRows > 0) {
+                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        id = rs.getInt(1);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return id;
+    }
+    
+    /**
+     * Update an existing task in the database
+     * @param taskId The ID of the task
+     * @param title The title of the task
+     * @param description The description of the task
+     * @param status The status of the task
+     * @param assignedTo The ID of the staff member assigned to the task
+     * @param shipId The ID of the ship associated with the task
+     * @param dueDate The due date of the task
+     * @return True if the update was successful, false otherwise
+     */
+    public static boolean updateTask(int taskId, String title, String description, String status, Integer assignedTo, Integer shipId, String dueDate) {
+        String sql = "UPDATE tasks SET title = ?, description = ?, status = ?, assigned_to = ?, ship_id = ?, due_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, title);
+            pstmt.setString(2, description);
+            pstmt.setString(3, status);
+            
+            if (assignedTo != null) {
+                pstmt.setInt(4, assignedTo);
+            } else {
+                pstmt.setNull(4, java.sql.Types.INTEGER);
+            }
+            
+            if (shipId != null) {
+                pstmt.setInt(5, shipId);
+            } else {
+                pstmt.setNull(5, java.sql.Types.INTEGER);
+            }
+            
+            pstmt.setString(6, dueDate);
+            pstmt.setInt(7, taskId);
+            
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Mark a task as complete
+     * @param taskId The ID of the task
+     * @return True if the update was successful, false otherwise
+     */
+    public static boolean completeTask(int taskId) {
+        String sql = "UPDATE tasks SET status = 'Completed', updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, taskId);
+            
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Delete a task from the database
+     * @param taskId The ID of the task
+     * @return True if the deletion was successful, false otherwise
+     */
+    public static boolean deleteTask(int taskId) {
+        String sql = "DELETE FROM tasks WHERE id = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, taskId);
+            
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Count the number of tasks assigned to a staff member
+     * @param staffId The ID of the staff member
+     * @return The number of tasks assigned to the staff member
+     */
+    public static int countStaffTasks(int staffId) {
+        String sql = "SELECT COUNT(*) FROM tasks WHERE assigned_to = ?";
+        int count = 0;
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, staffId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return count;
+    }
+    
+    /**
+     * Get all problem reports from the database
+     * @return List of problem report objects
+     */
+    public static List<Map<String, Object>> getAllProblems() {
+        List<Map<String, Object>> problems = new ArrayList<>();
+        String sql = "SELECT p.*, " +
+                    "s.first_name || ' ' || s.last_name as reported_by_name, " +
+                    "sh.name as ship_name " +
+                    "FROM problem_reports p " +
+                    "LEFT JOIN staff s ON p.reported_by = s.id " +
+                    "LEFT JOIN ships sh ON p.ship_id = sh.id " +
+                    "ORDER BY p.created_at DESC";
+        
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                Map<String, Object> problem = new HashMap<>();
+                problem.put("id", rs.getInt("id"));
+                problem.put("title", rs.getString("title"));
+                problem.put("description", rs.getString("description"));
+                problem.put("status", rs.getString("status"));
+                problem.put("priority", rs.getString("priority"));
+                problem.put("reported_by", rs.getInt("reported_by"));
+                problem.put("reported_by_name", rs.getString("reported_by_name"));
+                problem.put("ship_id", rs.getObject("ship_id"));
+                problem.put("ship_name", rs.getString("ship_name"));
+                problem.put("created_at", rs.getString("created_at"));
+                problem.put("updated_at", rs.getString("updated_at"));
+                problems.add(problem);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return problems;
+    }
+    
+    /**
+     * Get problem reports for a specific user
+     * @param userId The ID of the user
+     * @return List of problem report objects
+     */
+    public static List<Map<String, Object>> getUserProblems(int userId) {
+        List<Map<String, Object>> problems = new ArrayList<>();
+        String sql = "SELECT p.*, " +
+                    "s.first_name || ' ' || s.last_name as reported_by_name, " +
+                    "sh.name as ship_name " +
+                    "FROM problem_reports p " +
+                    "LEFT JOIN staff s ON p.reported_by = s.id " +
+                    "LEFT JOIN ships sh ON p.ship_id = sh.id " +
+                    "WHERE p.reported_by = ? " +
+                    "ORDER BY p.created_at DESC";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Map<String, Object> problem = new HashMap<>();
+                problem.put("id", rs.getInt("id"));
+                problem.put("title", rs.getString("title"));
+                problem.put("description", rs.getString("description"));
+                problem.put("status", rs.getString("status"));
+                problem.put("priority", rs.getString("priority"));
+                problem.put("reported_by", rs.getInt("reported_by"));
+                problem.put("reported_by_name", rs.getString("reported_by_name"));
+                problem.put("ship_id", rs.getObject("ship_id"));
+                problem.put("ship_name", rs.getString("ship_name"));
+                problem.put("created_at", rs.getString("created_at"));
+                problem.put("updated_at", rs.getString("updated_at"));
+                problems.add(problem);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return problems;
     }
 }
