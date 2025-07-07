@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -653,9 +654,20 @@ public class Main {
             });
             
             // Logout endpoint
-            get("/api/logout", (req, res) -> {
+            post("/logout", (req, res) -> {
                 req.session().removeAttribute("user");
-                return gson.toJson(Map.of("status", "success"));
+                res.status(200);
+                return "{\"success\": true, \"message\": \"Logged out successfully\"}";
+            });
+            
+            get("/logout", (req, res) -> {
+                req.session().removeAttribute("user");
+                res.header("Cache-Control", "no-cache, no-store, must-revalidate");
+                res.header("Pragma", "no-cache");
+                res.header("Expires", "0");
+                res.status(302); // Force a 302 redirect
+                res.redirect("/login.html");
+                return null;
             });
             
             // Check authentication endpoint
@@ -1752,26 +1764,25 @@ public class Main {
                 
                 try (Connection conn = DatabaseConnection.getConnection();
                      PreparedStatement stmt = conn.prepareStatement(
-                         "SELECT * FROM ships ORDER BY name")) {
+                         "SELECT id, name, type, status FROM ships")) {
                     
                     ResultSet rs = stmt.executeQuery();
-                    
                     List<Map<String, Object>> ships = new ArrayList<>();
+                    
                     while (rs.next()) {
                         Map<String, Object> ship = new HashMap<>();
                         ship.put("id", rs.getInt("id"));
                         ship.put("name", rs.getString("name"));
                         ship.put("type", rs.getString("type"));
-                        ship.put("capacity", rs.getInt("capacity"));
                         ship.put("status", rs.getString("status"));
                         ships.add(ship);
                     }
                     
                     return gson.toJson(ships);
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     res.status(500);
-                    return "{\"error\": \"Database error\"}";
+                    return "{\"error\": \"Server error: " + e.getMessage() + "\"}";
                 }
             });
             

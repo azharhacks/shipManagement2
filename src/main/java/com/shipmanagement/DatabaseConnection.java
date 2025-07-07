@@ -176,27 +176,225 @@ public class DatabaseConnection {
                 "FOREIGN KEY (ship_id) REFERENCES ships(id) ON DELETE CASCADE, " +
                 "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)");
             
-            // Create default admin user if not exists
-            if (!userExists("admin")) {
-                String hashedPassword = BCrypt.hashpw("admin123", BCrypt.gensalt());
-                try (PreparedStatement pstmt = conn.prepareStatement(
-                        "INSERT INTO users (username, password, role) VALUES (?, ?, ?)")) {
-                    pstmt.setString(1, "admin");
-                    pstmt.setString(2, hashedPassword);
-                    pstmt.setString(3, "admin");
-                    pstmt.executeUpdate();
+            // Insert admin user if not exists
+            try (PreparedStatement checkStmt = conn.prepareStatement("SELECT COUNT(*) FROM users WHERE role = 'admin'");
+                 ResultSet rs = checkStmt.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) == 0) {
+                    try (PreparedStatement insertStmt = conn.prepareStatement("INSERT INTO users (username, password, role) VALUES (?, ?, ?)")) {
+                        insertStmt.setString(1, "admin");
+                        insertStmt.setString(2, BCrypt.hashpw("admin", BCrypt.gensalt()));
+                        insertStmt.setString(3, "admin");
+                        insertStmt.executeUpdate();
+                    }
                 }
             }
             
-            // Create default staff user if not exists
-            if (!userExists("staff")) {
-                String hashedPassword = BCrypt.hashpw("staff123", BCrypt.gensalt());
-                try (PreparedStatement pstmt = conn.prepareStatement(
-                        "INSERT INTO users (username, password, role) VALUES (?, ?, ?)")) {
-                    pstmt.setString(1, "staff");
-                    pstmt.setString(2, hashedPassword);
-                    pstmt.setString(3, "staff");
-                    pstmt.executeUpdate();
+            // Insert staff user if not exists
+            try (PreparedStatement checkStmt = conn.prepareStatement("SELECT COUNT(*) FROM users WHERE role = 'staff'");
+                 ResultSet rs = checkStmt.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) == 0) {
+                    try (PreparedStatement insertStmt = conn.prepareStatement("INSERT INTO users (username, password, role) VALUES (?, ?, ?)")) {
+                        insertStmt.setString(1, "staff");
+                        insertStmt.setString(2, BCrypt.hashpw("staff", BCrypt.gensalt()));
+                        insertStmt.setString(3, "staff");
+                        insertStmt.executeUpdate();
+                    }
+                }
+            }
+            
+            // Insert sample ships if none exist
+            try (PreparedStatement checkStmt = conn.prepareStatement("SELECT COUNT(*) FROM ships");
+                 ResultSet rs = checkStmt.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) == 0) {
+                    String[] shipNames = {"Oceanic Voyager", "Northern Star", "Pacific Explorer", "Atlantic Mariner", "Southern Cross"};
+                    String[] shipTypes = {"Cargo Ship", "Passenger Ship", "Research Vessel", "Tanker", "Fishing Vessel"};
+                    String[] shipStatuses = {"Active", "Active", "Maintenance", "Active", "Inactive"};
+                    
+                    try (PreparedStatement insertStmt = conn.prepareStatement("INSERT INTO ships (name, type, status) VALUES (?, ?, ?)")) {
+                        for (int i = 0; i < shipNames.length; i++) {
+                            insertStmt.setString(1, shipNames[i]);
+                            insertStmt.setString(2, shipTypes[i]);
+                            insertStmt.setString(3, shipStatuses[i]);
+                            insertStmt.executeUpdate();
+                        }
+                    }
+                }
+            }
+            
+            // Insert sample crew members if none exist
+            try (PreparedStatement checkStmt = conn.prepareStatement("SELECT COUNT(*) FROM crew_members");
+                 ResultSet rs = checkStmt.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) == 0) {
+                    // Get ship IDs
+                    List<Integer> shipIds = new ArrayList<>();
+                    try (PreparedStatement shipStmt = conn.prepareStatement("SELECT id FROM ships");
+                         ResultSet shipRs = shipStmt.executeQuery()) {
+                        while (shipRs.next()) {
+                            shipIds.add(shipRs.getInt("id"));
+                        }
+                    }
+                    
+                    if (!shipIds.isEmpty()) {
+                        String[][] crewData = {
+                            {"John", "Doe", "Captain", "Senior"},
+                            {"Jane", "Smith", "First Mate", "Junior"},
+                            {"Robert", "Johnson", "Engineer", "Senior"},
+                            {"Emily", "Williams", "Navigator", "Junior"},
+                            {"Michael", "Brown", "Medic", "Senior"}
+                        };
+                        
+                        try (PreparedStatement insertStmt = conn.prepareStatement(
+                                "INSERT INTO crew_members (first_name, last_name, position, rank, ship_id) VALUES (?, ?, ?, ?, ?)")) {
+                            for (int i = 0; i < crewData.length; i++) {
+                                insertStmt.setString(1, crewData[i][0]);
+                                insertStmt.setString(2, crewData[i][1]);
+                                insertStmt.setString(3, crewData[i][2]);
+                                insertStmt.setString(4, crewData[i][3]);
+                                insertStmt.setInt(5, shipIds.get(i % shipIds.size()));
+                                insertStmt.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Insert sample bookings if none exist
+            try (PreparedStatement checkStmt = conn.prepareStatement("SELECT COUNT(*) FROM bookings");
+                 ResultSet rs = checkStmt.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) == 0) {
+                    // Get ship IDs and user IDs
+                    List<Integer> shipIds = new ArrayList<>();
+                    try (PreparedStatement shipStmt = conn.prepareStatement("SELECT id FROM ships");
+                         ResultSet shipRs = shipStmt.executeQuery()) {
+                        while (shipRs.next()) {
+                            shipIds.add(shipRs.getInt("id"));
+                        }
+                    }
+                    
+                    List<Integer> userIds = new ArrayList<>();
+                    try (PreparedStatement userStmt = conn.prepareStatement("SELECT id FROM users");
+                         ResultSet userRs = userStmt.executeQuery()) {
+                        while (userRs.next()) {
+                            userIds.add(userRs.getInt("id"));
+                        }
+                    }
+                    
+                    if (!shipIds.isEmpty() && !userIds.isEmpty()) {
+                        String[][] bookingData = {
+                            {"2025-07-15", "2025-07-20", "confirmed"},
+                            {"2025-08-01", "2025-08-10", "pending"},
+                            {"2025-07-25", "2025-07-30", "completed"},
+                            {"2025-09-05", "2025-09-15", "cancelled"}
+                        };
+                        
+                        try (PreparedStatement insertStmt = conn.prepareStatement(
+                                "INSERT INTO bookings (ship_id, user_id, start_date, end_date, status) VALUES (?, ?, ?, ?, ?)")) {
+                            for (int i = 0; i < bookingData.length; i++) {
+                                insertStmt.setInt(1, shipIds.get(i % shipIds.size()));
+                                insertStmt.setInt(2, userIds.get(i % userIds.size()));
+                                insertStmt.setString(3, bookingData[i][0]);
+                                insertStmt.setString(4, bookingData[i][1]);
+                                insertStmt.setString(5, bookingData[i][2]);
+                                insertStmt.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Insert sample tasks if none exist
+            try (PreparedStatement checkStmt = conn.prepareStatement("SELECT COUNT(*) FROM tasks");
+                 ResultSet rs = checkStmt.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) == 0) {
+                    // Get ship IDs and user IDs
+                    List<Integer> shipIds = new ArrayList<>();
+                    try (PreparedStatement shipStmt = conn.prepareStatement("SELECT id FROM ships");
+                         ResultSet shipRs = shipStmt.executeQuery()) {
+                        while (shipRs.next()) {
+                            shipIds.add(shipRs.getInt("id"));
+                        }
+                    }
+                    
+                    List<Integer> userIds = new ArrayList<>();
+                    try (PreparedStatement userStmt = conn.prepareStatement("SELECT id FROM users WHERE role = 'staff'");
+                         ResultSet userRs = userStmt.executeQuery()) {
+                        while (userRs.next()) {
+                            userIds.add(userRs.getInt("id"));
+                        }
+                    }
+                    
+                    if (!shipIds.isEmpty() && !userIds.isEmpty()) {
+                        String[][] taskData = {
+                            {"Maintenance Check", "Perform routine maintenance check on engine", "2025-07-15", "pending"},
+                            {"Safety Inspection", "Complete safety inspection of all equipment", "2025-08-01", "in_progress"},
+                            {"Inventory Update", "Update inventory of supplies and equipment", "2025-07-25", "completed"},
+                            {"Crew Training", "Conduct emergency response training for crew", "2025-09-05", "cancelled"}
+                        };
+                        
+                        try (PreparedStatement insertStmt = conn.prepareStatement(
+                                "INSERT INTO tasks (title, description, ship_id, assigned_to, due_date, status) VALUES (?, ?, ?, ?, ?, ?)")) {
+                            for (int i = 0; i < taskData.length; i++) {
+                                insertStmt.setString(1, taskData[i][0]);
+                                insertStmt.setString(2, taskData[i][1]);
+                                insertStmt.setInt(3, shipIds.get(i % shipIds.size()));
+                                insertStmt.setInt(4, userIds.get(i % userIds.size()));
+                                insertStmt.setString(5, taskData[i][2]);
+                                insertStmt.setString(6, taskData[i][3]);
+                                insertStmt.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Insert sample reports if none exist
+            try (PreparedStatement checkStmt = conn.prepareStatement("SELECT COUNT(*) FROM reports");
+                 ResultSet rs = checkStmt.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) == 0) {
+                    // Get ship IDs and user IDs
+                    List<Integer> shipIds = new ArrayList<>();
+                    try (PreparedStatement shipStmt = conn.prepareStatement("SELECT id FROM ships");
+                         ResultSet shipRs = shipStmt.executeQuery()) {
+                        while (shipRs.next()) {
+                            shipIds.add(shipRs.getInt("id"));
+                        }
+                    }
+                    
+                    List<Integer> userIds = new ArrayList<>();
+                    try (PreparedStatement userStmt = conn.prepareStatement("SELECT id FROM users");
+                         ResultSet userRs = userStmt.executeQuery()) {
+                        while (userRs.next()) {
+                            userIds.add(userRs.getInt("id"));
+                        }
+                    }
+                    
+                    if (!shipIds.isEmpty() && !userIds.isEmpty()) {
+                        String[][] reportData = {
+                            {"Monthly Status Report", "Status", "Monthly ship status and performance report"},
+                            {"Maintenance Report", "Maintenance", "Details of maintenance performed"},
+                            {"Incident Report", "Incident", "Report of minor incident during docking"},
+                            {"Inspection Report", "Inspection", "Results of safety inspection"}
+                        };
+                        
+                        try (PreparedStatement insertStmt = conn.prepareStatement(
+                                "INSERT INTO reports (title, report_type, content, generated_by, ship_id) VALUES (?, ?, ?, ?, ?)")) {
+                            for (int i = 0; i < reportData.length; i++) {
+                                insertStmt.setString(1, reportData[i][0]);
+                                insertStmt.setString(2, reportData[i][1]);
+                                insertStmt.setString(3, reportData[i][2]);
+                                insertStmt.setInt(4, userIds.get(i % userIds.size()));
+                                insertStmt.setInt(5, shipIds.get(i % shipIds.size()));
+                                insertStmt.executeUpdate();
+                            }
+                        }
+                    }
                 }
             }
             

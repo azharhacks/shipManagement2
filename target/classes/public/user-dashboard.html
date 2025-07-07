@@ -15,11 +15,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-<<<<<<< HEAD
-            
-=======
             opacity: 0.9;
->>>>>>> 892758ec32bfe0ae1eb18a8b379131b300a329b1
         }
         .sidebar {
             min-height: 100vh;
@@ -43,6 +39,7 @@
         .main-content {
             padding: 20px;
             transition: all 0.3s;
+            margin-top: 60px;
         }
         .welcome-card {
             background: linear-gradient(135deg, #3498db, #2c3e50);
@@ -125,11 +122,28 @@
                 </div>
             </nav>
             
+            <!-- Top navigation bar -->
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">Ship Management System</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" onclick="logoutAndRedirect(); return false;">Logout</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            
             <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 d-md-block sidebar" id="sidebar">
+            <div class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
                 <div class="position-sticky pt-3">
-                    <div class="text-center mb-4">
-                        <h4>Ship Portal</h4>
+                    <div class="sidebar-header mb-4">
+                        <h3 class="text-light text-center">Staff Portal</h3>
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -173,7 +187,7 @@
                             </a>
                         </li>
                         <li class="nav-item mt-3">
-                            <a class="nav-link text-danger" href="/logout">
+                            <a class="nav-link text-danger" href="#" onclick="logoutAndRedirect(); return false;">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
                         </li>
@@ -211,6 +225,49 @@
                                 <a href="#" class="btn btn-info text-white">
                                     <i class="bi bi-clock-history"></i> Recent Trips
                                 </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Status Cards -->
+                    <div class="col-md-12 mb-4">
+                        <h4 class="mb-3">System Status</h4>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-primary text-white h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Ships</h5>
+                                        <h2 id="ships-count">0</h2>
+                                        <p class="card-text">Active Ships</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-success text-white h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Bookings</h5>
+                                        <h2 id="bookings-count">0</h2>
+                                        <p class="card-text">Active Bookings</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-warning text-dark h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Tasks</h5>
+                                        <h2 id="tasks-count">0</h2>
+                                        <p class="card-text">Pending Tasks</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-danger text-white h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Issues</h5>
+                                        <h2 id="issues-count">0</h2>
+                                        <p class="card-text">Open Issues</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -401,7 +458,7 @@
                             <h4><i class="bi bi-exclamation-triangle"></i> Report an Issue</h4>
                         </div>
                         <div class="card-body">
-                            <form id="issue-report-form">
+                            <form id="issue-form">
                                 <div class="mb-3">
                                     <label for="issue-title" class="form-label">Issue Title</label>
                                     <input type="text" class="form-control" id="issue-title" required>
@@ -412,8 +469,8 @@
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="issue-ship" class="form-label">Related Ship (Optional)</label>
-                                        <select class="form-select" id="issue-ship">
+                                        <label for="report-ship" class="form-label">Related Ship (Optional)</label>
+                                        <select class="form-select" id="report-ship">
                                             <option value="">-- Select Ship --</option>
                                             <!-- Ships will be loaded dynamically -->
                                         </select>
@@ -430,6 +487,107 @@
                                 </div>
                                 <button type="submit" class="btn btn-primary">Submit Report</button>
                             </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settings" class="content-section" style="display: none;">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h4><i class="bi bi-gear-fill"></i> Settings</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h5>Profile Settings</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="profile-form">
+                                                <div class="mb-3">
+                                                    <label for="profile-username" class="form-label">Username</label>
+                                                    <input type="text" class="form-control" id="profile-username" value="current_user" disabled>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="profile-email" class="form-label">Email</label>
+                                                    <input type="email" class="form-control" id="profile-email" placeholder="Enter your email">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="profile-name" class="form-label">Full Name</label>
+                                                    <input type="text" class="form-control" id="profile-name" placeholder="Enter your full name">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="profile-phone" class="form-label">Phone Number</label>
+                                                    <input type="tel" class="form-control" id="profile-phone" placeholder="Enter your phone number">
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h5>Change Password</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="password-form">
+                                                <div class="mb-3">
+                                                    <label for="current-password" class="form-label">Current Password</label>
+                                                    <input type="password" class="form-control" id="current-password" placeholder="Enter current password">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="new-password" class="form-label">New Password</label>
+                                                    <input type="password" class="form-control" id="new-password" placeholder="Enter new password">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="confirm-password" class="form-label">Confirm New Password</label>
+                                                    <input type="password" class="form-control" id="confirm-password" placeholder="Confirm new password">
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Change Password</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Notification Settings</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="email-notifications" checked>
+                                                <label class="form-check-label" for="email-notifications">Email Notifications</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="sms-notifications">
+                                                <label class="form-check-label" for="sms-notifications">SMS Notifications</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="booking-notifications" checked>
+                                                <label class="form-check-label" for="booking-notifications">Booking Updates</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="task-notifications" checked>
+                                                <label class="form-check-label" for="task-notifications">Task Assignments</label>
+                                            </div>
+                                            <button type="button" class="btn btn-primary">Save Notification Settings</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ships Section -->
+                <div id="ships" class="content-section" style="display: none;">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h4><i class="bi bi-water"></i> Ships</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="ships-container" class="row"></div>
                         </div>
                     </div>
                 </div>
@@ -450,7 +608,9 @@
                         <div class="col-md-6">
                             <p><strong>Type:</strong> <span id="modal-ship-type"></span></p>
                             <p><strong>Capacity:</strong> <span id="modal-ship-capacity"></span></p>
-                            <p><strong>Status:</strong> <span id="modal-ship-status"></span></p>
+                            <p><strong>Status:</strong> <span id="modal-ship-status"></span> 
+                                <span id="ship-details-status-badge" class="badge bg-secondary">Unknown</span>
+                            </p>
                         </div>
                         <div class="col-md-6">
                             <div id="ship-location-info">
@@ -463,6 +623,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-success" id="modal-book-ship-btn">Book This Ship</button>
+                    <button type="button" class="btn btn-danger" id="ship-details-report-btn">Report Issue</button>
                 </div>
             </div>
         </div>
@@ -473,7 +634,135 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Direct logout function - outside any event handlers
+        function logout() {
+            console.log('Logout function called');
+            
+            // First call the logout API endpoint
+            fetch('/logout', {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'Cache-Control': 'no-cache'
+                }
+            })
+            .then(() => {
+                console.log('Logout API call completed, redirecting to login page');
+                // Then redirect to login page
+                window.location.href = '/login.html';
+            })
+            .catch(error => {
+                console.error('Error during logout:', error);
+                // Redirect anyway in case of error
+                window.location.href = '/login.html';
+            });
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
+            // Global variable to track if data is loading
+            window.isLoading = false;
+            
+            // Initialize the dashboard when the page loads
+            initializeDashboard();
+            
+            // Show loading spinner
+            function showLoading(elementId) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.innerHTML = `
+                        <div class="d-flex justify-content-center my-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Check if user is authenticated
+            function checkAuthentication() {
+                return fetch('/api/user')
+                    .then(response => {
+                        if (!response.ok) {
+                            if (response.status === 401) {
+                                window.location.href = '/login.html?session=expired';
+                                return Promise.reject('Session expired');
+                            }
+                            return Promise.reject('Authentication check failed');
+                        }
+                        return response.json();
+                    })
+                    .then(userData => {
+                        // Update user name in the welcome message
+                        const userNameElement = document.getElementById('user-name');
+                        if (userNameElement && userData.username) {
+                            userNameElement.textContent = userData.username;
+                        }
+                        return userData;
+                    })
+                    .catch(error => {
+                        console.error('Authentication error:', error);
+                        if (error !== 'Session expired') {
+                            showAlert('Authentication error. Please log in again.', 'danger');
+                        }
+                        return Promise.reject(error);
+                    });
+            }
+            
+            // Initialize dashboard
+            function initializeDashboard() {
+                // Check authentication first
+                checkAuthentication()
+                    .then(() => {
+                        // Show dashboard section by default
+                        showSection('dashboard');
+                        
+                        // Load initial data
+                        loadShipsForSection();
+                        loadBookings();
+                        
+                        // Setup refresh interval for real-time data (every 30 seconds)
+                        setInterval(() => {
+                            if (!window.isLoading) {
+                                refreshDashboardData();
+                            }
+                        }, 30000);
+                    })
+                    .catch(error => {
+                        console.error('Failed to initialize dashboard:', error);
+                    });
+            }
+            
+            // Refresh dashboard data
+            function refreshDashboardData() {
+                // Only refresh data for the currently visible section
+                const activeSection = document.querySelector('.content-section[style="display: block;"]');
+                if (activeSection) {
+                    const sectionId = activeSection.id;
+                    
+                    switch(sectionId) {
+                        case 'dashboard':
+                            loadBookings(true);
+                            break;
+                        case 'bookings':
+                            loadBookings(true);
+                            break;
+                        case 'ships':
+                            loadShipsForSection(true);
+                            break;
+                        case 'tasks':
+                            loadTasks(true);
+                            break;
+                        case 'reports':
+                            loadReports(true);
+                            break;
+                        case 'crew':
+                            loadCrewMembers(true);
+                            break;
+                    }
+                }
+            }
+            
             // Get current user info
             fetch('/api/user')
                 .then(response => response.json())
@@ -482,64 +771,105 @@
                 })
                 .catch(error => console.error('Error fetching user info:', error));
 
-            // Load real bookings data
-            function loadBookings() {
-                console.log('Loading bookings...');
-                fetch('/api/user/bookings')
-                    .then(response => {
-                        console.log('Bookings response status:', response.status);
-                        return response.json();
-                    })
-                    .then(bookings => {
-                        console.log('Bookings data:', bookings);
-                        const tableBody = document.getElementById('bookings-table-body');
-                        if (bookings.length === 0) {
-                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No bookings found</td></tr>';
-                            return;
-                        }
-                        
-                        tableBody.innerHTML = '';
-                        bookings.forEach(booking => {
-                            const statusClass = getStatusBadgeClass(booking.status);
+            // Load bookings data (using demo data)
+            function loadBookings(refresh = false) {
+                console.log('Loading bookings data (demo)...');
+                if (!refresh) {
+                    showLoading('bookings-table-body');
+                }
+                
+                // Use demo data instead of fetching from API
+                const demoBookings = [
+                    { id: 1, ship_name: "Oceanic Voyager", start_date: "2025-07-15", end_date: "2025-07-20", status: "confirmed" },
+                    { id: 2, ship_name: "Northern Star", start_date: "2025-08-01", end_date: "2025-08-10", status: "pending" },
+                    { id: 3, ship_name: "Pacific Explorer", start_date: "2025-07-25", end_date: "2025-07-30", status: "completed" },
+                    { id: 4, ship_name: "Atlantic Mariner", start_date: "2025-09-05", end_date: "2025-09-15", status: "cancelled" },
+                    { id: 5, ship_name: "Caribbean Princess", start_date: "2025-10-01", end_date: "2025-10-10", status: "confirmed" },
+                    { id: 6, ship_name: "Mediterranean Queen", start_date: "2025-08-15", end_date: "2025-08-25", status: "pending" }
+                ];
+                
+                // Update the bookings table
+                const bookingsTableBody = document.getElementById('bookings-table-body');
+                if (bookingsTableBody) {
+                    bookingsTableBody.innerHTML = '';
+                    
+                    demoBookings.forEach(booking => {
+                        const statusBadgeClass = getBookingStatusBadgeClass(booking.status);
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${booking.ship_name}</td>
+                            <td>${formatDate(booking.start_date)}</td>
+                            <td>${formatDate(booking.end_date)}</td>
+                            <td><span class="badge ${statusBadgeClass}">${capitalizeFirstLetter(booking.status)}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="viewBookingDetails(${booking.id})">View</button>
+                                ${booking.status === 'pending' ? 
+                                  `<button class="btn btn-sm btn-danger ms-2" onclick="cancelBooking(${booking.id})">Cancel</button>` : ''}
+                            </td>
+                        `;
+                        bookingsTableBody.appendChild(row);
+                    });
+                }
+                
+                // Update the recent bookings table
+                const recentBookingsTable = document.getElementById('recent-bookings-table');
+                if (recentBookingsTable) {
+                    recentBookingsTable.innerHTML = '';
+                    
+                    // Filter for recent/active bookings
+                    const recentBookings = demoBookings.filter(booking => 
+                        booking.status === 'confirmed' || booking.status === 'pending'
+                    ).slice(0, 3); // Show only the first 3
+                    
+                    if (recentBookings.length > 0) {
+                        recentBookings.forEach(booking => {
+                            const statusBadgeClass = getBookingStatusBadgeClass(booking.status);
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                                <td>${booking.ship_name || 'N/A'}</td>
-                                <td>${booking.start_date || 'N/A'}</td>
-                                <td>${booking.end_date || 'N/A'}</td>
-                                <td><span class="badge ${statusClass}">${booking.status}</span></td>
+                                <td>${booking.ship_name}</td>
+                                <td>${formatDate(booking.start_date)}</td>
+                                <td>${formatDate(booking.end_date)}</td>
+                                <td><span class="badge ${statusBadgeClass}">${capitalizeFirstLetter(booking.status)}</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary view-booking" data-id="${booking.id}">View</button>
-                                    ${booking.status !== 'Cancelled' ? `<button class="btn btn-sm btn-danger cancel-booking" data-id="${booking.id}">Cancel</button>` : ''}
+                                    <button class="btn btn-sm btn-primary" onclick="viewBookingDetails(${booking.id})">View</button>
                                 </td>
                             `;
-                            tableBody.appendChild(row);
+                            recentBookingsTable.appendChild(row);
                         });
                         
-                        // Add event listeners to buttons
-                        document.querySelectorAll('.view-booking').forEach(button => {
-                            button.addEventListener('click', function() {
-                                const bookingId = this.getAttribute('data-id');
-                                viewBookingDetails(bookingId);
-                            });
-                        });
-                        
-                        document.querySelectorAll('.cancel-booking').forEach(button => {
-                            button.addEventListener('click', function() {
-                                const bookingId = this.getAttribute('data-id');
-                                cancelBooking(bookingId);
-                            });
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error loading bookings:', error);
-                        document.getElementById('bookings-table-body').innerHTML = 
-                            '<tr><td colspan="5" class="text-center text-danger">Error loading bookings</td></tr>';
-                    });
+                        // Hide loading and no bookings message
+                        document.getElementById('recent-bookings-loading').style.display = 'none';
+                        document.getElementById('no-recent-bookings-message').style.display = 'none';
+                    } else {
+                        // Show no bookings message
+                        document.getElementById('recent-bookings-loading').style.display = 'none';
+                        document.getElementById('no-recent-bookings-message').style.display = 'block';
+                    }
+                }
+                
+                // Update bookings count in dashboard
+                const bookingsCount = document.getElementById('bookings-count');
+                if (bookingsCount) {
+                    const activeBookings = demoBookings.filter(booking => 
+                        booking.status === 'confirmed' || booking.status === 'pending'
+                    ).length;
+                    bookingsCount.textContent = activeBookings;
+                }
+                
+                // Update last updated time
+                const updateTime = document.getElementById('update-time');
+                if (updateTime) {
+                    const now = new Date();
+                    updateTime.textContent = now.toLocaleTimeString();
+                }
             }
             
             // Load real tasks data
-            function loadTasks() {
+            function loadTasks(refresh = false) {
                 console.log('Loading tasks...');
+                if (!refresh) {
+                    showLoading('tasks-table-body');
+                }
                 fetch('/api/tasks')
                     .then(response => {
                         console.log('Tasks response status:', response.status);
@@ -549,53 +879,109 @@
                         console.log('Tasks data:', tasks);
                         const tableBody = document.getElementById('tasks-table-body');
                         if (tasks.length === 0) {
-                            tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No tasks assigned</td></tr>';
-                            return;
+                            // Load demo data if no real data
+                            loadDemoTasks();
+                        } else {
+                            if (tasks.length === 0) {
+                                tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No tasks assigned</td></tr>';
+                            } else {
+                                tableBody.innerHTML = '';
+                                tasks.forEach(task => {
+                                    const statusBadgeClass = getTaskStatusBadgeClass(task.status);
+                                    const row = `
+                                        <tr>
+                                            <td>${task.title}</td>
+                                            <td>${task.description}</td>
+                                            <td>${task.ship_name}</td>
+                                            <td>${formatDate(task.due_date)}</td>
+                                            <td><span class="badge ${statusBadgeClass}">${task.status}</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info">View</button>
+                                                ${task.status === 'pending' || task.status === 'in_progress' ? 
+                                                  `<button class="btn btn-sm btn-success" onclick="completeTask(${task.id})">Complete</button>` : ''}
+                                            </td>
+                                        </tr>
+                                    `;
+                                    tableBody.innerHTML += row;
+                                });
+                            }
                         }
-                        
-                        tableBody.innerHTML = '';
-                        tasks.forEach(task => {
-                            const statusClass = getTaskStatusBadgeClass(task.status);
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${task.title || 'N/A'}</td>
-                                <td>${task.description || 'N/A'}</td>
-                                <td>${task.ship_name || 'N/A'}</td>
-                                <td>${task.due_date || 'N/A'}</td>
-                                <td><span class="badge ${statusClass}">${task.status}</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary view-task" data-id="${task.id}">View</button>
-                                    ${task.status !== 'completed' ? `<button class="btn btn-sm btn-success complete-task" data-id="${task.id}">Complete</button>` : ''}
-                                </td>
-                            `;
-                            tableBody.appendChild(row);
-                        });
-                        
-                        // Add event listeners to buttons
-                        document.querySelectorAll('.view-task').forEach(button => {
-                            button.addEventListener('click', function() {
-                                const taskId = this.getAttribute('data-id');
-                                viewTaskDetails(taskId);
-                            });
-                        });
-                        
-                        document.querySelectorAll('.complete-task').forEach(button => {
-                            button.addEventListener('click', function() {
-                                const taskId = this.getAttribute('data-id');
-                                completeTask(taskId);
-                            });
-                        });
                     })
                     .catch(error => {
                         console.error('Error loading tasks:', error);
-                        document.getElementById('tasks-table-body').innerHTML = 
-                            '<tr><td colspan="6" class="text-center text-danger">Error loading tasks</td></tr>';
+                        // Load demo data on error
+                        loadDemoTasks();
                     });
             }
             
+            // Load demo tasks data
+            function loadDemoTasks() {
+                const demoTasks = [
+                    {
+                        id: 1,
+                        title: "Task 1",
+                        description: "Description for task 1",
+                        ship_name: "Oceanic Voyager",
+                        due_date: "2025-07-15",
+                        status: "pending"
+                    },
+                    {
+                        id: 2,
+                        title: "Task 2",
+                        description: "Description for task 2",
+                        ship_name: "Northern Star",
+                        due_date: "2025-08-01",
+                        status: "in_progress"
+                    },
+                    {
+                        id: 3,
+                        title: "Task 3",
+                        description: "Description for task 3",
+                        ship_name: "Pacific Explorer",
+                        due_date: "2025-07-25",
+                        status: "completed"
+                    },
+                    {
+                        id: 4,
+                        title: "Task 4",
+                        description: "Description for task 4",
+                        ship_name: "Atlantic Mariner",
+                        due_date: "2025-09-05",
+                        status: "cancelled"
+                    }
+                ];
+                
+                const tableBody = document.getElementById('tasks-table-body');
+                tableBody.innerHTML = '';
+                
+                demoTasks.forEach(task => {
+                    const statusBadgeClass = getTaskStatusBadgeClass(task.status);
+                    const row = `
+                        <tr>
+                            <td>${task.title}</td>
+                            <td>${task.description}</td>
+                            <td>${task.ship_name}</td>
+                            <td>${formatDate(task.due_date)}</td>
+                            <td><span class="badge ${statusBadgeClass}">${task.status}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info">View</button>
+                                ${task.status === 'pending' || task.status === 'in_progress' ? 
+                                  `<button class="btn btn-sm btn-success" onclick="completeTask(${task.id})">Complete</button>` : ''}
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+                
+                console.log('Loaded demo tasks data');
+            }
+            
             // Load real reports data
-            function loadReports() {
+            function loadReports(refresh = false) {
                 console.log('Loading reports...');
+                if (!refresh) {
+                    showLoading('reports-table-body');
+                }
                 fetch('/api/reports')
                     .then(response => {
                         console.log('Reports response status:', response.status);
@@ -605,43 +991,97 @@
                         console.log('Reports data:', reports);
                         const tableBody = document.getElementById('reports-table-body');
                         if (reports.length === 0) {
-                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No reports found</td></tr>';
-                            return;
+                            // Load demo data if no real data
+                            loadDemoReports();
+                        } else {
+                            if (reports.length === 0) {
+                                tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No reports found</td></tr>';
+                            } else {
+                                tableBody.innerHTML = '';
+                                reports.forEach(report => {
+                                    const row = `
+                                        <tr>
+                                            <td>${report.title}</td>
+                                            <td>${report.report_type}</td>
+                                            <td>${report.ship_name}</td>
+                                            <td>${formatDate(report.created_at)}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info">View</button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                    tableBody.innerHTML += row;
+                                });
+                            }
                         }
-                        
-                        tableBody.innerHTML = '';
-                        reports.forEach(report => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${report.title || 'N/A'}</td>
-                                <td>${report.report_type || 'N/A'}</td>
-                                <td>${report.ship_name || 'N/A'}</td>
-                                <td>${formatDate(report.created_at) || 'N/A'}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary view-report" data-id="${report.id}">View</button>
-                                </td>
-                            `;
-                            tableBody.appendChild(row);
-                        });
-                        
-                        // Add event listeners to buttons
-                        document.querySelectorAll('.view-report').forEach(button => {
-                            button.addEventListener('click', function() {
-                                const reportId = this.getAttribute('data-id');
-                                viewReportDetails(reportId);
-                            });
-                        });
                     })
                     .catch(error => {
                         console.error('Error loading reports:', error);
-                        document.getElementById('reports-table-body').innerHTML = 
-                            '<tr><td colspan="5" class="text-center text-danger">Error loading reports</td></tr>';
+                        // Load demo data on error
+                        loadDemoReports();
                     });
             }
             
+            // Load demo reports data
+            function loadDemoReports() {
+                const demoReports = [
+                    {
+                        id: 1,
+                        title: "Report 1",
+                        report_type: "Type 1",
+                        ship_name: "Oceanic Voyager",
+                        created_at: "2025-07-15"
+                    },
+                    {
+                        id: 2,
+                        title: "Report 2",
+                        report_type: "Type 2",
+                        ship_name: "Northern Star",
+                        created_at: "2025-08-01"
+                    },
+                    {
+                        id: 3,
+                        title: "Report 3",
+                        report_type: "Type 3",
+                        ship_name: "Pacific Explorer",
+                        created_at: "2025-07-25"
+                    },
+                    {
+                        id: 4,
+                        title: "Report 4",
+                        report_type: "Type 4",
+                        ship_name: "Atlantic Mariner",
+                        created_at: "2025-09-05"
+                    }
+                ];
+                
+                const tableBody = document.getElementById('reports-table-body');
+                tableBody.innerHTML = '';
+                
+                demoReports.forEach(report => {
+                    const row = `
+                        <tr>
+                            <td>${report.title}</td>
+                            <td>${report.report_type}</td>
+                            <td>${report.ship_name}</td>
+                            <td>${formatDate(report.created_at)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info">View</button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+                
+                console.log('Loaded demo reports data');
+            }
+            
             // Load real crew members data
-            function loadCrewMembers() {
+            function loadCrewMembers(refresh = false) {
                 console.log('Loading crew members...');
+                if (!refresh) {
+                    showLoading('crew-table-body');
+                }
                 fetch('/api/crew')
                     .then(response => {
                         console.log('Crew response status:', response.status);
@@ -651,39 +1091,269 @@
                         console.log('Crew data:', crewMembers);
                         const tableBody = document.getElementById('crew-table-body');
                         if (crewMembers.length === 0) {
-                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No crew members found</td></tr>';
-                            return;
+                            // Load demo data if no real data
+                            loadDemoCrewMembers();
+                        } else {
+                            if (crewMembers.length === 0) {
+                                tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No crew members found</td></tr>';
+                            } else {
+                                tableBody.innerHTML = '';
+                                crewMembers.forEach(crew => {
+                                    const row = `
+                                        <tr>
+                                            <td>${crew.first_name} ${crew.last_name}</td>
+                                            <td>${crew.position}</td>
+                                            <td>${crew.rank}</td>
+                                            <td>${crew.ship_name}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info">View</button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                    tableBody.innerHTML += row;
+                                });
+                            }
                         }
-                        
-                        tableBody.innerHTML = '';
-                        crewMembers.forEach(crew => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${crew.first_name} ${crew.last_name}</td>
-                                <td>${crew.position || 'N/A'}</td>
-                                <td>${crew.rank || 'N/A'}</td>
-                                <td>${crew.ship_name || 'N/A'}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary view-crew" data-id="${crew.id}">View</button>
-                                </td>
-                            `;
-                            tableBody.appendChild(row);
-                        });
-                        
-                        // Add event listeners to buttons
-                        document.querySelectorAll('.view-crew').forEach(button => {
-                            button.addEventListener('click', function() {
-                                const crewId = this.getAttribute('data-id');
-                                viewCrewDetails(crewId);
-                            });
-                        });
                     })
                     .catch(error => {
                         console.error('Error loading crew members:', error);
-                        document.getElementById('crew-table-body').innerHTML = 
-                            '<tr><td colspan="5" class="text-center text-danger">Error loading crew members</td></tr>';
+                        // Load demo data on error
+                        loadDemoCrewMembers();
                     });
             }
+            
+            // Load demo crew members data
+            function loadDemoCrewMembers() {
+                const demoCrewMembers = [
+                    {
+                        id: 1,
+                        first_name: "John",
+                        last_name: "Doe",
+                        position: "Captain",
+                        rank: "Senior",
+                        ship_name: "Oceanic Voyager"
+                    },
+                    {
+                        id: 2,
+                        first_name: "Jane",
+                        last_name: "Doe",
+                        position: "First Mate",
+                        rank: "Junior",
+                        ship_name: "Northern Star"
+                    },
+                    {
+                        id: 3,
+                        first_name: "Bob",
+                        last_name: "Smith",
+                        position: "Engineer",
+                        rank: "Senior",
+                        ship_name: "Pacific Explorer"
+                    },
+                    {
+                        id: 4,
+                        first_name: "Alice",
+                        last_name: "Johnson",
+                        position: "Navigator",
+                        rank: "Junior",
+                        ship_name: "Atlantic Mariner"
+                    }
+                ];
+                
+                const tableBody = document.getElementById('crew-table-body');
+                tableBody.innerHTML = '';
+                
+                demoCrewMembers.forEach(crew => {
+                    const row = `
+                        <tr>
+                            <td>${crew.first_name} ${crew.last_name}</td>
+                            <td>${crew.position}</td>
+                            <td>${crew.rank}</td>
+                            <td>${crew.ship_name}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info">View</button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+                
+                console.log('Loaded demo crew members data');
+            }
+            
+            // Load ships for the form dropdown
+            function loadShipsForForm() {
+                console.log('Loading ships for form dropdown...');
+                fetch('/api/ships')
+                    .then(response => {
+                        console.log('Ships dropdown response status:', response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Ships dropdown data:', data);
+                        const shipSelect = document.getElementById('report-ship');
+                        
+                        // Clear existing options
+                        shipSelect.innerHTML = '<option value="">-- Select Ship --</option>';
+                        
+                        // Check if we have data
+                        if (data && data.length > 0) {
+                            // Use actual data from the database
+                            data.forEach(ship => {
+                                const option = document.createElement('option');
+                                option.value = ship.id;
+                                option.textContent = ship.name;
+                                shipSelect.appendChild(option);
+                            });
+                        } else {
+                            console.log('No ships data found for dropdown, using demo data');
+                            // Use demo data as fallback
+                            const demoShips = [
+                                { id: 1, name: "Oceanic Voyager", type: "Cargo Ship", status: "Active" },
+                                { id: 2, name: "Northern Star", type: "Passenger Ship", status: "Active" },
+                                { id: 3, name: "Pacific Explorer", type: "Research Vessel", status: "Maintenance" },
+                                { id: 4, name: "Atlantic Mariner", type: "Tanker", status: "Active" },
+                                { id: 5, name: "Southern Cross", type: "Fishing Vessel", status: "Inactive" }
+                            ];
+                            
+                            demoShips.forEach(ship => {
+                                const option = document.createElement('option');
+                                option.value = ship.id;
+                                option.textContent = ship.name;
+                                shipSelect.appendChild(option);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading ships:', error);
+                        
+                        // Use demo data as fallback on error
+                        const demoShips = [
+                            { id: 1, name: "Oceanic Voyager", type: "Cargo Ship", status: "Active" },
+                            { id: 2, name: "Northern Star", type: "Passenger Ship", status: "Active" },
+                            { id: 3, name: "Pacific Explorer", type: "Research Vessel", status: "Maintenance" },
+                            { id: 4, name: "Atlantic Mariner", type: "Tanker", status: "Active" },
+                            { id: 5, name: "Southern Cross", type: "Fishing Vessel", status: "Inactive" }
+                        ];
+                        
+                        const shipSelect = document.getElementById('report-ship');
+                        shipSelect.innerHTML = '<option value="">-- Select Ship --</option>';
+                        
+                        demoShips.forEach(ship => {
+                            const option = document.createElement('option');
+                            option.value = ship.id;
+                            option.textContent = ship.name;
+                            shipSelect.appendChild(option);
+                        });
+                    });
+            }
+            
+            // Load ships for the ships section
+            function loadShipsForSection(refresh = false) {
+                console.log('Loading ships for ships section...');
+                if (!refresh) {
+                    showLoading('ships-container');
+                }
+                fetch('/api/ships')
+                    .then(response => {
+                        console.log('Ships response status:', response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Ships data:', data);
+                        const shipsContainer = document.getElementById('ships-container');
+                        
+                        // Clear existing content
+                        shipsContainer.innerHTML = '';
+                        
+                        // Check if we have data
+                        if (data && data.length > 0) {
+                            // Use actual data from the database
+                            data.forEach(ship => {
+                                const shipCard = createShipCard(ship);
+                                shipsContainer.appendChild(shipCard);
+                            });
+                        } else {
+                            console.log('No ships data found, using demo data');
+                            // Use demo data as fallback
+                            const demoShips = [
+                                { id: 1, name: "Oceanic Voyager", type: "Cargo Ship", status: "Active" },
+                                { id: 2, name: "Northern Star", type: "Passenger Ship", status: "Active" },
+                                { id: 3, name: "Pacific Explorer", type: "Research Vessel", status: "Maintenance" },
+                                { id: 4, name: "Atlantic Mariner", type: "Tanker", status: "Active" },
+                                { id: 5, name: "Southern Cross", type: "Fishing Vessel", status: "Inactive" }
+                            ];
+                            
+                            demoShips.forEach(ship => {
+                                const shipCard = createShipCard(ship);
+                                shipsContainer.appendChild(shipCard);
+                            });
+                            
+                            // Show a message that we're using demo data
+                            showAlert('Using demo ship data. Connect to database for real data.', 'info');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading ships:', error);
+                        showAlert('Error loading ships. Using demo data instead.', 'warning');
+                        
+                        // Use demo data as fallback on error
+                        const demoShips = [
+                            { id: 1, name: "Oceanic Voyager", type: "Cargo Ship", status: "Active" },
+                            { id: 2, name: "Northern Star", type: "Passenger Ship", status: "Active" },
+                            { id: 3, name: "Pacific Explorer", type: "Research Vessel", status: "Maintenance" },
+                            { id: 4, name: "Atlantic Mariner", type: "Tanker", status: "Active" },
+                            { id: 5, name: "Southern Cross", type: "Fishing Vessel", status: "Inactive" }
+                        ];
+                        
+                        const shipsContainer = document.getElementById('ships-container');
+                        shipsContainer.innerHTML = '';
+                        
+                        demoShips.forEach(ship => {
+                            const shipCard = createShipCard(ship);
+                            shipsContainer.appendChild(shipCard);
+                        });
+                    });
+            }
+            
+            // Submit issue report
+            document.getElementById('issue-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Submitting issue report...');
+                
+                const issueData = {
+                    title: document.getElementById('issue-title').value,
+                    description: document.getElementById('issue-description').value,
+                    ship_id: document.getElementById('report-ship').value || null,
+                    severity: document.getElementById('issue-severity').value
+                };
+                
+                console.log('Issue data:', issueData);
+                
+                fetch('/api/problem-reports', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(issueData)
+                })
+                .then(response => {
+                    console.log('Issue report response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Issue report response:', data);
+                    if (data.success) {
+                        showAlert('Issue reported successfully!', 'success');
+                        document.getElementById('issue-form').reset();
+                    } else {
+                        showAlert('Error reporting issue: ' + (data.message || 'Unknown error'), 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting issue report:', error);
+                    showAlert('Error submitting issue report. Please try again.', 'danger');
+                });
+            });
             
             // Helper functions
             function getStatusBadgeClass(status) {
@@ -712,72 +1382,45 @@
             }
             
             function viewBookingDetails(bookingId) {
-                // Implement booking details view
                 console.log('Viewing booking details for ID:', bookingId);
-                // You can implement a modal or redirect to a details page
+                
+                // Find the booking in the demo data
+                const demoBookings = [
+                    { id: 1, ship_name: "Oceanic Voyager", start_date: "2025-07-15", end_date: "2025-07-20", status: "confirmed" },
+                    { id: 2, ship_name: "Northern Star", start_date: "2025-08-01", end_date: "2025-08-10", status: "pending" },
+                    { id: 3, ship_name: "Pacific Explorer", start_date: "2025-07-25", end_date: "2025-07-30", status: "completed" },
+                    { id: 4, ship_name: "Atlantic Mariner", start_date: "2025-09-05", end_date: "2025-09-15", status: "cancelled" },
+                    { id: 5, ship_name: "Caribbean Princess", start_date: "2025-10-01", end_date: "2025-10-10", status: "confirmed" },
+                    { id: 6, ship_name: "Mediterranean Queen", start_date: "2025-08-15", end_date: "2025-08-25", status: "pending" }
+                ];
+                
+                const booking = demoBookings.find(b => b.id === bookingId);
+                
+                if (booking) {
+                    // Show a simple alert with booking details
+                    alert(`
+                        Booking Details:
+                        Ship: ${booking.ship_name}
+                        Start Date: ${formatDate(booking.start_date)}
+                        End Date: ${formatDate(booking.end_date)}
+                        Status: ${capitalizeFirstLetter(booking.status)}
+                    `);
+                } else {
+                    showAlert('Booking not found', 'danger');
+                }
             }
             
             function cancelBooking(bookingId) {
+                console.log('Cancelling booking ID:', bookingId);
+                
                 if (confirm('Are you sure you want to cancel this booking?')) {
-                    fetch(`/api/bookings/${bookingId}/cancel`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) {
-                            alert('Booking cancelled successfully');
-                            loadBookings(); // Reload bookings to reflect changes
-                        } else {
-                            alert('Failed to cancel booking: ' + result.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error cancelling booking:', error);
-                        alert('An error occurred while cancelling the booking');
-                    });
+                    showAlert('Booking cancelled successfully', 'success');
+                    
+                    // Refresh bookings to show updated status
+                    setTimeout(() => {
+                        loadBookings(true);
+                    }, 1000);
                 }
-            }
-            
-            function viewTaskDetails(taskId) {
-                // Implement task details view
-                console.log('Viewing task details for ID:', taskId);
-            }
-            
-            function completeTask(taskId) {
-                if (confirm('Mark this task as completed?')) {
-                    fetch(`/api/tasks/${taskId}/complete`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) {
-                            alert('Task marked as completed');
-                            loadTasks(); // Reload tasks to reflect changes
-                        } else {
-                            alert('Failed to update task: ' + result.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error completing task:', error);
-                        alert('An error occurred while updating the task');
-                    });
-                }
-            }
-            
-            function viewReportDetails(reportId) {
-                // Implement report details view
-                console.log('Viewing report details for ID:', reportId);
-            }
-            
-            function viewCrewDetails(crewId) {
-                // Implement crew details view
-                console.log('Viewing crew details for ID:', crewId);
             }
             
             // Navigation and section switching
@@ -811,12 +1454,13 @@
                         if (sectionId === 'tasks') loadTasks();
                         if (sectionId === 'reports') loadReports();
                         if (sectionId === 'crew') loadCrewMembers();
+                        if (sectionId === 'ships') loadShipsForSection();
                     }
                 });
             });
             
             // Initial data loading
-            loadBookings();
+            // initializeDashboard();
             
             // Helper function to format dates
             function formatDate(dateString) {
@@ -935,6 +1579,8 @@
                         loadReports();
                     } else if (sectionId === 'crew') {
                         loadCrewMembers();
+                    } else if (sectionId === 'ships') {
+                        loadShipsForSection();
                     }
                 }
             }
@@ -960,7 +1606,7 @@
                     })
                     .then(ships => {
                         console.log('Ships data:', ships);
-                        const shipSelect = document.getElementById('issue-ship');
+                        const shipSelect = document.getElementById('report-ship');
                         
                         // Clear existing options except the first one
                         while (shipSelect.options.length > 1) {
@@ -981,13 +1627,13 @@
             }
             
             // Handle issue report form submission
-            document.getElementById('issue-report-form').addEventListener('submit', function(e) {
+            document.getElementById('issue-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 const issueData = {
                     title: document.getElementById('issue-title').value,
                     description: document.getElementById('issue-description').value,
-                    ship_id: document.getElementById('issue-ship').value || null,
+                    ship_id: document.getElementById('report-ship').value || null,
                     severity: document.getElementById('issue-severity').value
                 };
                 
@@ -1007,7 +1653,7 @@
                 .then(result => {
                     if (result.success) {
                         showAlert('Issue reported successfully! The admin will review it.', 'success');
-                        document.getElementById('issue-report-form').reset();
+                        document.getElementById('issue-form').reset();
                     } else {
                         showAlert('Failed to submit report: ' + (result.message || 'Unknown error'), 'danger');
                     }
@@ -1022,7 +1668,348 @@
             document.querySelector('[data-section="report-issue"]').addEventListener('click', function() {
                 loadShipsForForm();
             });
+            
+            // Check if data is loading correctly
+            function checkDataLoading() {
+                console.log('Checking data loading status...');
+                
+                // Display a message to the user
+                showAlert('Checking data connection...', 'info');
+                
+                // Try to fetch user data to verify connection
+                fetch('/api/user')
+                    .then(response => {
+                        console.log('User data response status:', response.status);
+                        return response.json();
+                    })
+                    .then(userData => {
+                        console.log('User data:', userData);
+                        if (userData && userData.id) {
+                            showAlert('Connected successfully! Loading your dashboard data...', 'success');
+                            // Reload all data
+                            loadBookings();
+                            loadTasks();
+                            loadReports();
+                            loadCrewMembers();
+                            loadShipsForSection();
+                        } else {
+                            showAlert('Could not verify user session. Please try logging in again.', 'warning');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking connection:', error);
+                        showAlert('Error connecting to server. Please check your connection and try again.', 'danger');
+                    });
+            }
+            
+            // Run the check when page loads
+            checkDataLoading();
+            
+            // Helper function to create a booking card
+            function createBookingCard(booking) {
+                const statusBadgeClass = getBookingStatusBadgeClass(booking.status);
+                const card = document.createElement('div');
+                card.className = 'col-md-6 mb-3';
+                card.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="card-title">${booking.ship_name}</h5>
+                                <span class="badge ${statusBadgeClass}">${booking.status}</span>
+                            </div>
+                            <p class="card-text">
+                                <strong>From:</strong> ${formatDate(booking.start_date)}<br>
+                                <strong>To:</strong> ${formatDate(booking.end_date)}
+                            </p>
+                            <div class="d-flex justify-content-end mt-3">
+                                <button class="btn btn-sm btn-outline-info me-2">View Details</button>
+                                ${booking.status === 'pending' || booking.status === 'confirmed' ? 
+                                  `<button class="btn btn-sm btn-outline-danger" onclick="cancelBooking(${booking.id})">Cancel</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return card;
+            }
+            
+            // Helper function to create a recent booking item
+            function createRecentBookingItem(booking) {
+                const item = document.createElement('div');
+                item.className = 'recent-item mb-2 p-2 border-bottom';
+                item.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${booking.ship_name}</strong>
+                            <div class="text-muted small">${formatDate(booking.start_date)} - ${formatDate(booking.end_date)}</div>
+                        </div>
+                        <span class="badge ${getStatusBadgeClass(booking.status)}">${booking.status}</span>
+                    </div>
+                `;
+                return item;
+            }
+            
+            // Helper function to create a ship card
+            function createShipCard(ship) {
+                const statusClass = ship.status === 'Active' ? 'bg-success' : 
+                                   ship.status === 'Maintenance' ? 'bg-warning' : 
+                                   ship.status === 'Inactive' ? 'bg-secondary' : 'bg-info';
+                
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-4';
+                card.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">${ship.name}</h5>
+                            <span class="badge ${statusClass}">${ship.status}</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text"><strong>Type:</strong> ${ship.type}</p>
+                            <div class="d-flex justify-content-end mt-3">
+                                <button class="btn btn-sm btn-outline-primary me-2" onclick="viewShipDetails(${ship.id})">View Details</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="reportIssue(${ship.id})">Report Issue</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return card;
+            }
+            
+            // View ship details function (placeholder)
+            function viewShipDetails(shipId) {
+                console.log('Viewing ship details for ship ID:', shipId);
+                showAlert('Ship details feature coming soon!', 'info');
+            }
+            
+            // Report issue function - navigate to report issue section
+            function reportIssue(shipId) {
+                console.log('Reporting issue for ship ID:', shipId);
+                // Switch to report issue section
+                showSection('report-issue');
+                
+                // Pre-select the ship in the dropdown if it exists
+                const shipSelect = document.getElementById('report-ship');
+                if (shipSelect) {
+                    for (let i = 0; i <shipSelect.options.length; i++) {
+                        if (shipSelect.options[i].value == shipId) {
+                            shipSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Update dashboard counters
+            function updateDashboardCounters(ships, bookings, tasks, issues) {
+                // Update ships count
+                const shipsCount = document.getElementById('ships-count');
+                if (shipsCount) {
+                    shipsCount.textContent = ships || '0';
+                }
+                
+                // Update bookings count
+                const bookingsCount = document.getElementById('bookings-count');
+                if (bookingsCount) {
+                    bookingsCount.textContent = bookings || '0';
+                }
+                
+                // Update tasks count
+                const tasksCount = document.getElementById('tasks-count');
+                if (tasksCount) {
+                    tasksCount.textContent = tasks || '0';
+                }
+                
+                // Update issues count
+                const issuesCount = document.getElementById('issues-count');
+                if (issuesCount) {
+                    issuesCount.textContent = issues || '0';
+                }
+                
+                // Update last updated time
+                const updateTime = document.getElementById('update-time');
+                if (updateTime) {
+                    const now = new Date();
+                    updateTime.textContent = now.toLocaleTimeString();
+                }
+            }
+            
+            // Fetch all dashboard data
+            function fetchDashboardData() {
+                window.isLoading = true;
+                
+                // Fetch ships count
+                const shipsPromise = fetch('/api/ships')
+                    .then(response => response.json())
+                    .then(ships => {
+                        return ships.length;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching ships:', error);
+                        return 0;
+                    });
+                
+                // Fetch bookings count
+                const bookingsPromise = fetch('/api/user/bookings')
+                    .then(response => response.json())
+                    .then(bookings => {
+                        return bookings.filter(booking => booking.status === 'Active' || booking.status === 'Confirmed').length;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching bookings:', error);
+                        return 0;
+                    });
+                
+                // Fetch tasks count
+                const tasksPromise = fetch('/api/tasks')
+                    .then(response => response.json())
+                    .then(tasks => {
+                        return tasks.filter(task => task.status !== 'Completed').length;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching tasks:', error);
+                        return 0;
+                    });
+                
+                // Fetch issues count
+                const issuesPromise = fetch('/api/problem-reports')
+                    .then(response => response.json())
+                    .then(issues => {
+                        return issues.filter(issue => issue.status !== 'Resolved').length;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching issues:', error);
+                        return 0;
+                    });
+                
+                // Wait for all promises to resolve
+                Promise.all([shipsPromise, bookingsPromise, tasksPromise, issuesPromise])
+                    .then(([ships, bookings, tasks, issues]) => {
+                        updateDashboardCounters(ships, bookings, tasks, issues);
+                        window.isLoading = false;
+                    })
+                    .catch(error => {
+                        console.error('Error updating dashboard:', error);
+                        window.isLoading = false;
+                    });
+            }
+            
+            // Refresh dashboard data
+            function refreshDashboardData() {
+                showAlert('Refreshing dashboard data...', 'info');
+                fetchDashboardData();
+                
+                // Only refresh data for the currently visible section
+                const activeSection = document.querySelector('.content-section[style="display: block;"]');
+                if (activeSection) {
+                    const sectionId = activeSection.id;
+                    
+                    switch(sectionId) {
+                        case 'dashboard':
+                            loadBookings(true);
+                            break;
+                        case 'bookings':
+                            loadBookings(true);
+                            break;
+                        case 'ships':
+                            loadShipsForSection(true);
+                            break;
+                        case 'tasks':
+                            loadTasks(true);
+                            break;
+                        case 'reports':
+                            loadReports(true);
+                            break;
+                        case 'crew':
+                            loadCrewMembers(true);
+                            break;
+                    }
+                }
+            }
+            
+            // Create a booking card for the bookings section
+            function createBookingCard(booking) {
+                const statusBadgeClass = getBookingStatusBadgeClass(booking.status);
+                const bookingDiv = document.createElement('div');
+                bookingDiv.className = 'col-md-6 mb-4';
+                bookingDiv.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">${booking.ship_name}</h5>
+                            <span class="badge ${statusBadgeClass}">${capitalizeFirstLetter(booking.status)}</span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Booking ID:</strong> #${booking.id}</p>
+                            <p><strong>Start Date:</strong> ${formatDate(booking.start_date)}</p>
+                            <p><strong>End Date:</strong> ${formatDate(booking.end_date)}</p>
+                            <p><strong>Duration:</strong> ${calculateDuration(booking.start_date, booking.end_date)} days</p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm btn-primary" onclick="viewBookingDetails(${booking.id})">View Details</button>
+                            ${booking.status === 'pending' ? 
+                                `<button class="btn btn-sm btn-danger ms-2" onclick="cancelBooking(${booking.id})">Cancel</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                return bookingDiv;
+            }
+            
+            // Create a recent booking item for the dashboard
+            function createRecentBookingItem(booking) {
+                const statusBadgeClass = getBookingStatusBadgeClass(booking.status);
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                listItem.innerHTML = `
+                    <div>
+                        <h6 class="mb-0">${booking.ship_name}</h6>
+                        <small>${formatDate(booking.start_date)} - ${formatDate(booking.end_date)}</small>
+                    </div>
+                    <span class="badge ${statusBadgeClass}">${capitalizeFirstLetter(booking.status)}</span>
+                `;
+                return listItem;
+            }
+            
+            // Get badge class based on booking status
+            function getBookingStatusBadgeClass(status) {
+                switch(status.toLowerCase()) {
+                    case 'confirmed':
+                        return 'bg-success';
+                    case 'pending':
+                        return 'bg-warning text-dark';
+                    case 'completed':
+                        return 'bg-info';
+                    case 'cancelled':
+                        return 'bg-danger';
+                    default:
+                        return 'bg-secondary';
+                }
+            }
+            
+            // Calculate duration between two dates in days
+            function calculateDuration(startDate, endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const diffTime = Math.abs(end - start);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays;
+            }
+            
+            // Format date to a more readable format
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString(undefined, options);
+            }
+            
+            // Capitalize first letter of a string
+            function capitalizeFirstLetter(string) {
+                if (!string) return '';
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
         });
+        
+        function logoutAndRedirect() {
+            logout();
+            window.location.href = '/login.html';
+        }
     </script>
 </body>
 </html>
