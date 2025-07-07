@@ -134,7 +134,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="ships.html">
+                            <a class="nav-link" href="#ships" data-section="ships-section">
                                 <i class="bi bi-ship"></i> View Ships
                             </a>
                         </li>
@@ -178,11 +178,11 @@
                         <div class="col-12">
                             <h4>Quick Actions</h4>
                             <div class="d-flex flex-wrap quick-actions">
-                                <a href="ships.html" class="btn btn-primary">
+                                <a href="#ships" class="btn btn-primary" data-section="ships-section">
                                     <i class="bi bi-search"></i> Find a Ship
                                 </a>
-                                <a href="#bookings" class="btn btn-success section-link" data-section="bookings-section">
-                                    <i class="bi bi-calendar-plus"></i> New Booking
+                                <a href="#bookings" class="btn btn-success" data-section="bookings-section">
+                                    <i class="bi bi-calendar-plus"></i> View Bookings
                                 </a>
                                 <a href="#" class="btn btn-info text-white">
                                     <i class="bi bi-clock-history"></i> Recent Trips
@@ -208,8 +208,115 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Recent Bookings -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Recent Bookings</h5>
+                                    <a href="#bookings" class="btn btn-sm btn-primary" data-section="bookings-section">View All</a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ship</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="recent-bookings-table">
+                                                <!-- Recent bookings will be loaded here -->
+                                            </tbody>
+                                        </table>
+                                        
+                                        <!-- Loading Spinner -->
+                                        <div class="text-center py-4" id="recent-bookings-loading">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- No Bookings Message -->
+                                        <div class="alert alert-info" id="no-recent-bookings-message" style="display: none;">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            You don't have any bookings yet. <a href="#ships" class="alert-link" data-section="ships-section">Browse ships</a> to make a booking.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
+                <!-- Ships Section -->
+                <div class="content-section" id="ships-section" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Available Ships</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="input-group me-2">
+                                <input type="text" class="form-control" id="ship-search" placeholder="Search ships...">
+                                <button class="btn btn-outline-secondary" type="button" id="search-ship-btn">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ships Filter Card -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="ship-type-filter" class="form-label">Ship Type</label>
+                                    <select class="form-select" id="ship-type-filter">
+                                        <option value="all">All Types</option>
+                                        <option value="Cargo">Cargo</option>
+                                        <option value="Passenger">Passenger</option>
+                                        <option value="Tanker">Tanker</option>
+                                        <option value="Container">Container</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="ship-status-filter" class="form-label">Status</label>
+                                    <select class="form-select" id="ship-status-filter">
+                                        <option value="all">All Statuses</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Maintenance">Maintenance</option>
+                                        <option value="Docked">Docked</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button class="btn btn-primary" id="apply-ship-filters">Apply Filters</button>
+                                    <button class="btn btn-outline-secondary ms-2" id="reset-ship-filters">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ships Grid -->
+                    <div class="row" id="ships-grid">
+                        <!-- Ships will be loaded here -->
+                    </div>
+                    
+                    <!-- Loading Spinner -->
+                    <div class="text-center py-4" id="ships-loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- No Ships Message -->
+                    <div class="alert alert-info" id="no-ships-message" style="display: none;">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No ships found.
+                    </div>
+                </div>
+
                 <!-- Bookings Section -->
                 <div id="bookings-section" class="content-section">
                     <div class="card">
@@ -219,38 +326,83 @@
                         <div class="card-body">
                             <div class="alert alert-info">
                                 <i class="bi bi-info-circle"></i> You don't have any bookings yet. 
-                                <a href="ships.html" class="alert-link">Browse ships</a> to make your first booking.
+                                <a href="#ships" class="alert-link" data-section="ships-section">Browse ships</a> to make your first booking.
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Settings Section -->
-                <div id="settings-section" class="content-section">
-                    <div class="card">
-                        <div class="card-header bg-secondary text-white">
-                            <h4><i class="bi bi-gear"></i> Account Settings</h4>
+                <div class="content-section" id="settings-section" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Profile Settings</h1>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <div class="mb-3">
+                                        <img src="https://via.placeholder.com/150" class="rounded-circle img-fluid" alt="Profile Picture">
+                                    </div>
+                                    <h5 class="card-title" id="profile-name">Loading...</h5>
+                                    <p class="card-text text-muted" id="profile-role">Staff</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <form id="settings-form">
-                                <div class="mb-3">
-                                    <label for="username" class="form-label">Username</label>
-                                    <input type="text" class="form-control" id="username" disabled>
+                        
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Personal Information</h5>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="current-password" class="form-label">Current Password</label>
-                                    <input type="password" class="form-control" id="current-password" required>
+                                <div class="card-body">
+                                    <form id="profile-form">
+                                        <div class="mb-3">
+                                            <label for="profile-username" class="form-label">Username</label>
+                                            <input type="text" class="form-control" id="profile-username" readonly>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="profile-first-name" class="form-label">First Name</label>
+                                                <input type="text" class="form-control" id="profile-first-name">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="profile-last-name" class="form-label">Last Name</label>
+                                                <input type="text" class="form-control" id="profile-last-name">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="profile-email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="profile-email">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                                    </form>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="new-password" class="form-label">New Password</label>
-                                    <input type="password" class="form-control" id="new-password" required>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Change Password</h5>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="confirm-password" class="form-label">Confirm New Password</label>
-                                    <input type="password" class="form-control" id="confirm-password" required>
+                                <div class="card-body">
+                                    <form id="password-form">
+                                        <div class="mb-3">
+                                            <label for="current-password" class="form-label">Current Password</label>
+                                            <input type="password" class="form-control" id="current-password" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="new-password" class="form-label">New Password</label>
+                                            <input type="password" class="form-control" id="new-password" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="confirm-password" class="form-label">Confirm New Password</label>
+                                            <input type="password" class="form-control" id="confirm-password" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Change Password</button>
+                                    </form>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Update Password</button>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -295,13 +447,13 @@
         function showSection(sectionId) {
             // Hide all sections
             contentSections.forEach(section => {
-                section.classList.remove('active');
+                section.style.display = 'none';
             });
             
             // Show the selected section
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
-                targetSection.classList.add('active');
+                targetSection.style.display = 'block';
             }
             
             // Update active nav link
@@ -423,6 +575,444 @@
             })
             .then(() => {
                 window.location.href = '/login.html';
+            });
+        });
+
+        // Load recent bookings
+        function loadRecentBookings() {
+            document.getElementById('recent-bookings-loading').style.display = 'block';
+            document.getElementById('no-recent-bookings-message').style.display = 'none';
+            
+            fetch('/api/user/bookings')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch bookings');
+                    }
+                    return response.json();
+                })
+                .then(bookings => {
+                    // Take only the 5 most recent bookings
+                    const recentBookings = bookings.slice(0, 5);
+                    updateRecentBookingsTable(recentBookings);
+                })
+                .catch(error => {
+                    console.error('Error loading recent bookings:', error);
+                    document.getElementById('recent-bookings-loading').style.display = 'none';
+                    document.getElementById('no-recent-bookings-message').style.display = 'block';
+                });
+        }
+        
+        // Update recent bookings table
+        function updateRecentBookingsTable(bookings) {
+            const tableBody = document.getElementById('recent-bookings-table');
+            tableBody.innerHTML = '';
+            
+            document.getElementById('recent-bookings-loading').style.display = 'none';
+            
+            if (!bookings || bookings.length === 0) {
+                document.getElementById('no-recent-bookings-message').style.display = 'block';
+                return;
+            }
+            
+            bookings.forEach(booking => {
+                const row = document.createElement('tr');
+                
+                // Format dates
+                const startDate = new Date(booking.start_date);
+                const endDate = new Date(booking.end_date);
+                
+                // Determine status badge class
+                let statusBadgeClass = 'bg-secondary';
+                if (booking.status === 'Pending') statusBadgeClass = 'bg-warning text-dark';
+                if (booking.status === 'Approved') statusBadgeClass = 'bg-success';
+                if (booking.status === 'Rejected') statusBadgeClass = 'bg-danger';
+                if (booking.status === 'Completed') statusBadgeClass = 'bg-info';
+                if (booking.status === 'Cancelled') statusBadgeClass = 'bg-secondary';
+                
+                row.innerHTML = `
+                    <td>${booking.ship_name}</td>
+                    <td>${startDate.toLocaleDateString()}</td>
+                    <td>${endDate.toLocaleDateString()}</td>
+                    <td><span class="badge ${statusBadgeClass}">${booking.status}</span></td>
+                    <td>
+                        <a href="bookings.html" class="btn btn-sm btn-primary">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            loadRecentBookings();
+            
+            // Event listeners
+            document.getElementById('logout-link').addEventListener('click', logout);
+        });
+
+        // Function to check authentication
+        function checkAuthentication() {
+            fetch('/api/check-auth')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Not authenticated');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.role !== 'staff') {
+                        window.location.href = '/login.html';
+                    }
+                    
+                    // Set user info in the UI
+                    document.getElementById('user-name').textContent = data.username;
+                    
+                    // Load user profile data
+                    loadUserProfile(data.id);
+                })
+                .catch(error => {
+                    console.error('Authentication error:', error);
+                    window.location.href = '/login.html';
+                });
+        }
+        
+        // Function to load user profile
+        function loadUserProfile(userId) {
+            fetch(`/api/users/${userId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch user profile');
+                    }
+                    return response.json();
+                })
+                .then(user => {
+                    // Populate profile form
+                    document.getElementById('profile-name').textContent = `${user.first_name} ${user.last_name}`;
+                    document.getElementById('profile-username').value = user.username;
+                    document.getElementById('profile-first-name').value = user.first_name || '';
+                    document.getElementById('profile-last-name').value = user.last_name || '';
+                    document.getElementById('profile-email').value = user.email || '';
+                })
+                .catch(error => {
+                    console.error('Error loading user profile:', error);
+                    showAlert('Error loading profile data', 'danger');
+                });
+        }
+        
+        // Function to load ships
+        function loadShips() {
+            document.getElementById('ships-loading').style.display = 'block';
+            document.getElementById('no-ships-message').style.display = 'none';
+            document.getElementById('ships-grid').innerHTML = '';
+            
+            fetch('/api/ships')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch ships');
+                    }
+                    return response.json();
+                })
+                .then(ships => {
+                    updateShipsGrid(ships);
+                })
+                .catch(error => {
+                    console.error('Error loading ships:', error);
+                    document.getElementById('ships-loading').style.display = 'none';
+                    document.getElementById('no-ships-message').style.display = 'block';
+                    document.getElementById('no-ships-message').textContent = 'Error loading ships. Please try again.';
+                });
+        }
+        
+        // Function to update ships grid
+        function updateShipsGrid(ships) {
+            const shipsGrid = document.getElementById('ships-grid');
+            shipsGrid.innerHTML = '';
+            
+            document.getElementById('ships-loading').style.display = 'none';
+            
+            if (!ships || ships.length === 0) {
+                document.getElementById('no-ships-message').style.display = 'block';
+                return;
+            }
+            
+            ships.forEach(ship => {
+                // Only show active ships to staff
+                if (ship.status === 'Active') {
+                    const shipCard = document.createElement('div');
+                    shipCard.className = 'col-md-4 mb-4';
+                    
+                    shipCard.innerHTML = `
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">${ship.name}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Type:</strong> ${ship.type}</p>
+                                <p><strong>Capacity:</strong> ${ship.capacity}</p>
+                                <p><strong>Status:</strong> <span class="badge bg-success">${ship.status}</span></p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-primary view-ship-details" data-ship-id="${ship.id}">
+                                    <i class="bi bi-eye"></i> View Details
+                                </button>
+                                <button class="btn btn-success book-ship" data-ship-id="${ship.id}" data-ship-name="${ship.name}">
+                                    <i class="bi bi-calendar-plus"></i> Book
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    shipsGrid.appendChild(shipCard);
+                }
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.view-ship-details').forEach(button => {
+                button.addEventListener('click', () => viewShipDetails(button.getAttribute('data-ship-id')));
+            });
+            
+            document.querySelectorAll('.book-ship').forEach(button => {
+                button.addEventListener('click', () => {
+                    const shipId = button.getAttribute('data-ship-id');
+                    const shipName = button.getAttribute('data-ship-name');
+                    window.location.href = `book-ship.html?id=${shipId}&name=${encodeURIComponent(shipName)}`;
+                });
+            });
+        }
+        
+        // Function to view ship details
+        function viewShipDetails(shipId) {
+            fetch(`/api/ships/${shipId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch ship details');
+                    }
+                    return response.json();
+                })
+                .then(ship => {
+                    // Create a modal to display ship details
+                    const modal = new bootstrap.Modal(document.getElementById('ship-details-modal'));
+                    
+                    // Populate modal with ship details
+                    document.getElementById('modal-ship-name').textContent = ship.name;
+                    document.getElementById('modal-ship-type').textContent = ship.type;
+                    document.getElementById('modal-ship-capacity').textContent = ship.capacity;
+                    document.getElementById('modal-ship-status').textContent = ship.status;
+                    
+                    // Show the modal
+                    modal.show();
+                })
+                .catch(error => {
+                    console.error('Error loading ship details:', error);
+                    showAlert('Error loading ship details', 'danger');
+                });
+        }
+        
+        // Function to apply ship filters
+        function applyShipFilters() {
+            const typeFilter = document.getElementById('ship-type-filter').value;
+            const statusFilter = document.getElementById('ship-status-filter').value;
+            const searchQuery = document.getElementById('ship-search').value.toLowerCase();
+            
+            document.getElementById('ships-loading').style.display = 'block';
+            document.getElementById('ships-grid').innerHTML = '';
+            
+            fetch('/api/ships')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch ships');
+                    }
+                    return response.json();
+                })
+                .then(ships => {
+                    // Filter ships based on criteria
+                    let filteredShips = ships;
+                    
+                    if (typeFilter !== 'all') {
+                        filteredShips = filteredShips.filter(ship => ship.type === typeFilter);
+                    }
+                    
+                    if (statusFilter !== 'all') {
+                        filteredShips = filteredShips.filter(ship => ship.status === statusFilter);
+                    }
+                    
+                    if (searchQuery) {
+                        filteredShips = filteredShips.filter(ship => 
+                            ship.name.toLowerCase().includes(searchQuery) || 
+                            ship.type.toLowerCase().includes(searchQuery)
+                        );
+                    }
+                    
+                    updateShipsGrid(filteredShips);
+                })
+                .catch(error => {
+                    console.error('Error applying filters:', error);
+                    document.getElementById('ships-loading').style.display = 'none';
+                    document.getElementById('no-ships-message').style.display = 'block';
+                    document.getElementById('no-ships-message').textContent = 'Error filtering ships. Please try again.';
+                });
+        }
+        
+        // Function to show alert
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            const alertContainer = document.getElementById('alert-container');
+            alertContainer.appendChild(alertDiv);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                const alert = bootstrap.Alert.getOrCreateInstance(alertDiv);
+                alert.close();
+            }, 5000);
+        }
+        
+        // Function to logout
+        function logout() {
+            fetch('/logout', {
+                method: 'POST'
+            })
+            .then(response => {
+                window.location.href = '/login.html';
+            })
+            .catch(error => {
+                console.error('Error during logout:', error);
+                window.location.href = '/login.html';
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            
+            // Load initial data
+            loadRecentBookings();
+            loadShips();
+            
+            // Setup navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.getAttribute('href') === '#') {
+                        e.preventDefault();
+                        
+                        // Hide all content sections
+                        document.querySelectorAll('.content-section').forEach(section => {
+                            section.style.display = 'none';
+                        });
+                        
+                        // Remove active class from all nav links
+                        document.querySelectorAll('.nav-link').forEach(navLink => {
+                            navLink.classList.remove('active');
+                        });
+                        
+                        // Show the selected section
+                        const sectionId = this.getAttribute('data-section');
+                        document.getElementById(sectionId).style.display = 'block';
+                        
+                        // Add active class to the clicked link
+                        this.classList.add('active');
+                    }
+                });
+            });
+            
+            // Event listeners
+            document.getElementById('logout-link').addEventListener('click', logout);
+            
+            // Ship filters
+            document.getElementById('apply-ship-filters').addEventListener('click', applyShipFilters);
+            document.getElementById('reset-ship-filters').addEventListener('click', function() {
+                document.getElementById('ship-type-filter').value = 'all';
+                document.getElementById('ship-status-filter').value = 'all';
+                document.getElementById('ship-search').value = '';
+                loadShips();
+            });
+            
+            document.getElementById('search-ship-btn').addEventListener('click', applyShipFilters);
+            document.getElementById('ship-search').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    applyShipFilters();
+                }
+            });
+            
+            // Profile form submission
+            document.getElementById('profile-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const userData = {
+                    first_name: document.getElementById('profile-first-name').value,
+                    last_name: document.getElementById('profile-last-name').value,
+                    email: document.getElementById('profile-email').value
+                };
+                
+                fetch('/api/users/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update profile');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showAlert('Profile updated successfully', 'success');
+                })
+                .catch(error => {
+                    console.error('Error updating profile:', error);
+                    showAlert('Error updating profile', 'danger');
+                });
+            });
+            
+            // Password form submission
+            document.getElementById('password-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                if (newPassword !== confirmPassword) {
+                    showAlert('Passwords do not match', 'danger');
+                    return;
+                }
+                
+                const passwordData = {
+                    current_password: document.getElementById('current-password').value,
+                    new_password: newPassword
+                };
+                
+                fetch('/api/users/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(passwordData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to change password');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showAlert('Password changed successfully', 'success');
+                    document.getElementById('password-form').reset();
+                })
+                .catch(error => {
+                    console.error('Error changing password:', error);
+                    showAlert('Error changing password. Please check your current password.', 'danger');
+                });
             });
         });
     </script>

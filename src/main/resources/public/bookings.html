@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - Ship Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #343a40;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            z-index: 100;
+            padding-top: 20px;
+            transition: all 0.3s;
+        }
+        .sidebar-header {
+            padding: 0 15px 20px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        .sidebar-menu a {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 15px;
+            display: block;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-menu i {
+            margin-right: 10px;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+            padding: 15px 20px;
+        }
+        .booking-card {
+            transition: transform 0.3s;
+        }
+        .booking-card:hover {
+            transform: translateY(-5px);
+        }
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -250px;
+            }
+            .sidebar.active {
+                margin-left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .main-content.active {
+                margin-left: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Ship Management</h3>
+            <p class="text-muted mb-0" id="user-name">User</p>
+        </div>
+        <div class="sidebar-menu">
+            <a href="user-dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <a href="ships.html"><i class="bi bi-ship"></i> Ships</a>
+            <a href="bookings.html" class="active"><i class="bi bi-calendar-check"></i> My Bookings</a>
+            <a href="settings.html"><i class="bi bi-gear"></i> Settings</a>
+            <a href="#" id="logout-link"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <h1 class="mb-0">My Bookings</h1>
+                    <p class="text-muted">View and manage your ship bookings</p>
+                </div>
+            </div>
+
+            <!-- Booking Filters -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="status-filter" class="form-label">Status</label>
+                                    <select class="form-select" id="status-filter">
+                                        <option value="all">All Statuses</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Rejected">Rejected</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="date-filter" class="form-label">Date Range</label>
+                                    <select class="form-select" id="date-filter">
+                                        <option value="all">All Time</option>
+                                        <option value="upcoming">Upcoming</option>
+                                        <option value="past">Past</option>
+                                        <option value="current">Current</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button class="btn btn-primary" id="apply-filters">Apply Filters</button>
+                                    <button class="btn btn-outline-secondary ms-2" id="reset-filters">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bookings List -->
+            <div class="row" id="bookings-container">
+                <!-- Loading Spinner -->
+                <div class="col-12 text-center py-5" id="bookings-loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                
+                <!-- No Bookings Message -->
+                <div class="col-12 text-center py-5" id="no-bookings-message" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        You don't have any bookings yet. <a href="ships.html" class="alert-link">Browse ships</a> to make a booking.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Details Modal -->
+    <div class="modal fade" id="booking-details-modal" tabindex="-1" aria-labelledby="booking-details-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="booking-details-modal-label">Booking Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Ship Information</h6>
+                            <p><strong>Name:</strong> <span id="modal-ship-name"></span></p>
+                            <p><strong>Type:</strong> <span id="modal-ship-type"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Booking Information</h6>
+                            <p><strong>Status:</strong> <span id="modal-booking-status"></span></p>
+                            <p><strong>Booking Date:</strong> <span id="modal-booking-date"></span></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Date Range</h6>
+                            <p><strong>Start Date:</strong> <span id="modal-start-date"></span></p>
+                            <p><strong>End Date:</strong> <span id="modal-end-date"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Purpose</h6>
+                            <p id="modal-purpose"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="cancel-booking-btn">Cancel Booking</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Confirmation Modal -->
+    <div class="modal fade" id="cancel-confirmation-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Cancellation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this booking? This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Booking</button>
+                    <button type="button" class="btn btn-danger" id="confirm-cancel-btn">Yes, Cancel Booking</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let allBookings = [];
+        let currentBookingId = null;
+        const bookingDetailsModal = new bootstrap.Modal(document.getElementById('booking-details-modal'));
+        const cancelConfirmationModal = new bootstrap.Modal(document.getElementById('cancel-confirmation-modal'));
+        
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            loadBookings();
+            
+            // Event listeners
+            document.getElementById('logout-link').addEventListener('click', logout);
+            document.getElementById('apply-filters').addEventListener('click', applyFilters);
+            document.getElementById('reset-filters').addEventListener('click', resetFilters);
+            document.getElementById('cancel-booking-btn').addEventListener('click', showCancelConfirmation);
+            document.getElementById('confirm-cancel-btn').addEventListener('click', cancelBooking);
+        });
+        
+        // Check if user is authenticated
+        function checkAuthentication() {
+            fetch('/api/check-auth')
+                .then(response => {
+                    if (!response.ok) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.authenticated) {
+                        document.getElementById('user-name').textContent = data.username;
+                    } else {
+                        window.location.href = 'login.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking authentication:', error);
+                    window.location.href = 'login.html';
+                });
+        }
+        
+        // Load user bookings
+        function loadBookings() {
+            document.getElementById('bookings-loading').style.display = 'block';
+            document.getElementById('no-bookings-message').style.display = 'none';
+            
+            fetch('/api/user/bookings')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch bookings');
+                    }
+                    return response.json();
+                })
+                .then(bookings => {
+                    allBookings = bookings;
+                    displayBookings(bookings);
+                    document.getElementById('loading-overlay').style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error loading bookings:', error);
+                    document.getElementById('loading-overlay').style.display = 'none';
+                    alert('Error loading bookings. Please try again later.');
+                });
+        }
+        
+        // Display bookings in the UI
+        function displayBookings(bookings) {
+            const container = document.getElementById('bookings-container');
+            
+            // Clear previous bookings except for loading and no-bookings message
+            Array.from(container.children).forEach(child => {
+                if (child.id !== 'bookings-loading' && child.id !== 'no-bookings-message') {
+                    container.removeChild(child);
+                }
+            });
+            
+            // Hide loading spinner
+            document.getElementById('bookings-loading').style.display = 'none';
+            
+            // Show no bookings message if no bookings
+            if (!bookings || bookings.length === 0) {
+                document.getElementById('no-bookings-message').style.display = 'block';
+                return;
+            }
+            
+            // Create booking cards
+            bookings.forEach(booking => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 col-lg-4 mb-4';
+                
+                // Determine status badge color
+                let statusBadgeClass = 'bg-secondary';
+                if (booking.status === 'Pending') statusBadgeClass = 'bg-warning text-dark';
+                if (booking.status === 'Approved') statusBadgeClass = 'bg-success';
+                if (booking.status === 'Rejected') statusBadgeClass = 'bg-danger';
+                if (booking.status === 'Completed') statusBadgeClass = 'bg-info';
+                if (booking.status === 'Cancelled') statusBadgeClass = 'bg-secondary';
+                
+                // Format dates
+                const startDate = new Date(booking.start_date);
+                const endDate = new Date(booking.end_date);
+                const formattedStartDate = startDate.toLocaleDateString();
+                const formattedEndDate = endDate.toLocaleDateString();
+                
+                // Create booking card HTML
+                col.innerHTML = `
+                    <div class="card booking-card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">${booking.ship_name}</h5>
+                            <span class="badge ${statusBadgeClass} status-badge">${booking.status}</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text"><strong>Ship Type:</strong> ${booking.ship_type}</p>
+                            <p class="card-text"><strong>Dates:</strong> ${formattedStartDate} to ${formattedEndDate}</p>
+                            <p class="card-text"><strong>Purpose:</strong> ${booking.purpose ? booking.purpose.substring(0, 50) + (booking.purpose.length > 50 ? '...' : '') : 'N/A'}</p>
+                        </div>
+                        <div class="card-footer bg-white border-top-0">
+                            <button class="btn btn-primary btn-sm view-details" data-booking-id="${booking.id}">View Details</button>
+                            ${booking.status === 'Pending' || booking.status === 'Approved' ? 
+                                `<button class="btn btn-danger btn-sm float-end cancel-booking" data-booking-id="${booking.id}">Cancel</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(col);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.view-details').forEach(button => {
+                button.addEventListener('click', () => viewBookingDetails(button.getAttribute('data-booking-id')));
+            });
+            
+            document.querySelectorAll('.cancel-booking').forEach(button => {
+                button.addEventListener('click', () => {
+                    currentBookingId = button.getAttribute('data-booking-id');
+                    cancelConfirmationModal.show();
+                });
+            });
+        }
+        
+        // View booking details
+        function viewBookingDetails(bookingId) {
+            const booking = allBookings.find(b => b.id == bookingId);
+            if (!booking) return;
+            
+            currentBookingId = bookingId;
+            
+            // Format dates
+            const startDate = new Date(booking.start_date);
+            const endDate = new Date(booking.end_date);
+            const createdDate = new Date(booking.created_at);
+            
+            // Populate modal
+            document.getElementById('modal-ship-name').textContent = booking.ship_name;
+            document.getElementById('modal-ship-type').textContent = booking.ship_type;
+            document.getElementById('modal-booking-status').textContent = booking.status;
+            document.getElementById('modal-booking-date').textContent = createdDate.toLocaleString();
+            document.getElementById('modal-start-date').textContent = startDate.toLocaleDateString();
+            document.getElementById('modal-end-date').textContent = endDate.toLocaleDateString();
+            document.getElementById('modal-purpose').textContent = booking.purpose || 'No purpose specified';
+            
+            // Show/hide cancel button based on status
+            const canCancel = booking.status === 'Pending' || booking.status === 'Approved';
+            document.getElementById('cancel-booking-btn').style.display = canCancel ? 'block' : 'none';
+            
+            // Show modal
+            bookingDetailsModal.show();
+        }
+        
+        // Show cancel confirmation modal
+        function showCancelConfirmation() {
+            bookingDetailsModal.hide();
+            cancelConfirmationModal.show();
+        }
+        
+        // Cancel booking
+        function cancelBooking() {
+            if (!currentBookingId) return;
+            
+            document.getElementById('loading-overlay').style.display = 'flex';
+            
+            fetch(`/api/bookings/${currentBookingId}/cancel`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to cancel booking');
+                }
+                return response.json();
+            })
+            .then(data => {
+                cancelConfirmationModal.hide();
+                loadBookings(); // Reload bookings to reflect changes
+                alert('Booking cancelled successfully');
+            })
+            .catch(error => {
+                console.error('Error cancelling booking:', error);
+                document.getElementById('loading-overlay').style.display = 'none';
+                alert('Error cancelling booking. Please try again later.');
+            });
+        }
+        
+        // Apply filters to bookings
+        function applyFilters() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const dateFilter = document.getElementById('date-filter').value;
+            
+            let filteredBookings = [...allBookings];
+            
+            // Apply status filter
+            if (statusFilter !== 'all') {
+                filteredBookings = filteredBookings.filter(booking => booking.status === statusFilter);
+            }
+            
+            // Apply date filter
+            if (dateFilter !== 'all') {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                filteredBookings = filteredBookings.filter(booking => {
+                    const startDate = new Date(booking.start_date);
+                    const endDate = new Date(booking.end_date);
+                    
+                    if (dateFilter === 'upcoming') {
+                        return startDate > today;
+                    } else if (dateFilter === 'past') {
+                        return endDate < today;
+                    } else if (dateFilter === 'current') {
+                        return startDate <= today && endDate >= today;
+                    }
+                    return true;
+                });
+            }
+            
+            displayBookings(filteredBookings);
+        }
+        
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('status-filter').value = 'all';
+            document.getElementById('date-filter').value = 'all';
+            displayBookings(allBookings);
+        }
+        
+        // Logout function
+        function logout() {
+            fetch('/api/logout', {
+                method: 'POST'
+            })
+            .then(() => {
+                window.location.href = 'login.html';
+            })
+            .catch(error => {
+                console.error('Error during logout:', error);
+                window.location.href = 'login.html';
+            });
+        }
+    </script>
+</body>
+</html>
