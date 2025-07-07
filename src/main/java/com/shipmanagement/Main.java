@@ -1482,7 +1482,7 @@ public class Main {
                 }
             });
 
-            // User API endpoints
+            // User API endpoint
             get("/api/user", (req, res) -> {
                 User user = req.session().attribute("user");
                 if (user == null) {
@@ -1490,12 +1490,12 @@ public class Main {
                     return "{\"error\": \"Not authenticated\"}";
                 }
                 
-                Map<String, Object> userInfo = new HashMap<>();
-                userInfo.put("id", user.getId());
-                userInfo.put("username", user.getUsername());
-                userInfo.put("role", user.getRole());
+                Map<String, Object> userData = new HashMap<>();
+                userData.put("id", user.getId());
+                userData.put("username", user.getUsername());
+                userData.put("role", user.getRole());
                 
-                return gson.toJson(userInfo);
+                return gson.toJson(userData);
             });
             
             // Bookings API endpoints
@@ -1742,6 +1742,104 @@ public class Main {
                 }
             });
 
+            // Ships API endpoint
+            get("/api/ships", (req, res) -> {
+                User user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\": \"Not authenticated\"}";
+                }
+                
+                try (Connection conn = DatabaseConnection.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(
+                         "SELECT * FROM ships ORDER BY name")) {
+                    
+                    ResultSet rs = stmt.executeQuery();
+                    
+                    List<Map<String, Object>> ships = new ArrayList<>();
+                    while (rs.next()) {
+                        Map<String, Object> ship = new HashMap<>();
+                        ship.put("id", rs.getInt("id"));
+                        ship.put("name", rs.getString("name"));
+                        ship.put("type", rs.getString("type"));
+                        ship.put("capacity", rs.getInt("capacity"));
+                        ship.put("status", rs.getString("status"));
+                        ships.add(ship);
+                    }
+                    
+                    return gson.toJson(ships);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    res.status(500);
+                    return "{\"error\": \"Database error\"}";
+                }
+            });
+            
+            // Problem Reports API endpoint
+            post("/api/problem-reports", (req, res) -> {
+                User user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\": \"Not authenticated\"}";
+                }
+                
+                try {
+                    String body = req.body();
+                    Map<String, Object> requestData = gson.fromJson(body, Map.class);
+                    
+                    String title = (String) requestData.get("title");
+                    String description = (String) requestData.get("description");
+                    String severity = (String) requestData.get("severity");
+                    
+                    if (title == null || title.trim().isEmpty() || 
+                        description == null || description.trim().isEmpty()) {
+                        res.status(400);
+                        return "{\"success\": false, \"message\": \"Title and description are required\"}";
+                    }
+                    
+                    Double shipIdDouble = (Double) requestData.get("ship_id");
+                    Integer shipId = null;
+                    if (shipIdDouble != null) {
+                        shipId = shipIdDouble.intValue();
+                    }
+                    
+                    try (Connection conn = DatabaseConnection.getConnection();
+                         PreparedStatement stmt = conn.prepareStatement(
+                             "INSERT INTO problem_reports (title, description, reported_by, ship_id, severity) " +
+                             "VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+                        
+                        stmt.setString(1, title);
+                        stmt.setString(2, description);
+                        stmt.setInt(3, user.getId());
+                        
+                        if (shipId != null) {
+                            stmt.setInt(4, shipId);
+                        } else {
+                            stmt.setNull(4, java.sql.Types.INTEGER);
+                        }
+                        
+                        stmt.setString(5, severity);
+                        
+                        int affectedRows = stmt.executeUpdate();
+                        
+                        if (affectedRows > 0) {
+                            ResultSet generatedKeys = stmt.getGeneratedKeys();
+                            if (generatedKeys.next()) {
+                                int reportId = generatedKeys.getInt(1);
+                                return "{\"success\": true, \"message\": \"Problem report submitted successfully\", \"id\": " + reportId + "}";
+                            }
+                        }
+                        
+                        res.status(500);
+                        return "{\"success\": false, \"message\": \"Failed to submit problem report\"}";
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    res.status(500);
+                    return "{\"success\": false, \"message\": \"Server error: " + e.getMessage() + "\"}";
+                }
+            });
+            
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Failed to start server: " + e.getMessage());

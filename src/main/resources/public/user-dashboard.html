@@ -159,6 +159,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="report-issue">
+                                <i class="bi bi-exclamation-triangle"></i> Report an Issue
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#" data-section="settings">
                                 <i class="bi bi-gear"></i> Settings
                             </a>
@@ -384,6 +389,46 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Report Issue Section -->
+                <div id="report-issue" class="content-section" style="display: none;">
+                    <div class="card">
+                        <div class="card-header bg-danger text-white">
+                            <h4><i class="bi bi-exclamation-triangle"></i> Report an Issue</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="issue-report-form">
+                                <div class="mb-3">
+                                    <label for="issue-title" class="form-label">Issue Title</label>
+                                    <input type="text" class="form-control" id="issue-title" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="issue-description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="issue-description" rows="5" required></textarea>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="issue-ship" class="form-label">Related Ship (Optional)</label>
+                                        <select class="form-select" id="issue-ship">
+                                            <option value="">-- Select Ship --</option>
+                                            <!-- Ships will be loaded dynamically -->
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="issue-severity" class="form-label">Severity</label>
+                                        <select class="form-select" id="issue-severity" required>
+                                            <option value="low">Low</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="high">High</option>
+                                            <option value="critical">Critical</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Report</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -435,9 +480,14 @@
 
             // Load real bookings data
             function loadBookings() {
+                console.log('Loading bookings...');
                 fetch('/api/user/bookings')
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Bookings response status:', response.status);
+                        return response.json();
+                    })
                     .then(bookings => {
+                        console.log('Bookings data:', bookings);
                         const tableBody = document.getElementById('bookings-table-body');
                         if (bookings.length === 0) {
                             tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No bookings found</td></tr>';
@@ -485,9 +535,14 @@
             
             // Load real tasks data
             function loadTasks() {
+                console.log('Loading tasks...');
                 fetch('/api/tasks')
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Tasks response status:', response.status);
+                        return response.json();
+                    })
                     .then(tasks => {
+                        console.log('Tasks data:', tasks);
                         const tableBody = document.getElementById('tasks-table-body');
                         if (tasks.length === 0) {
                             tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No tasks assigned</td></tr>';
@@ -536,9 +591,14 @@
             
             // Load real reports data
             function loadReports() {
+                console.log('Loading reports...');
                 fetch('/api/reports')
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Reports response status:', response.status);
+                        return response.json();
+                    })
                     .then(reports => {
+                        console.log('Reports data:', reports);
                         const tableBody = document.getElementById('reports-table-body');
                         if (reports.length === 0) {
                             tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No reports found</td></tr>';
@@ -577,9 +637,14 @@
             
             // Load real crew members data
             function loadCrewMembers() {
+                console.log('Loading crew members...');
                 fetch('/api/crew')
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Crew response status:', response.status);
+                        return response.json();
+                    })
                     .then(crewMembers => {
+                        console.log('Crew data:', crewMembers);
                         const tableBody = document.getElementById('crew-table-body');
                         if (crewMembers.length === 0) {
                             tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No crew members found</td></tr>';
@@ -748,6 +813,211 @@
             
             // Initial data loading
             loadBookings();
+            
+            // Helper function to format dates
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const date = new Date(dateString);
+                return date.toLocaleDateString();
+            }
+            
+            // Helper function to get status badge class
+            function getStatusBadgeClass(status) {
+                switch(status.toLowerCase()) {
+                    case 'confirmed': return 'bg-success';
+                    case 'pending': return 'bg-warning';
+                    case 'cancelled': return 'bg-danger';
+                    default: return 'bg-secondary';
+                }
+            }
+            
+            // Helper function to get task status badge class
+            function getTaskStatusBadgeClass(status) {
+                switch(status.toLowerCase()) {
+                    case 'completed': return 'bg-success';
+                    case 'in_progress': return 'bg-primary';
+                    case 'pending': return 'bg-warning';
+                    case 'rejected': return 'bg-danger';
+                    default: return 'bg-secondary';
+                }
+            }
+            
+            // Function to cancel a booking
+            function cancelBooking(bookingId) {
+                if (confirm('Are you sure you want to cancel this booking?')) {
+                    fetch(`/api/bookings/${bookingId}/cancel`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            showAlert('Booking cancelled successfully', 'success');
+                            loadBookings(); // Reload the bookings
+                        } else {
+                            showAlert('Failed to cancel booking: ' + (result.message || 'Unknown error'), 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error cancelling booking:', error);
+                        showAlert('Error cancelling booking', 'danger');
+                    });
+                }
+            }
+            
+            // Function to complete a task
+            function completeTask(taskId) {
+                if (confirm('Mark this task as completed?')) {
+                    fetch(`/api/tasks/${taskId}/complete`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            showAlert('Task marked as completed', 'success');
+                            loadTasks(); // Reload the tasks
+                        } else {
+                            showAlert('Failed to update task: ' + (result.message || 'Unknown error'), 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error completing task:', error);
+                        showAlert('Error updating task', 'danger');
+                    });
+                }
+            }
+            
+            // Function to show alerts
+            function showAlert(message, type = 'info') {
+                const alertContainer = document.getElementById('alert-container');
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                alertContainer.appendChild(alertDiv);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    alertDiv.classList.remove('show');
+                    setTimeout(() => alertDiv.remove(), 300);
+                }, 5000);
+            }
+            
+            // Handle section navigation
+            function showSection(sectionId) {
+                // Hide all sections
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // Show the selected section
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                    
+                    // Load data based on the section
+                    if (sectionId === 'bookings') {
+                        loadBookings();
+                    } else if (sectionId === 'tasks') {
+                        loadTasks();
+                    } else if (sectionId === 'reports') {
+                        loadReports();
+                    } else if (sectionId === 'crew') {
+                        loadCrewMembers();
+                    }
+                }
+            }
+            
+            // Add event listeners to navigation links
+            document.querySelectorAll('[data-section]').forEach(link => {
+                link.addEventListener('click', function() {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    showSection(sectionId);
+                });
+            });
+            
+            // Initialize - show bookings section by default and load its data
+            showSection('bookings');
+            
+            // Load ships for the issue report form
+            function loadShipsForForm() {
+                fetch('/api/ships')
+                    .then(response => {
+                        console.log('Ships response status:', response.status);
+                        return response.json();
+                    })
+                    .then(ships => {
+                        console.log('Ships data:', ships);
+                        const shipSelect = document.getElementById('issue-ship');
+                        
+                        // Clear existing options except the first one
+                        while (shipSelect.options.length > 1) {
+                            shipSelect.remove(1);
+                        }
+                        
+                        // Add ships to dropdown
+                        ships.forEach(ship => {
+                            const option = document.createElement('option');
+                            option.value = ship.id;
+                            option.textContent = ship.name;
+                            shipSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading ships:', error);
+                    });
+            }
+            
+            // Handle issue report form submission
+            document.getElementById('issue-report-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const issueData = {
+                    title: document.getElementById('issue-title').value,
+                    description: document.getElementById('issue-description').value,
+                    ship_id: document.getElementById('issue-ship').value || null,
+                    severity: document.getElementById('issue-severity').value
+                };
+                
+                console.log('Submitting issue report:', issueData);
+                
+                fetch('/api/problem-reports', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(issueData)
+                })
+                .then(response => {
+                    console.log('Report submission status:', response.status);
+                    return response.json();
+                })
+                .then(result => {
+                    if (result.success) {
+                        showAlert('Issue reported successfully! The admin will review it.', 'success');
+                        document.getElementById('issue-report-form').reset();
+                    } else {
+                        showAlert('Failed to submit report: ' + (result.message || 'Unknown error'), 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting report:', error);
+                    showAlert('Error submitting report. Please try again.', 'danger');
+                });
+            });
+            
+            // Load ships when the report issue section is shown
+            document.querySelector('[data-section="report-issue"]').addEventListener('click', function() {
+                loadShipsForForm();
+            });
         });
     </script>
 </body>
