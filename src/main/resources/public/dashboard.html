@@ -150,6 +150,11 @@
             display: none;
         }
 
+        /* Staff Only Content */
+        .staff-only {
+            display: none;
+        }
+
         /* User Only Content */
         .user-only {
             display: none;
@@ -375,6 +380,10 @@
                 <div class="nav-item" data-section="settings">
                     <i>⚙️</i> Settings
                 </div>
+                
+                <div class="nav-item user-only" data-section="bookings">
+                    <i>📅</i> My Bookings
+                </div>
             </div>
         </div>
 
@@ -499,7 +508,60 @@
                 </div>
             </div>
 
-            <!-- Other sections would go here -->
+            <!-- My Bookings Section (for regular users) -->
+            <div class="content-section user-only" id="bookings-section" style="display: none;">
+                <h2>My Bookings</h2>
+                <div class="section-container">
+                    <div class="card">
+                        <h3>Current Bookings</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ship</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bookings-table">
+                                    <!-- Bookings will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="content-section" id="settings-section" style="display: none;">
+                <h2>Settings</h2>
+                <div class="section-container">
+                    <div class="card">
+                        <h3>User Profile</h3>
+                        <form id="settings-form">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" placeholder="Username" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" placeholder="Email">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">New Password</label>
+                                <input type="password" id="password" placeholder="New Password">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password">Confirm Password</label>
+                                <input type="password" id="confirm-password" placeholder="Confirm Password">
+                            </div>
+                            <button type="submit" class="btn primary">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -534,6 +596,8 @@
 
         function updateUIForRole(role) {
             console.log('Updating UI for role:', role);
+            currentUserRole = role;
+            
             // Update welcome message
             const welcomeMsg = document.getElementById('welcome-msg');
             const userAvatar = document.getElementById('user-avatar');
@@ -548,14 +612,52 @@
             
             // Show/hide elements based on role
             const adminElements = document.querySelectorAll('.admin-only');
+            const staffElements = document.querySelectorAll('.staff-only');
             const userElements = document.querySelectorAll('.user-only');
             
             if (role === 'admin') {
+                // Admin sees everything
                 adminElements.forEach(el => el.style.display = 'block');
+                staffElements.forEach(el => el.style.display = 'block');
+                userElements.forEach(el => el.style.display = 'block');
+            } else if (role === 'staff') {
+                // Staff sees staff and user elements, but not admin elements
+                adminElements.forEach(el => el.style.display = 'none');
+                staffElements.forEach(el => el.style.display = 'block');
                 userElements.forEach(el => el.style.display = 'block');
             } else {
+                // Regular users only see user elements
                 adminElements.forEach(el => el.style.display = 'none');
+                staffElements.forEach(el => el.style.display = 'none');
                 userElements.forEach(el => el.style.display = 'block');
+            }
+            
+            // Show appropriate sections in the navigation menu
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                const sectionId = item.getAttribute('data-section');
+                
+                // Hide admin sections for non-admin users
+                if (item.classList.contains('admin-only') && role !== 'admin') {
+                    item.style.display = 'none';
+                }
+                
+                // Hide staff sections for regular users
+                if (item.classList.contains('staff-only') && role !== 'admin' && role !== 'staff') {
+                    item.style.display = 'none';
+                }
+                
+                // Show user sections for all users
+                if (item.classList.contains('user-only') || !item.classList.contains('admin-only') && !item.classList.contains('staff-only')) {
+                    item.style.display = 'block';
+                }
+            });
+            
+            // Show the first available section
+            let firstVisibleNavItem = document.querySelector('.nav-item[style="display: block"]');
+            if (firstVisibleNavItem) {
+                const sectionId = firstVisibleNavItem.getAttribute('data-section');
+                showSection(sectionId);
             }
         }
 
@@ -611,6 +713,9 @@
                     case 'settings':
                         loadSettings();
                         break;
+                    case 'bookings':
+                        loadBookings();
+                        break;
                 }
             } else {
                 console.warn('Section not found:', sectionId);
@@ -662,6 +767,11 @@
         function loadSettings() {
             console.log('Loading settings...');
             // Implement settings loading
+        }
+
+        function loadBookings() {
+            console.log('Loading bookings...');
+            // Implement bookings loading
         }
 
         function setupLogout() {
@@ -840,6 +950,66 @@
             loadCrewMembers();
             loadReports();
         });
+
+        // Add demo bookings to bookings section
+        const bookingsSection = document.getElementById('bookings-section');
+        if (bookingsSection) {
+            const bookingsTable = document.getElementById('bookings-table');
+            if (bookingsTable && bookingsTable.children.length === 0) {
+                // Add demo bookings
+                const demoBookings = [
+                    { id: 1, ship: 'Ocean Explorer', startDate: '2025-07-15', endDate: '2025-07-30', status: 'Confirmed' },
+                    { id: 2, ship: 'Northern Star', startDate: '2025-08-10', endDate: '2025-08-25', status: 'Pending' },
+                    { id: 3, ship: 'Coastal Voyager', startDate: '2025-09-05', endDate: '2025-09-15', status: 'Confirmed' }
+                ];
+                
+                demoBookings.forEach(booking => {
+                    const row = document.createElement('tr');
+                    
+                    // Create status badge with appropriate color
+                    let statusClass = 'status-pending';
+                    if (booking.status === 'Confirmed') {
+                        statusClass = 'status-active';
+                    } else if (booking.status === 'Cancelled') {
+                        statusClass = 'status-inactive';
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${booking.ship}</td>
+                        <td>${booking.startDate}</td>
+                        <td>${booking.endDate}</td>
+                        <td><span class="status-badge ${statusClass}">${booking.status}</span></td>
+                        <td>
+                            <button class="btn small view-booking" data-id="${booking.id}">View</button>
+                            <button class="btn small danger cancel-booking" data-id="${booking.id}">Cancel</button>
+                        </td>
+                    `;
+                    
+                    bookingsTable.appendChild(row);
+                });
+                
+                // Add event listeners to booking buttons
+                const viewButtons = bookingsTable.querySelectorAll('.view-booking');
+                viewButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const bookingId = this.getAttribute('data-id');
+                        alert(`Viewing booking details for booking #${bookingId}`);
+                    });
+                });
+                
+                const cancelButtons = bookingsTable.querySelectorAll('.cancel-booking');
+                cancelButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const bookingId = this.getAttribute('data-id');
+                        if (confirm(`Are you sure you want to cancel booking #${bookingId}?`)) {
+                            alert(`Booking #${bookingId} has been cancelled`);
+                            // In a real app, you would call an API to cancel the booking
+                            // and then update the UI
+                        }
+                    });
+                });
+            }
+        }
     </script>
     <!-- Staff Portal Fixes -->
     <script src="js/staff-fixes.js"></script>

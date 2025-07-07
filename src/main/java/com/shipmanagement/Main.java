@@ -1,5 +1,9 @@
 package com.shipmanagement;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -137,6 +141,99 @@ public class Main {
                     return gson.toJson(Map.of(
                         "status", "error",
                         "message", "An error occurred during login: " + e.getMessage()
+                    ));
+                }
+            });
+            
+            // Signup endpoint
+            post("/api/signup", (req, res) -> {
+                System.out.println("Signup attempt received");
+                System.out.println("Request body: " + req.body());
+                
+                try {
+                    // Parse request body
+                    JsonObject json = JsonParser.parseString(req.body()).getAsJsonObject();
+                    String username = json.get("username").getAsString();
+                    String password = json.get("password").getAsString();
+                    String role = json.has("role") ? json.get("role").getAsString() : "staff";
+                    
+                    // Validate input
+                    if (username == null || username.trim().isEmpty()) {
+                        res.status(400);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Username is required"
+                        ));
+                    }
+                    
+                    if (username.length() < 3) {
+                        res.status(400);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Username must be at least 3 characters"
+                        ));
+                    }
+                    
+                    if (password == null || password.trim().isEmpty()) {
+                        res.status(400);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Password is required"
+                        ));
+                    }
+                    
+                    if (password.length() < 6) {
+                        res.status(400);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Password must be at least 6 characters"
+                        ));
+                    }
+                    
+                    // Validate role (only allow admin or staff)
+                    if (!"admin".equals(role) && !"staff".equals(role)) {
+                        role = "staff"; // Default to staff if invalid role
+                    }
+                    
+                    // Check if username already exists
+                    if (DatabaseConnection.usernameExists(username)) {
+                        res.status(400);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Username already exists"
+                        ));
+                    }
+                    
+                    // Create user
+                    boolean success = DatabaseConnection.createUser(username, password, role);
+                    
+                    if (success) {
+                        return gson.toJson(Map.of(
+                            "status", "success",
+                            "message", "User registered successfully"
+                        ));
+                    } else {
+                        res.status(500);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Failed to create user"
+                        ));
+                    }
+                } catch (JsonSyntaxException e) {
+                    System.err.println("JSON parsing error: " + e.getMessage());
+                    e.printStackTrace();
+                    res.status(400);
+                    return gson.toJson(Map.of(
+                        "status", "error",
+                        "message", "Invalid JSON format"
+                    ));
+                } catch (Exception e) {
+                    System.err.println("Signup error: " + e.getMessage());
+                    e.printStackTrace();
+                    res.status(500);
+                    return gson.toJson(Map.of(
+                        "status", "error",
+                        "message", "An error occurred during signup: " + e.getMessage()
                     ));
                 }
             });
@@ -1382,6 +1479,266 @@ public class Main {
                     res.status(500);
                     res.type("application/json");
                     return gson.toJson(Map.of("error", "Failed to retrieve problems: " + e.getMessage()));
+                }
+            });
+
+            // User API endpoints
+            get("/api/user", (req, res) -> {
+                User user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\": \"Not authenticated\"}";
+                }
+                
+                Map<String, Object> userInfo = new HashMap<>();
+                userInfo.put("id", user.getId());
+                userInfo.put("username", user.getUsername());
+                userInfo.put("role", user.getRole());
+                
+                return gson.toJson(userInfo);
+            });
+            
+            // Bookings API endpoints
+            get("/api/user/bookings", (req, res) -> {
+                User user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\": \"Not authenticated\"}";
+                }
+                
+                try (Connection conn = DatabaseConnection.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(
+                         "SELECT b.*, s.name as ship_name FROM bookings b " +
+                         "LEFT JOIN ships s ON b.ship_id = s.id " +
+                         "WHERE b.user_id = ? " +
+                         "ORDER BY b.start_date DESC")) {
+                    
+                    stmt.setInt(1, user.getId());
+                    ResultSet rs = stmt.executeQuery();
+                    
+                    List<Map<String, Object>> bookings = new ArrayList<>();
+                    while (rs.next()) {
+                        Map<String, Object> booking = new HashMap<>();
+                        booking.put("id", rs.getInt("id"));
+                        booking.put("ship_id", rs.getInt("ship_id"));
+                        booking.put("ship_name", rs.getString("ship_name"));
+                        booking.put("start_date", rs.getString("start_date"));
+                        booking.put("end_date", rs.getString("end_date"));
+                        booking.put("status", rs.getString("status"));
+                        booking.put("created_at", rs.getString("created_at"));
+                        bookings.add(booking);
+                    }
+                    
+                    return gson.toJson(bookings);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    res.status(500);
+                    return "{\"error\": \"Database error\"}";
+                }
+            });
+            
+            // Cancel booking endpoint
+            put("/api/bookings/:id/cancel", (req, res) -> {
+                User user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\": \"Not authenticated\"}";
+                }
+                
+                int bookingId = Integer.parseInt(req.params(":id"));
+                
+                try (Connection conn = DatabaseConnection.getConnection();
+                     PreparedStatement checkStmt = conn.prepareStatement(
+                         "SELECT * FROM bookings WHERE id = ? AND user_id = ?");
+                     PreparedStatement updateStmt = conn.prepareStatement(
+                         "UPDATE bookings SET status = 'Cancelled' WHERE id = ? AND user_id = ?")) {
+                    
+                    // Check if booking exists and belongs to user
+                    checkStmt.setInt(1, bookingId);
+                    checkStmt.setInt(2, user.getId());
+                    ResultSet rs = checkStmt.executeQuery();
+                    
+                    if (!rs.next()) {
+                        res.status(404);
+                        return "{\"error\": \"Booking not found or not authorized\"}";
+                    }
+                    
+                    // Update booking status
+                    updateStmt.setInt(1, bookingId);
+                    updateStmt.setInt(2, user.getId());
+                    int updated = updateStmt.executeUpdate();
+                    
+                    if (updated > 0) {
+                        return "{\"success\": true, \"message\": \"Booking cancelled successfully\"}";
+                    } else {
+                        res.status(500);
+                        return "{\"success\": false, \"message\": \"Failed to cancel booking\"}";
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    res.status(500);
+                    return "{\"error\": \"Database error\"}";
+                }
+            });
+            
+            // Tasks API endpoints
+            get("/api/tasks", (req, res) -> {
+                User user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\": \"Not authenticated\"}";
+                }
+                
+                try (Connection conn = DatabaseConnection.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(
+                         "SELECT t.*, s.name as ship_name FROM tasks t " +
+                         "LEFT JOIN ships s ON t.ship_id = s.id " +
+                         "WHERE t.assigned_to = ? " +
+                         "ORDER BY t.due_date ASC")) {
+                    
+                    stmt.setInt(1, user.getId());
+                    ResultSet rs = stmt.executeQuery();
+                    
+                    List<Map<String, Object>> tasks = new ArrayList<>();
+                    while (rs.next()) {
+                        Map<String, Object> task = new HashMap<>();
+                        task.put("id", rs.getInt("id"));
+                        task.put("title", rs.getString("title"));
+                        task.put("description", rs.getString("description"));
+                        task.put("ship_id", rs.getInt("ship_id"));
+                        task.put("ship_name", rs.getString("ship_name"));
+                        task.put("due_date", rs.getString("due_date"));
+                        task.put("status", rs.getString("status"));
+                        task.put("priority", rs.getString("priority"));
+                        task.put("created_at", rs.getString("created_at"));
+                        tasks.add(task);
+                    }
+                    
+                    return gson.toJson(tasks);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    res.status(500);
+                    return "{\"error\": \"Database error\"}";
+                }
+            });
+            
+            // Complete task endpoint
+            put("/api/tasks/:id/complete", (req, res) -> {
+                User user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\": \"Not authenticated\"}";
+                }
+                
+                int taskId = Integer.parseInt(req.params(":id"));
+                
+                try (Connection conn = DatabaseConnection.getConnection();
+                     PreparedStatement checkStmt = conn.prepareStatement(
+                         "SELECT * FROM tasks WHERE id = ? AND assigned_to = ?");
+                     PreparedStatement updateStmt = conn.prepareStatement(
+                         "UPDATE tasks SET status = 'completed' WHERE id = ? AND assigned_to = ?")) {
+                    
+                    // Check if task exists and belongs to user
+                    checkStmt.setInt(1, taskId);
+                    checkStmt.setInt(2, user.getId());
+                    ResultSet rs = checkStmt.executeQuery();
+                    
+                    if (!rs.next()) {
+                        res.status(404);
+                        return "{\"error\": \"Task not found or not authorized\"}";
+                    }
+                    
+                    // Update task status
+                    updateStmt.setInt(1, taskId);
+                    updateStmt.setInt(2, user.getId());
+                    int updated = updateStmt.executeUpdate();
+                    
+                    if (updated > 0) {
+                        return "{\"success\": true, \"message\": \"Task completed successfully\"}";
+                    } else {
+                        res.status(500);
+                        return "{\"success\": false, \"message\": \"Failed to update task\"}";
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    res.status(500);
+                    return "{\"error\": \"Database error\"}";
+                }
+            });
+            
+            // Reports API endpoints
+            get("/api/reports", (req, res) -> {
+                User user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\": \"Not authenticated\"}";
+                }
+                
+                try (Connection conn = DatabaseConnection.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(
+                         "SELECT r.*, s.name as ship_name FROM reports r " +
+                         "LEFT JOIN ships s ON r.ship_id = s.id " +
+                         "ORDER BY r.created_at DESC")) {
+                    
+                    ResultSet rs = stmt.executeQuery();
+                    
+                    List<Map<String, Object>> reports = new ArrayList<>();
+                    while (rs.next()) {
+                        Map<String, Object> report = new HashMap<>();
+                        report.put("id", rs.getInt("id"));
+                        report.put("title", rs.getString("title"));
+                        report.put("report_type", rs.getString("report_type"));
+                        report.put("content", rs.getString("content"));
+                        report.put("ship_id", rs.getInt("ship_id"));
+                        report.put("ship_name", rs.getString("ship_name"));
+                        report.put("generated_by", rs.getInt("generated_by"));
+                        report.put("created_at", rs.getString("created_at"));
+                        reports.add(report);
+                    }
+                    
+                    return gson.toJson(reports);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    res.status(500);
+                    return "{\"error\": \"Database error\"}";
+                }
+            });
+            
+            // Crew members API endpoints
+            get("/api/crew", (req, res) -> {
+                User user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\": \"Not authenticated\"}";
+                }
+                
+                try (Connection conn = DatabaseConnection.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(
+                         "SELECT c.*, s.name as ship_name FROM crew_members c " +
+                         "LEFT JOIN ships s ON c.ship_id = s.id " +
+                         "ORDER BY c.last_name, c.first_name")) {
+                    
+                    ResultSet rs = stmt.executeQuery();
+                    
+                    List<Map<String, Object>> crewMembers = new ArrayList<>();
+                    while (rs.next()) {
+                        Map<String, Object> crew = new HashMap<>();
+                        crew.put("id", rs.getInt("id"));
+                        crew.put("first_name", rs.getString("first_name"));
+                        crew.put("last_name", rs.getString("last_name"));
+                        crew.put("position", rs.getString("position"));
+                        crew.put("rank", rs.getString("rank"));
+                        crew.put("nationality", rs.getString("nationality"));
+                        crew.put("ship_id", rs.getInt("ship_id"));
+                        crew.put("ship_name", rs.getString("ship_name"));
+                        crewMembers.add(crew);
+                    }
+                    
+                    return gson.toJson(crewMembers);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    res.status(500);
+                    return "{\"error\": \"Database error\"}";
                 }
             });
 
