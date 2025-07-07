@@ -129,27 +129,42 @@
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#dashboard" data-section="dashboard">
-                                <i class="bi bi-house-door"></i> Dashboard
+                            <a class="nav-link active" href="#" data-section="dashboard">
+                                <i class="bi bi-speedometer2"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#ships" data-section="ships">
-                                <i class="bi bi-ship"></i> View Ships
+                            <a class="nav-link" href="#" data-section="ships">
+                                <i class="bi bi-water"></i> Ships
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#bookings" data-section="bookings">
+                            <a class="nav-link" href="#" data-section="bookings">
                                 <i class="bi bi-calendar-check"></i> My Bookings
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#settings" data-section="settings">
+                            <a class="nav-link" href="#" data-section="tasks">
+                                <i class="bi bi-list-task"></i> My Tasks
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="reports">
+                                <i class="bi bi-file-earmark-text"></i> Reports
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="crew">
+                                <i class="bi bi-people-fill"></i> Crew Members
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="settings">
                                 <i class="bi bi-gear"></i> Settings
                             </a>
                         </li>
-                        <li class="nav-item mt-4">
-                            <a class="nav-link text-danger" href="#" id="logout-link">
+                        <li class="nav-item mt-3">
+                            <a class="nav-link text-danger" href="/logout">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
                         </li>
@@ -178,10 +193,10 @@
                         <div class="col-12">
                             <h4>Quick Actions</h4>
                             <div class="d-flex flex-wrap quick-actions">
-                                <a href="#ships" class="btn btn-primary" data-section="ships">
+                                <a href="#" class="btn btn-primary" data-section="ships">
                                     <i class="bi bi-search"></i> Find a Ship
                                 </a>
-                                <a href="#bookings" class="btn btn-success" data-section="bookings">
+                                <a href="#" class="btn btn-success" data-section="bookings">
                                     <i class="bi bi-calendar-plus"></i> View Bookings
                                 </a>
                                 <a href="#" class="btn btn-info text-white">
@@ -215,7 +230,7 @@
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">Recent Bookings</h5>
-                                    <a href="#bookings" class="btn btn-sm btn-primary" data-section="bookings">View All</a>
+                                    <a href="#" class="btn btn-sm btn-primary" data-section="bookings">View All</a>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -244,7 +259,7 @@
                                         <!-- No Bookings Message -->
                                         <div class="alert alert-info" id="no-recent-bookings-message" style="display: none;">
                                             <i class="bi bi-info-circle me-2"></i>
-                                            You don't have any bookings yet. <a href="#ships" class="alert-link" data-section="ships">Browse ships</a> to make a booking.
+                                            You don't have any bookings yet. <a href="#" class="alert-link" data-section="ships">Browse ships</a> to make a booking.
                                         </div>
                                     </div>
                                 </div>
@@ -253,70 +268,6 @@
                     </div>
                 </div>
                 
-                <!-- Ships Section -->
-                <div class="content-section" id="ships" style="display: none;">
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Available Ships</h1>
-                        <div class="btn-toolbar mb-2 mb-md-0">
-                            <div class="input-group me-2">
-                                <input type="text" class="form-control" id="ship-search" placeholder="Search ships...">
-                                <button class="btn btn-outline-secondary" type="button" id="search-ship-btn">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Ships Filter Card -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-3">
-                                    <label for="ship-type-filter" class="form-label">Ship Type</label>
-                                    <select class="form-select" id="ship-type-filter">
-                                        <option value="all">All Types</option>
-                                        <option value="Cargo">Cargo</option>
-                                        <option value="Passenger">Passenger</option>
-                                        <option value="Tanker">Tanker</option>
-                                        <option value="Container">Container</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="ship-status-filter" class="form-label">Status</label>
-                                    <select class="form-select" id="ship-status-filter">
-                                        <option value="all">All Statuses</option>
-                                        <option value="Active">Active</option>
-                                        <option value="Maintenance">Maintenance</option>
-                                        <option value="Docked">Docked</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4 d-flex align-items-end">
-                                    <button class="btn btn-primary" id="apply-ship-filters">Apply Filters</button>
-                                    <button class="btn btn-outline-secondary ms-2" id="reset-ship-filters">Reset</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Ships Grid -->
-                    <div class="row" id="ships-grid">
-                        <!-- Ships will be loaded here -->
-                    </div>
-                    
-                    <!-- Loading Spinner -->
-                    <div class="text-center py-4" id="ships-loading">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                    
-                    <!-- No Ships Message -->
-                    <div class="alert alert-info" id="no-ships-message" style="display: none;">
-                        <i class="bi bi-info-circle me-2"></i>
-                        No ships found.
-                    </div>
-                </div>
-
                 <!-- Bookings Section -->
                 <div id="bookings" class="content-section">
                     <div class="card">
@@ -335,26 +286,9 @@
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="bookings-table-body">
                                         <tr>
-                                            <td>Ocean Explorer</td>
-                                            <td>2025-07-15</td>
-                                            <td>2025-07-30</td>
-                                            <td><span class="badge bg-success">Confirmed</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">View</button>
-                                                <button class="btn btn-sm btn-danger">Cancel</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Northern Star</td>
-                                            <td>2025-08-10</td>
-                                            <td>2025-08-25</td>
-                                            <td><span class="badge bg-warning text-dark">Pending</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">View</button>
-                                                <button class="btn btn-sm btn-danger">Cancel</button>
-                                            </td>
+                                            <td colspan="5" class="text-center">Loading bookings...</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -362,77 +296,90 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Settings Section -->
-                <div class="content-section" id="settings" style="display: none;">
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Profile Settings</h1>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body text-center">
-                                    <div class="mb-3">
-                                        <img src="https://via.placeholder.com/150" class="rounded-circle img-fluid" alt="Profile Picture">
-                                    </div>
-                                    <h5 class="card-title" id="profile-name">John Doe</h5>
-                                    <p class="card-text text-muted" id="profile-role">Customer</p>
-                                </div>
+
+                <!-- Tasks Section -->
+                <div id="tasks" class="content-section" style="display: none;">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h4><i class="bi bi-list-task"></i> My Tasks</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Description</th>
+                                            <th>Ship</th>
+                                            <th>Due Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tasks-table-body">
+                                        <tr>
+                                            <td colspan="6" class="text-center">Loading tasks...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        
-                        <div class="col-md-8">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Personal Information</h5>
-                                </div>
-                                <div class="card-body">
-                                    <form id="profile-form">
-                                        <div class="mb-3">
-                                            <label for="profile-username" class="form-label">Username</label>
-                                            <input type="text" class="form-control" id="profile-username" readonly>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-6">
-                                                <label for="profile-first-name" class="form-label">First Name</label>
-                                                <input type="text" class="form-control" id="profile-first-name">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="profile-last-name" class="form-label">Last Name</label>
-                                                <input type="text" class="form-control" id="profile-last-name">
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="profile-email" class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="profile-email">
-                                        </div>
-                                        <button type="submit" class="btn btn-primary">Update Profile</button>
-                                    </form>
-                                </div>
+                    </div>
+                </div>
+
+                <!-- Reports Section -->
+                <div id="reports" class="content-section" style="display: none;">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h4><i class="bi bi-file-earmark-text"></i> Reports</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Type</th>
+                                            <th>Ship</th>
+                                            <th>Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reports-table-body">
+                                        <tr>
+                                            <td colspan="5" class="text-center">Loading reports...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            
-                            <div class="card mt-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Change Password</h5>
-                                </div>
-                                <div class="card-body">
-                                    <form id="password-form">
-                                        <div class="mb-3">
-                                            <label for="current-password" class="form-label">Current Password</label>
-                                            <input type="password" class="form-control" id="current-password" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="new-password" class="form-label">New Password</label>
-                                            <input type="password" class="form-control" id="new-password" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="confirm-password" class="form-label">Confirm New Password</label>
-                                            <input type="password" class="form-control" id="confirm-password" required>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary">Change Password</button>
-                                    </form>
-                                </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crew Members Section -->
+                <div id="crew" class="content-section" style="display: none;">
+                    <div class="card">
+                        <div class="card-header bg-secondary text-white">
+                            <h4><i class="bi bi-people-fill"></i> Crew Members</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Position</th>
+                                            <th>Rank</th>
+                                            <th>Ship</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="crew-table-body">
+                                        <tr>
+                                            <td colspan="5" class="text-center">Loading crew members...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -476,208 +423,331 @@
     <div id="alert-container" style="position: fixed; top: 20px; right: 20px; z-index: 1050;"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/user-fixes.js"></script>
-    <!-- Simple Direct Fix -->
     <script>
-        console.log('Simple fix script loaded');
-        
         document.addEventListener('DOMContentLoaded', function() {
-            // Fix navigation
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.onclick = function(e) {
-                    const sectionId = this.getAttribute('data-section');
-                    if (sectionId) {
-                        e.preventDefault();
-                        console.log('Navigating to section:', sectionId);
-                        
-                        // Hide all sections
-                        const sections = document.querySelectorAll('.content-section');
-                        sections.forEach(section => {
-                            section.style.display = 'none';
-                        });
-                        
-                        // Show selected section
-                        const targetSection = document.getElementById(sectionId);
-                        if (targetSection) {
-                            targetSection.style.display = 'block';
+            // Get current user info
+            fetch('/api/user')
+                .then(response => response.json())
+                .then(user => {
+                    document.getElementById('user-name').textContent = user.username;
+                })
+                .catch(error => console.error('Error fetching user info:', error));
+
+            // Load real bookings data
+            function loadBookings() {
+                fetch('/api/user/bookings')
+                    .then(response => response.json())
+                    .then(bookings => {
+                        const tableBody = document.getElementById('bookings-table-body');
+                        if (bookings.length === 0) {
+                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No bookings found</td></tr>';
+                            return;
                         }
                         
-                        // Update active state
-                        navLinks.forEach(l => l.classList.remove('active'));
-                        this.classList.add('active');
+                        tableBody.innerHTML = '';
+                        bookings.forEach(booking => {
+                            const statusClass = getStatusBadgeClass(booking.status);
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${booking.ship_name || 'N/A'}</td>
+                                <td>${booking.start_date || 'N/A'}</td>
+                                <td>${booking.end_date || 'N/A'}</td>
+                                <td><span class="badge ${statusClass}">${booking.status}</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary view-booking" data-id="${booking.id}">View</button>
+                                    ${booking.status !== 'Cancelled' ? `<button class="btn btn-sm btn-danger cancel-booking" data-id="${booking.id}">Cancel</button>` : ''}
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                        
+                        // Add event listeners to buttons
+                        document.querySelectorAll('.view-booking').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const bookingId = this.getAttribute('data-id');
+                                viewBookingDetails(bookingId);
+                            });
+                        });
+                        
+                        document.querySelectorAll('.cancel-booking').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const bookingId = this.getAttribute('data-id');
+                                cancelBooking(bookingId);
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading bookings:', error);
+                        document.getElementById('bookings-table-body').innerHTML = 
+                            '<tr><td colspan="5" class="text-center text-danger">Error loading bookings</td></tr>';
+                    });
+            }
+            
+            // Load real tasks data
+            function loadTasks() {
+                fetch('/api/tasks')
+                    .then(response => response.json())
+                    .then(tasks => {
+                        const tableBody = document.getElementById('tasks-table-body');
+                        if (tasks.length === 0) {
+                            tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No tasks assigned</td></tr>';
+                            return;
+                        }
+                        
+                        tableBody.innerHTML = '';
+                        tasks.forEach(task => {
+                            const statusClass = getTaskStatusBadgeClass(task.status);
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${task.title || 'N/A'}</td>
+                                <td>${task.description || 'N/A'}</td>
+                                <td>${task.ship_name || 'N/A'}</td>
+                                <td>${task.due_date || 'N/A'}</td>
+                                <td><span class="badge ${statusClass}">${task.status}</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary view-task" data-id="${task.id}">View</button>
+                                    ${task.status !== 'completed' ? `<button class="btn btn-sm btn-success complete-task" data-id="${task.id}">Complete</button>` : ''}
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                        
+                        // Add event listeners to buttons
+                        document.querySelectorAll('.view-task').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const taskId = this.getAttribute('data-id');
+                                viewTaskDetails(taskId);
+                            });
+                        });
+                        
+                        document.querySelectorAll('.complete-task').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const taskId = this.getAttribute('data-id');
+                                completeTask(taskId);
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading tasks:', error);
+                        document.getElementById('tasks-table-body').innerHTML = 
+                            '<tr><td colspan="6" class="text-center text-danger">Error loading tasks</td></tr>';
+                    });
+            }
+            
+            // Load real reports data
+            function loadReports() {
+                fetch('/api/reports')
+                    .then(response => response.json())
+                    .then(reports => {
+                        const tableBody = document.getElementById('reports-table-body');
+                        if (reports.length === 0) {
+                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No reports found</td></tr>';
+                            return;
+                        }
+                        
+                        tableBody.innerHTML = '';
+                        reports.forEach(report => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${report.title || 'N/A'}</td>
+                                <td>${report.report_type || 'N/A'}</td>
+                                <td>${report.ship_name || 'N/A'}</td>
+                                <td>${formatDate(report.created_at) || 'N/A'}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary view-report" data-id="${report.id}">View</button>
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                        
+                        // Add event listeners to buttons
+                        document.querySelectorAll('.view-report').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const reportId = this.getAttribute('data-id');
+                                viewReportDetails(reportId);
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading reports:', error);
+                        document.getElementById('reports-table-body').innerHTML = 
+                            '<tr><td colspan="5" class="text-center text-danger">Error loading reports</td></tr>';
+                    });
+            }
+            
+            // Load real crew members data
+            function loadCrewMembers() {
+                fetch('/api/crew')
+                    .then(response => response.json())
+                    .then(crewMembers => {
+                        const tableBody = document.getElementById('crew-table-body');
+                        if (crewMembers.length === 0) {
+                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No crew members found</td></tr>';
+                            return;
+                        }
+                        
+                        tableBody.innerHTML = '';
+                        crewMembers.forEach(crew => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${crew.first_name} ${crew.last_name}</td>
+                                <td>${crew.position || 'N/A'}</td>
+                                <td>${crew.rank || 'N/A'}</td>
+                                <td>${crew.ship_name || 'N/A'}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary view-crew" data-id="${crew.id}">View</button>
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                        
+                        // Add event listeners to buttons
+                        document.querySelectorAll('.view-crew').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const crewId = this.getAttribute('data-id');
+                                viewCrewDetails(crewId);
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading crew members:', error);
+                        document.getElementById('crew-table-body').innerHTML = 
+                            '<tr><td colspan="5" class="text-center text-danger">Error loading crew members</td></tr>';
+                    });
+            }
+            
+            // Helper functions
+            function getStatusBadgeClass(status) {
+                switch(status.toLowerCase()) {
+                    case 'confirmed': return 'bg-success';
+                    case 'pending': return 'bg-warning text-dark';
+                    case 'cancelled': return 'bg-danger';
+                    case 'completed': return 'bg-info';
+                    default: return 'bg-secondary';
+                }
+            }
+            
+            function getTaskStatusBadgeClass(status) {
+                switch(status.toLowerCase()) {
+                    case 'completed': return 'bg-success';
+                    case 'in_progress': return 'bg-primary';
+                    case 'pending': return 'bg-warning text-dark';
+                    default: return 'bg-secondary';
+                }
+            }
+            
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const date = new Date(dateString);
+                return date.toLocaleDateString();
+            }
+            
+            function viewBookingDetails(bookingId) {
+                // Implement booking details view
+                console.log('Viewing booking details for ID:', bookingId);
+                // You can implement a modal or redirect to a details page
+            }
+            
+            function cancelBooking(bookingId) {
+                if (confirm('Are you sure you want to cancel this booking?')) {
+                    fetch(`/api/bookings/${bookingId}/cancel`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('Booking cancelled successfully');
+                            loadBookings(); // Reload bookings to reflect changes
+                        } else {
+                            alert('Failed to cancel booking: ' + result.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error cancelling booking:', error);
+                        alert('An error occurred while cancelling the booking');
+                    });
+                }
+            }
+            
+            function viewTaskDetails(taskId) {
+                // Implement task details view
+                console.log('Viewing task details for ID:', taskId);
+            }
+            
+            function completeTask(taskId) {
+                if (confirm('Mark this task as completed?')) {
+                    fetch(`/api/tasks/${taskId}/complete`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('Task marked as completed');
+                            loadTasks(); // Reload tasks to reflect changes
+                        } else {
+                            alert('Failed to update task: ' + result.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error completing task:', error);
+                        alert('An error occurred while updating the task');
+                    });
+                }
+            }
+            
+            function viewReportDetails(reportId) {
+                // Implement report details view
+                console.log('Viewing report details for ID:', reportId);
+            }
+            
+            function viewCrewDetails(crewId) {
+                // Implement crew details view
+                console.log('Viewing crew details for ID:', crewId);
+            }
+            
+            // Navigation and section switching
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Skip if it's the logout link
+                    if (this.getAttribute('href') === '/logout') return;
+                    
+                    // Remove active class from all links
+                    navLinks.forEach(navLink => navLink.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Hide all content sections
+                    contentSections.forEach(section => section.style.display = 'none');
+                    
+                    // Show the selected section
+                    const sectionId = this.getAttribute('data-section');
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        section.style.display = 'block';
+                        
+                        // Load data based on section
+                        if (sectionId === 'bookings') loadBookings();
+                        if (sectionId === 'tasks') loadTasks();
+                        if (sectionId === 'reports') loadReports();
+                        if (sectionId === 'crew') loadCrewMembers();
                     }
-                };
+                });
             });
             
-            // Fix logout button with a simpler approach
-            const logoutBtn = document.querySelector('.nav-link.text-danger');
-            if (logoutBtn) {
-                logoutBtn.onclick = function(e) {
-                    e.preventDefault();
-                    console.log('Logout clicked');
-                    
-                    // Simple redirect
-                    window.location.href = '/login.html';
-                };
-            }
-            
-            // Add demo ships
-            const shipsGrid = document.getElementById('ships-grid');
-            if (shipsGrid && shipsGrid.children.length === 0) {
-                // Hide loading and no ships message
-                const shipsLoading = document.getElementById('ships-loading');
-                const noShipsMessage = document.getElementById('no-ships-message');
-                if (shipsLoading) shipsLoading.style.display = 'none';
-                if (noShipsMessage) noShipsMessage.style.display = 'none';
-                
-                // Add demo ships
-                const demoShips = [
-                    { id: 1, name: 'Ocean Explorer', type: 'Cargo Ship', status: 'Active', location: 'Port of Singapore' },
-                    { id: 2, name: 'Coastal Voyager', type: 'Passenger Ferry', status: 'Maintenance', location: 'Port of Miami' },
-                    { id: 3, name: 'Northern Star', type: 'Cruise Ship', status: 'En Route', location: 'Mediterranean Sea' },
-                    { id: 4, name: 'Pacific Trader', type: 'Container Ship', status: 'Available', location: 'Port of Shanghai' }
-                ];
-                
-                demoShips.forEach(ship => {
-                    // Create ship card
-                    const shipCard = document.createElement('div');
-                    shipCard.className = 'col-md-6 col-lg-4 mb-4';
-                    
-                    // Set badge color based on status
-                    let badgeClass = 'bg-secondary';
-                    let canBook = false;
-                    
-                    if (ship.status === 'Active' || ship.status === 'Available') {
-                        badgeClass = 'bg-success';
-                        canBook = true;
-                    } else if (ship.status === 'Maintenance') {
-                        badgeClass = 'bg-warning text-dark';
-                    } else if (ship.status === 'En Route') {
-                        badgeClass = 'bg-info text-dark';
-                    }
-                    
-                    shipCard.innerHTML = `
-                        <div class="card h-100">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0">${ship.name}</h5>
-                                <span class="badge ${badgeClass}">${ship.status}</span>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">Type: ${ship.type}</p>
-                                <p class="card-text">Location: ${ship.location}</p>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between">
-                                <button class="btn btn-sm btn-outline-primary view-ship-details" data-ship-id="${ship.id}">View Details</button>
-                                <button class="btn btn-sm btn-primary book-ship" data-ship-id="${ship.id}" data-ship-name="${ship.name}" ${!canBook ? 'disabled' : ''}>Book Now</button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    shipsGrid.appendChild(shipCard);
-                });
-                
-                // Add event listeners for ship buttons
-                const viewButtons = document.querySelectorAll('.view-ship-details');
-                viewButtons.forEach(button => {
-                    button.onclick = function() {
-                        const shipId = this.getAttribute('data-ship-id');
-                        alert(`Viewing details for ship ID: ${shipId}`);
-                    };
-                });
-                
-                const bookButtons = document.querySelectorAll('.book-ship');
-                bookButtons.forEach(button => {
-                    button.onclick = function() {
-                        const shipId = this.getAttribute('data-ship-id');
-                        const shipName = this.getAttribute('data-ship-name');
-                        
-                        // Show booking modal
-                        const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
-                        document.getElementById('bookingShipId').value = shipId;
-                        document.getElementById('bookingShipName').textContent = shipName;
-                        bookingModal.show();
-                    };
-                });
-            }
-            
-            // Add demo bookings
-            const bookingsSection = document.getElementById('bookings');
-            if (bookingsSection) {
-                bookingsSection.innerHTML = `
-                    <div class="card">
-                        <div class="card-header bg-success text-white">
-                            <h4><i class="bi bi-calendar-check"></i> My Bookings</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Ship</th>
-                                            <th>Start Date</th>
-                                            <th>End Date</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Ocean Explorer</td>
-                                            <td>2025-07-15</td>
-                                            <td>2025-07-30</td>
-                                            <td><span class="badge bg-success">Confirmed</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">View</button>
-                                                <button class="btn btn-sm btn-danger">Cancel</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Northern Star</td>
-                                            <td>2025-08-10</td>
-                                            <td>2025-08-25</td>
-                                            <td><span class="badge bg-warning text-dark">Pending</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">View</button>
-                                                <button class="btn btn-sm btn-danger">Cancel</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Update profile in settings section
-            const profileName = document.getElementById('profile-name');
-            if (profileName) {
-                profileName.textContent = 'John Doe';
-            }
-            
-            const profileRole = document.getElementById('profile-role');
-            if (profileRole) {
-                profileRole.textContent = 'Customer';
-            }
-            
-            // Handle form submissions
-            const profileForm = document.getElementById('profile-form');
-            if (profileForm) {
-                profileForm.onsubmit = function(e) {
-                    e.preventDefault();
-                    alert('Profile updated successfully!');
-                };
-            }
-            
-            const passwordForm = document.getElementById('password-form');
-            if (passwordForm) {
-                passwordForm.onsubmit = function(e) {
-                    e.preventDefault();
-                    alert('Password changed successfully!');
-                };
-            }
+            // Initial data loading
+            loadBookings();
         });
     </script>
 </body>
