@@ -15,7 +15,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            opacity: 0.4;
+            opacity: 0.8;
         }
         .sidebar {
             min-height: 100vh;
@@ -410,6 +410,40 @@
         </div>
     </div>
 
+    <!-- Ship Details Modal -->
+    <div class="modal fade" id="ship-details-modal" tabindex="-1" aria-labelledby="shipDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="shipDetailsModalLabel">Ship Details: <span id="modal-ship-name"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Type:</strong> <span id="modal-ship-type"></span></p>
+                            <p><strong>Capacity:</strong> <span id="modal-ship-capacity"></span></p>
+                            <p><strong>Status:</strong> <span id="modal-ship-status"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="ship-location-info">
+                                <p><strong>Current Location:</strong> <span id="modal-ship-location">Loading...</span></p>
+                                <p><strong>Last Updated:</strong> <span id="modal-ship-last-updated">Loading...</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="modal-book-ship-btn">Book This Ship</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Container for notifications -->
+    <div id="alert-container" style="position: fixed; top: 20px; right: 20px; z-index: 1050;"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // DOM Elements
@@ -664,8 +698,11 @@
                     return response.json();
                 })
                 .then(data => {
-                    if (data.role !== 'staff') {
-                        window.location.href = '/login.html';
+                    // Allow users with role 'user' or any non-admin role to access this dashboard
+                    // Redirect admin users to admin dashboard
+                    if (data.role === 'admin') {
+                        window.location.href = '/admin-dashboard.html';
+                        return;
                     }
                     
                     // Set user info in the UI
@@ -802,6 +839,26 @@
                     document.getElementById('modal-ship-type').textContent = ship.type;
                     document.getElementById('modal-ship-capacity').textContent = ship.capacity;
                     document.getElementById('modal-ship-status').textContent = ship.status;
+                    
+                    // Set ship ID on the book button
+                    document.getElementById('modal-book-ship-btn').setAttribute('data-ship-id', ship.id);
+                    
+                    // Try to load ship location if available
+                    fetch(`/api/ships/${shipId}/location`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Location data not available');
+                            }
+                            return response.json();
+                        })
+                        .then(locationData => {
+                            document.getElementById('modal-ship-location').textContent = locationData.current_port || 'At sea';
+                            document.getElementById('modal-ship-last-updated').textContent = new Date(locationData.last_updated).toLocaleString();
+                        })
+                        .catch(error => {
+                            document.getElementById('modal-ship-location').textContent = 'Not available';
+                            document.getElementById('modal-ship-last-updated').textContent = 'Not available';
+                        });
                     
                     // Show the modal
                     modal.show();

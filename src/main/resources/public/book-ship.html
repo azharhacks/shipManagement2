@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Ship - Ship Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-image: url('images/dashboard.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.8;
+        }
+        .card {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .booking-form {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 booking-form">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="bi bi-calendar-plus"></i> Book a Ship</h2>
+                    <a href="user-dashboard.html" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+
+                <div id="alert-container"></div>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">Ship Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4 id="ship-name">Loading...</h4>
+                                <p id="ship-details">Loading ship details...</p>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <span class="badge bg-success" id="ship-status">Available</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="booking-form">
+                    <input type="hidden" id="ship-id" name="ship-id">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="start-date" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start-date" name="start-date" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end-date" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end-date" name="end-date" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="purpose" class="form-label">Purpose of Booking</label>
+                        <textarea class="form-control" id="purpose" name="purpose" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-calendar-check"></i> Submit Booking Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Container for notifications -->
+    <div id="floating-alert-container" style="position: fixed; top: 20px; right: 20px; z-index: 1050;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const shipId = urlParams.get('id');
+        const shipName = urlParams.get('name');
+        
+        // Set minimum dates for the date inputs
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        
+        // Format date as YYYY-MM-DD for input value
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+        
+        startDateInput.min = formatDate(tomorrow);
+        endDateInput.min = formatDate(tomorrow);
+        
+        // Set default values
+        startDateInput.value = formatDate(tomorrow);
+        
+        const nextWeek = new Date(today);
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        endDateInput.value = formatDate(nextWeek);
+        
+        // Function to check authentication
+        function checkAuthentication() {
+            fetch('/api/check-auth')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Not authenticated');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.role === 'admin') {
+                        window.location.href = '/admin-dashboard.html';
+                        return;
+                    }
+                })
+                .catch(error => {
+                    console.error('Authentication error:', error);
+                    window.location.href = '/login.html';
+                });
+        }
+        
+        // Function to load ship details
+        function loadShipDetails() {
+            if (!shipId) {
+                showAlert('No ship selected. Please go back and select a ship.', 'danger');
+                return;
+            }
+            
+            // Set ship ID in form
+            document.getElementById('ship-id').value = shipId;
+            
+            // Set ship name if available from URL
+            if (shipName) {
+                document.getElementById('ship-name').textContent = decodeURIComponent(shipName);
+            }
+            
+            // Fetch ship details from API
+            fetch(`/api/ships/${shipId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch ship details');
+                    }
+                    return response.json();
+                })
+                .then(ship => {
+                    document.getElementById('ship-name').textContent = ship.name;
+                    document.getElementById('ship-details').innerHTML = `
+                        <strong>Type:</strong> ${ship.type}<br>
+                        <strong>Capacity:</strong> ${ship.capacity}<br>
+                    `;
+                    document.getElementById('ship-status').textContent = ship.status;
+                    
+                    // If ship is not active, disable booking
+                    if (ship.status !== 'Active') {
+                        document.getElementById('booking-form').innerHTML = `
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i> 
+                                This ship is currently ${ship.status.toLowerCase()} and not available for booking.
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading ship details:', error);
+                    showAlert('Error loading ship details. Please try again.', 'danger');
+                });
+        }
+        
+        // Function to show alert
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            const alertContainer = document.getElementById('alert-container');
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            
+            // Also show in floating container
+            const floatingAlertDiv = alertDiv.cloneNode(true);
+            const floatingContainer = document.getElementById('floating-alert-container');
+            floatingContainer.appendChild(floatingAlertDiv);
+            
+            // Auto-dismiss floating alert after 5 seconds
+            setTimeout(() => {
+                floatingAlertDiv.remove();
+            }, 5000);
+        }
+        
+        // Handle form submission
+        document.getElementById('booking-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const purpose = document.getElementById('purpose').value;
+            
+            // Validate dates
+            if (new Date(startDate) >= new Date(endDate)) {
+                showAlert('End date must be after start date', 'danger');
+                return;
+            }
+            
+            // Create booking data
+            const bookingData = {
+                ship_id: shipId,
+                start_date: startDate,
+                end_date: endDate,
+                purpose: purpose
+            };
+            
+            // Submit booking request
+            fetch('/api/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bookingData),
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to create booking');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                showAlert('Booking request submitted successfully!', 'success');
+                
+                // Disable form after successful submission
+                const form = document.getElementById('booking-form');
+                const inputs = form.querySelectorAll('input, textarea, button');
+                inputs.forEach(input => input.disabled = true);
+                
+                // Add return to dashboard button
+                form.innerHTML += `
+                    <div class="mt-4 text-center">
+                        <a href="user-dashboard.html" class="btn btn-primary">
+                            <i class="bi bi-arrow-left"></i> Return to Dashboard
+                        </a>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                console.error('Error creating booking:', error);
+                showAlert('Error: ' + error.message, 'danger');
+            });
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            loadShipDetails();
+        });
+    </script>
+</body>
+</html>
