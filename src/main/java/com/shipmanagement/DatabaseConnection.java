@@ -240,7 +240,17 @@ public class DatabaseConnection {
         return null;
     }
     
+    /**
+     * Creates a new user in the database
+     * @param username The username
+     * @param password The password (will be hashed)
+     * @param role The user role (user, staff, admin)
+     * @return true if user was created successfully, false otherwise
+     */
     public static boolean createUser(String username, String password, String role) {
+        if (usernameExists(username)) {
+            return false;
+        }
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
         
@@ -250,6 +260,32 @@ public class DatabaseConnection {
             pstmt.setString(2, hashedPassword);
             pstmt.setString(3, role);
             return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Checks if a username already exists in the database
+     * @param username The username to check
+     * @return true if the username exists, false otherwise
+     */
+    public static boolean usernameExists(String username) {
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                 "SELECT COUNT(*) FROM users WHERE username = ?"
+             )) {
+            
+            stmt.setString(1, username);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+            
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

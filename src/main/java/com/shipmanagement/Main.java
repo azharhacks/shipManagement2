@@ -141,6 +141,99 @@ public class Main {
                 }
             });
             
+            // Signup endpoint
+            post("/api/signup", (req, res) -> {
+                System.out.println("Signup attempt received");
+                System.out.println("Request body: " + req.body());
+                
+                try {
+                    // Parse request body
+                    JsonObject json = JsonParser.parseString(req.body()).getAsJsonObject();
+                    String username = json.get("username").getAsString();
+                    String password = json.get("password").getAsString();
+                    String role = json.has("role") ? json.get("role").getAsString() : "staff";
+                    
+                    // Validate input
+                    if (username == null || username.trim().isEmpty()) {
+                        res.status(400);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Username is required"
+                        ));
+                    }
+                    
+                    if (username.length() < 3) {
+                        res.status(400);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Username must be at least 3 characters"
+                        ));
+                    }
+                    
+                    if (password == null || password.trim().isEmpty()) {
+                        res.status(400);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Password is required"
+                        ));
+                    }
+                    
+                    if (password.length() < 6) {
+                        res.status(400);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Password must be at least 6 characters"
+                        ));
+                    }
+                    
+                    // Validate role (only allow admin or staff)
+                    if (!"admin".equals(role) && !"staff".equals(role)) {
+                        role = "staff"; // Default to staff if invalid role
+                    }
+                    
+                    // Check if username already exists
+                    if (DatabaseConnection.usernameExists(username)) {
+                        res.status(400);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Username already exists"
+                        ));
+                    }
+                    
+                    // Create user
+                    boolean success = DatabaseConnection.createUser(username, password, role);
+                    
+                    if (success) {
+                        return gson.toJson(Map.of(
+                            "status", "success",
+                            "message", "User registered successfully"
+                        ));
+                    } else {
+                        res.status(500);
+                        return gson.toJson(Map.of(
+                            "status", "error",
+                            "message", "Failed to create user"
+                        ));
+                    }
+                } catch (JsonSyntaxException e) {
+                    System.err.println("JSON parsing error: " + e.getMessage());
+                    e.printStackTrace();
+                    res.status(400);
+                    return gson.toJson(Map.of(
+                        "status", "error",
+                        "message", "Invalid JSON format"
+                    ));
+                } catch (Exception e) {
+                    System.err.println("Signup error: " + e.getMessage());
+                    e.printStackTrace();
+                    res.status(500);
+                    return gson.toJson(Map.of(
+                        "status", "error",
+                        "message", "An error occurred during signup: " + e.getMessage()
+                    ));
+                }
+            });
+            
             // Password change endpoint
             post("/api/change-password", (req, res) -> {
                 try {
