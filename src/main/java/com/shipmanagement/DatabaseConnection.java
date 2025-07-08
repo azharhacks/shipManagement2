@@ -20,6 +20,9 @@ import com.shipmanagement.model.User;
 public class DatabaseConnection {
     private static SQLiteDataSource dataSource;
     
+    // Add a test connection field for unit testing
+    private static Connection testConnection = null;
+    
     static {
         try {
             // Configure SQLite
@@ -41,7 +44,21 @@ public class DatabaseConnection {
     }
     
     public static Connection getConnection() throws SQLException {
+        // If a test connection is set, return it instead of a real connection
+        if (testConnection != null) {
+            return testConnection;
+        }
         return dataSource.getConnection();
+    }
+    
+    // Method to set a test connection for unit tests
+    public static void setTestConnection(Connection connection) {
+        testConnection = connection;
+    }
+    
+    // Method to reset the test connection
+    public static void resetTestConnection() {
+        testConnection = null;
     }
     
     private static void initializeDatabase() {
@@ -104,6 +121,13 @@ public class DatabaseConnection {
                 "ship_id INTEGER, " +
                 "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                 "FOREIGN KEY (ship_id) REFERENCES ships(id) ON DELETE SET NULL)");
+                
+            // Create cargo table
+            stmt.execute("CREATE TABLE IF NOT EXISTS cargo (" +
+                "cargo_id TEXT PRIMARY KEY, " +
+                "owner_name TEXT, " +
+                "capacity REAL, " +
+                "used_capacity REAL DEFAULT 0)");
                 
             // Create ship_locations table
             stmt.execute("CREATE TABLE IF NOT EXISTS ship_locations (" +

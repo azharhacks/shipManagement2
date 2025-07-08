@@ -1,6 +1,8 @@
 package com.shipmanagement;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +41,11 @@ public class Cargo {
             pstmt.setDouble(3, capacity);
             pstmt.setDouble(4, usedCapacity);
             pstmt.executeUpdate();
+            
+            // Explicitly commit the transaction if auto-commit is disabled
+            if (!conn.getAutoCommit()) {
+                conn.commit();
+            }
         } catch (SQLException e) {
             System.err.println("Error saving cargo: " + e.getMessage());
             e.printStackTrace();
@@ -92,6 +99,11 @@ public class Cargo {
             pstmt.setDouble(1, usedCapacity);
             pstmt.setString(2, cargoId);
             pstmt.executeUpdate();
+            
+            // Explicitly commit the transaction if auto-commit is disabled
+            if (!conn.getAutoCommit()) {
+                conn.commit();
+            }
         } catch (SQLException e) {
             System.err.println("Error updating cargo: " + e.getMessage());
             e.printStackTrace();
